@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Observatory · Astronomical Twilight</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  width: 100%; height: 100vh;
+  background: #02010a;
+  display: flex; align-items: center; justify-content: center;
+  overflow: hidden;
+}
+svg { width: 100%; height: 100%; }
+
+.star-a { animation: twinkle-a 3.2s ease-in-out infinite; }
+.star-b { animation: twinkle-b 4.7s ease-in-out infinite; }
+.star-c { animation: twinkle-c 2.8s ease-in-out infinite; }
+.star-d { animation: twinkle-d 5.5s ease-in-out infinite; }
+.star-e { animation: twinkle-a 6.1s ease-in-out infinite; }
+
+@keyframes twinkle-a { 0%,100%{opacity:1}    50%{opacity:0.25} }
+@keyframes twinkle-b { 0%,100%{opacity:0.55} 30%{opacity:1}    70%{opacity:0.15} }
+@keyframes twinkle-c { 0%,100%{opacity:0.8}  45%{opacity:0.1} }
+@keyframes twinkle-d { 0%,100%{opacity:0.4}  60%{opacity:0.95} }
+
+.sea-glimmer { animation: sea-glimmer 7s ease-in-out infinite; }
+@keyframes sea-glimmer { 0%,100%{opacity:0.55} 50%{opacity:0.85} }
+
+.obs-pulse { animation: obs-pulse 9s ease-in-out infinite; }
+@keyframes obs-pulse { 0%,100%{opacity:0.88} 50%{opacity:1} }
+
+.beacon { animation: beacon 2.8s ease-in-out infinite; }
+@keyframes beacon { 0%,100%{opacity:0.8} 50%{opacity:0.1} }
+
+.far-light { animation: far-light 4.2s ease-in-out infinite; }
+@keyframes far-light { 0%,100%{opacity:0.5} 50%{opacity:0.15} }
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750"
+     preserveAspectRatio="xMidYMid slice">
+<defs>
+
+  <!-- SKY: deep indigo at zenith, bleeding into rose-amber at horizon -->
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#030110"/>
+    <stop offset="12%"  stop-color="#070422"/>
+    <stop offset="25%"  stop-color="#0e0838"/>
+    <stop offset="38%"  stop-color="#1c0e50"/>
+    <stop offset="50%"  stop-color="#2c1358"/>
+    <stop offset="62%"  stop-color="#451852"/>
+    <stop offset="72%"  stop-color="#621c40"/>
+    <stop offset="82%"  stop-color="#8c2022"/>
+    <stop offset="91%"  stop-color="#b83a14"/>
+    <stop offset="97%"  stop-color="#d05210"/>
+    <stop offset="100%" stop-color="#dc6010"/>
+  </linearGradient>
+
+  <!-- SEA: amber-dark near horizon, deep void at bottom -->
+  <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#2e1a0a"/>
+    <stop offset="8%"   stop-color="#1e1008"/>
+    <stop offset="22%"  stop-color="#100c18"/>
+    <stop offset="50%"  stop-color="#080a1c"/>
+    <stop offset="100%" stop-color="#040610"/>
+  </linearGradient>
+
+  <!-- HORIZON GLOW: where sun just set -->
+  <radialGradient id="hglow" cx="47%" cy="100%" r="65%">
+    <stop offset="0%"   stop-color="#e85810" stop-opacity="0.9"/>
+    <stop offset="18%"  stop-color="#c03818" stop-opacity="0.65"/>
+    <stop offset="42%"  stop-color="#801818" stop-opacity="0.32"/>
+    <stop offset="75%"  stop-color="#380808" stop-opacity="0.1"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </radialGradient>
+
+  <!-- SEA REFLECTION of sunset -->
+  <radialGradient id="sreflect" cx="44%" cy="5%" r="65%">
+    <stop offset="0%"   stop-color="#c85010" stop-opacity="0.85"/>
+    <stop offset="22%"  stop-color="#842808" stop-opacity="0.5"/>
+    <stop offset="55%"  stop-color="#401408" stop-opacity="0.22"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </radialGradient>
+
+  <!-- MILKY WAY: faint diagonal band -->
+  <linearGradient id="mw" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%"   stop-color="transparent"/>
+    <stop offset="25%"  stop-color="#9898c0" stop-opacity="0.055"/>
+    <stop offset="50%"  stop-color="#c0c0e0" stop-opacity="0.09"/>
+    <stop offset="75%"  stop-color="#9898c0" stop-opacity="0.05"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </linearGradient>
+
+  <!-- OBSERVATORY WINDOW GLOW cast on cliff -->
+  <radialGradient id="winglow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%"   stop-color="#f8c030" stop-opacity="0.95"/>
+    <stop offset="35%"  stop-color="#e09020" stop-opacity="0.55"/>
+    <stop offset="70%"  stop-color="#c06010" stop-opacity="0.2"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </radialGradient>
+
+  <!-- CLIFF LEFT FACE: warm light catching sunset -->
+  <linearGradient id="cliffleft" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="#5a280a" stop-opacity="0.7"/>
+    <stop offset="50%"  stop-color="#381408" stop-opacity="0.3"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </linearGradient>
+
+  <!-- VIGNETTE: darken edges -->
+  <radialGradient id="vig" cx="50%" cy="50%" r="75%">
+    <stop offset="0%"   stop-color="transparent"/>
+    <stop offset="100%" stop-color="#02010a" stop-opacity="0.65"/>
+  </radialGradient>
+
+  <!-- Filters -->
+  <filter id="fsm">  <feGaussianBlur stdDeviation="2.5"/></filter>
+  <filter id="fmd">  <feGaussianBlur stdDeviation="7"/></filter>
+  <filter id="flg">  <feGaussianBlur stdDeviation="20"/></filter>
+  <filter id="fxl">  <feGaussianBlur stdDeviation="40"/></filter>
+  <filter id="fstar">
+    <feGaussianBlur stdDeviation="1.2" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+
+</defs>
+
+<!-- ═══════════════════ SKY ═══════════════════ -->
+<rect width="1200" height="750" fill="url(#sky)"/>
+
+<!-- Horizon afterglow -->
+<ellipse cx="565" cy="415" rx="720" ry="195" fill="url(#hglow)" filter="url(#fmd)"/>
+
+<!-- Milky Way diagonal band -->
+<rect x="-300" y="-200" width="1800" height="420"
+      fill="url(#mw)" transform="rotate(-26 600 200)"
+      filter="url(#flg)" opacity="0.9"/>
+
+<!-- ═══════════════════ STARS ═══════════════════ -->
+<!-- Bright foreground stars with glow -->
+<g filter="url(#fstar)">
+  <circle class="star-a" cx="105"  cy="45"  r="1.9" fill="#fff"     opacity="0.95"/>
+  <circle class="star-b" cx="252"  cy="30"  r="1.5" fill="#e8e8ff"  opacity="0.9"/>
+  <circle class="star-c" cx="388"  cy="62"  r="2.3" fill="#fff"     opacity="0.92"/>
+  <circle class="star-d" cx="522"  cy="26"  r="1.7" fill="#fff"     opacity="0.88"/>
+  <circle class="star-a" cx="668"  cy="40"  r="2.0" fill="#cce4ff"  opacity="0.9"/>
+  <circle class="star-b" cx="798"  cy="20"  r="2.6" fill="#fff"     opacity="0.97"/> <!-- bright -->
+  <circle class="star-c" cx="934"  cy="52"  r="1.6" fill="#e0e0ff"  opacity="0.82"/>
+  <circle class="star-d" cx="1062" cy="35"  r="1.9" fill="#fff"     opacity="0.9"/>
+  <circle class="star-a" cx="1148" cy="68"  r="1.5" fill="#e8e8ff"  opacity="0.87"/>
+  <!-- Venus — brilliant, near horizon left -->
+  <circle class="star-e" cx="408"  cy="295" r="3.2" fill="#fff8e0"  opacity="1"/>
+  <!-- A nice blue star -->
+  <circle class="star-b" cx="620"  cy="118" r="2.1" fill="#aaccff"  opacity="0.9"/>
+</g>
+
+<!-- Mid stars -->
+<g opacity="0.72">
+  <circle class="star-c" cx="62"   cy="80"  r="1.2" fill="#d8d8ff"/>
+  <circle class="star-a" cx="148"  cy="115" r="1.0" fill="#ffffff"/>
+  <circle class="star-d" cx="195"  cy="72"  r="1.1" fill="#e0d8ff"/>
+  <circle class="star-b" cx="312"  cy="92"  r="1.3" fill="#ffffff"/>
+  <circle class="star-c" cx="355"  cy="138" r="0.9" fill="#c8d8ff"/>
+  <circle class="star-a" cx="428"  cy="85"  r="1.2" fill="#ffffff"/>
+  <circle class="star-d" cx="482"  cy="148" r="1.0" fill="#e8e8ff"/>
+  <circle class="star-b" cx="558"  cy="70"  r="1.1" fill="#ffffff"/>
+  <circle class="star-c" cx="602"  cy="130" r="1.3" fill="#ddeeff"/>
+  <circle class="star-a" cx="645"  cy="82"  r="0.9" fill="#ffffff"/>
+  <circle class="star-d" cx="712"  cy="58"  r="1.2" fill="#e0e8ff"/>
+  <circle class="star-b" cx="748"  cy="105" r="1.0" fill="#ffffff"/>
+  <circle class="star-c" cx="842"  cy="75"  r="1.1" fill="#f0f0ff"/>
+  <circle class="star-a" cx="878"  cy="40"  r="1.4" fill="#ffffff"/>
+  <circle class="star-d" cx="972"  cy="88"  r="1.0" fill="#e8f0ff"/>
+  <circle class="star-b" cx="1018" cy="58"  r="1.3" fill="#ffffff"/>
+  <circle class="star-c" cx="1085" cy="102" r="1.1" fill="#d8e8ff"/>
+  <circle class="star-a" cx="1152" cy="42"  r="1.0" fill="#ffffff"/>
+  <circle class="star-d" cx="1188" cy="108" r="1.2" fill="#e0e0ff"/>
+</g>
+
+<!-- Faint stars — the multitude -->
+<g opacity="0.42">
+  <circle cx="44"   cy="50"  r="0.7" fill="#fff"/>   <circle cx="88"   cy="142" r="0.8" fill="#e8e8ff"/>
+  <circle cx="132"  cy="162" r="0.6" fill="#fff"/>   <circle cx="172"  cy="212" r="0.7" fill="#d8d8ff"/>
+  <circle cx="215"  cy="132" r="0.8" fill="#fff"/>   <circle cx="265"  cy="182" r="0.6" fill="#e0e0ff"/>
+  <circle cx="292"  cy="50"  r="0.7" fill="#fff"/>   <circle cx="330"  cy="228" r="0.8" fill="#d8d8ff"/>
+  <circle cx="362"  cy="172" r="0.6" fill="#fff"/>   <circle cx="405"  cy="218" r="0.7" fill="#e8e8ff"/>
+  <circle cx="445"  cy="160" r="0.8" fill="#fff"/>   <circle cx="468"  cy="46"  r="0.6" fill="#d0d8ff"/>
+  <circle cx="502"  cy="195" r="0.7" fill="#fff"/>   <circle cx="542"  cy="160" r="0.8" fill="#e8e8ff"/>
+  <circle cx="575"  cy="222" r="0.6" fill="#fff"/>   <circle cx="615"  cy="165" r="0.7" fill="#d8d8ff"/>
+  <circle cx="655"  cy="202" r="0.8" fill="#fff"/>   <circle cx="682"  cy="130" r="0.6" fill="#e0e8ff"/>
+  <circle cx="716"  cy="162" r="0.7" fill="#fff"/>   <circle cx="750"  cy="80"  r="0.8" fill="#e8e8ff"/>
+  <circle cx="775"  cy="195" r="0.6" fill="#fff"/>   <circle cx="812"  cy="145" r="0.7" fill="#d8d8ff"/>
+  <circle cx="848"  cy="185" r="0.8" fill="#fff"/>   <circle cx="905"  cy="125" r="0.6" fill="#e0e0ff"/>
+  <circle cx="940"  cy="160" r="0.7" fill="#fff"/>   <circle cx="978"  cy="42"  r="0.8" fill="#e8e8ff"/>
+  <circle cx="1008" cy="145" r="0.6" fill="#fff"/>   <circle cx="1042" cy="180" r="0.7" fill="#d0d8ff"/>
+  <circle cx="1072" cy="75"  r="0.8" fill="#fff"/>   <circle cx="1108" cy="132" r="0.6" fill="#e8e8ff"/>
+  <circle cx="1125" cy="165" r="0.7" fill="#fff"/>   <circle cx="1162" cy="90"  r="0.8" fill="#d8d8ff"/>
+  <circle cx="1188" cy="152" r="0.6" fill="#fff"/>
+  <!-- Sparse atmospheric stars near horizon (more haze, less visible) -->
+  <circle cx="92"   cy="252" r="0.7" fill="#fff" opacity="0.5"/>
+  <circle cx="188"  cy="268" r="0.6" fill="#e8e8ff" opacity="0.4"/>
+  <circle cx="285"  cy="262" r="0.7" fill="#fff" opacity="0.45"/>
+  <circle cx="492"  cy="255" r="0.6" fill="#d8d8ff" opacity="0.38"/>
+  <circle cx="625"  cy="275" r="0.7" fill="#fff" opacity="0.32"/>
+  <circle cx="730"  cy="252" r="0.6" fill="#e0e0ff" opacity="0.38"/>
+  <circle cx="885"  cy="265" r="0.7" fill="#fff" opacity="0.3"/>
+  <circle cx="1042" cy="252" r="0.6" fill="#e8e8ff" opacity="0.38"/>
+  <circle cx="1172" cy="268" r="0.7" fill="#fff" opacity="0.32"/>
+</g>
+
+<!-- ═══════════════════ SEA ═══════════════════ -->
+<rect x="0" y="415" width="1200" height="335" fill="url(#sea)"/>
+
+<!-- Sunset reflection column in the water -->
+<ellipse cx="552" cy="422" rx="510" ry="160" fill="url(#sreflect)" filter="url(#fsm)"/>
+
+<!-- Wave shimmer lines -->
+<g class="sea-glimmer">
+  <line x1="0"   y1="428" x2="1200" y2="426" stroke="#e8a858" stroke-width="1.0" opacity="0.22"/>
+  <line x1="0"   y1="444" x2="1200" y2="446" stroke="#c88040" stroke-width="0.7" opacity="0.16"/>
+  <line x1="40"  y1="462" x2="1160" y2="464" stroke="#b06828" stroke-width="0.6" opacity="0.12"/>
+  <line x1="0"   y1="480" x2="850"  y2="478" stroke="#986030" stroke-width="0.5" opacity="0.1"/>
+  <line x1="0"   y1="498" x2="720"  y2="500" stroke="#805028" stroke-width="0.4" opacity="0.08"/>
+  <line x1="20"  y1="518" x2="600"  y2="516" stroke="#684020" stroke-width="0.4" opacity="0.07"/>
+</g>
+
+<!-- Reflections of bright stars in sea -->
+<g opacity="0.18" filter="url(#fsm)">
+  <circle cx="105"  cy="472" r="1.8" fill="#a0a0c8"/>
+  <circle cx="388"  cy="455" r="2.0" fill="#ffffff"/>
+  <circle cx="668"  cy="462" r="1.8" fill="#c8d8ff"/>
+  <circle cx="798"  cy="448" r="2.4" fill="#ffffff"/>
+  <circle cx="1062" cy="458" r="1.7" fill="#a0a8d0"/>
+  <circle cx="408"  cy="485" r="2.8" fill="#f0e8c0"/> <!-- Venus reflection -->
+</g>
+
+<!-- ═══════════════════ DISTANT HEADLANDS (atmosphere, depth) ═══════════════════ -->
+<!-- Furthest headland — barely visible, blue-grey fog -->
+<path d="M 0,415 C 40,405 85,396 132,390 C 178,384 218,382 252,384
+         C 280,386 302,390 318,398 C 328,404 334,410 338,415 Z"
+     fill="#181030" opacity="0.5" filter="url(#fsm)"/>
+
+<!-- Second headland layer -->
+<path d="M 300,415 C 345,407 395,400 448,397 C 500,394 538,395 565,400
+         C 580,404 588,410 592,415 Z"
+     fill="#140e28" opacity="0.38" filter="url(#fsm)"/>
+
+<!-- Lighthouse on far headland — just a suggestion, a light -->
+<rect x="178" y="370" width="7" height="14" fill="#22183c" opacity="0.55" filter="url(#fsm)"/>
+<circle cx="182" cy="368" r="3" fill="#f8e898" opacity="0.48"
+        filter="url(#fsm)" class="far-light"/>
+
+<!-- ═══════════════════ LEFT CLIFF (foreground left) ═══════════════════ -->
+<path d="M 0,750 L 0,308
+         C 24,295 52,282 82,274
+         C 112,266 142,262 168,260
+         C 194,258 218,259 238,264
+         C 255,268 268,274 276,282
+         C 288,296 293,314 295,338
+         C 297,360 297,385 296,415
+         L 0,415 Z"
+     fill="#0b0716"/>
+
+<!-- Warm face of left cliff (catches sunset) -->
+<path d="M 296,415 C 297,385 297,360 295,338 C 293,314 288,296 276,282
+         C 268,274 255,268 238,264
+         L 242,265 C 258,270 270,277 278,286
+         C 292,302 296,322 298,345
+         C 300,368 300,392 299,415 Z"
+     fill="#5a2810" opacity="0.22"/>
+
+<!-- ═══════════════════ MAIN CLIFF (right, observatory cliff) ═══════════════════ -->
+<path d="M 1200,750 L 1200,118
+         C 1162,130 1122,146 1082,164
+         C 1042,182 1005,199 970,211
+         C 945,220 920,225 902,227
+         L 836,227
+         C 820,229 806,233 793,240
+         C 780,247 766,258 750,272
+         C 732,288 713,308 693,332
+         C 673,356 652,382 635,408
+         C 633,411 632,414 630,415
+         L 1200,415 Z"
+     fill="#09051a"/>
+
+<!-- Cliff warm face (vertical ocean-facing surface catches last light) -->
+<path d="M 630,415 C 632,414 633,411 635,408 C 652,382 673,356 693,332
+         C 713,308 732,288 750,272 C 766,258 780,247 793,240
+         L 796,240 C 782,249 768,261 751,276
+         C 732,294 712,315 691,340
+         C 671,365 650,391 634,415 Z"
+     fill="#6c3018" opacity="0.28"/>
+
+<!-- Cliff rock strata — very subtle layering -->
+<g opacity="0.1" stroke="#261838" stroke-width="1.5" fill="none">
+  <path d="M 755,278 C 772,292 786,308 796,326"/>
+  <path d="M 775,265 C 793,280 808,298 818,318"/>
+  <path d="M 836,229 C 828,248 818,266 804,282"/>
+  <path d="M 870,228 C 875,248 882,268 892,286"/>
+  <path d="M 910,227 C 918,245 928,264 940,280"/>
+</g>
+
+<!-- ═══════════════════ STONE PATH ═══════════════════ -->
+<!-- Main path surface -->
+<path d="M 300,412
+         C 328,406 362,398 398,389
+         C 434,380 465,372 498,362
+         C 532,352 562,342 592,330
+         C 622,318 650,307 676,296
+         C 700,286 722,276 742,266
+         C 762,256 778,248 792,241
+         C 805,235 816,231 825,229"
+     stroke="#30243a" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.92"/>
+
+<!-- Path highlight (upper edge catches faint light) -->
+<path d="M 300,412
+         C 328,406 362,398 398,389
+         C 434,380 465,372 498,362
+         C 532,352 562,342 592,330
+         C 622,318 650,307 676,296
+         C 700,286 722,276 742,266
+         C 762,256 778,248 792,241
+         C 805,235 816,231 825,229"
+     stroke="#584860" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.4"/>
+
+<!-- Path warm-tinted (where sunset light grazes it) -->
+<path d="M 620,330 C 650,318 678,307 704,296 C 728,286 750,276 770,265 C 790,254 806,245 818,237"
+     stroke="#8a4828" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.18"/>
+
+<!-- ═══════════════════ THE FIGURE ═══════════════════ -->
+<!-- A person standing at the cliff edge, alone, looking out -->
+<g fill="#06030e">
+  <circle cx="788" cy="216" r="5.8"/>          <!-- head -->
+  <rect   x="784"  y="221" width="8"  height="16" rx="2"/>  <!-- body -->
+  <rect   x="782"  y="235" width="4"  height="11" rx="1.5"/> <!-- left leg -->
+  <rect   x="788"  y="235" width="4"  height="11" rx="1.5"/> <!-- right leg -->
+</g>
+<!-- Rim light on figure from sunset (right-facing edge) -->
+<g fill="#7a3412" opacity="0.45">
+  <circle cx="791" cy="216" r="5"/>
+  <rect   x="789"  y="221" width="3" height="16" rx="2"/>
+</g>
+<!-- Figure hat (just a slight widening at head top) -->
+<rect x="783" y="211" width="11" height="4" rx="2" fill="#06030e"/>
+<rect x="787" y="208" width="5"  height="5" rx="1" fill="#06030e"/>
+
+<!-- ═══════════════════ OBSERVATORY ═══════════════════ -->
+<!-- Window glow on cliff face — cast light, the soul of the scene -->
+<ellipse cx="872" cy="213" rx="62" ry="44"
+         fill="url(#winglow)" filter="url(#flg)" class="obs-pulse" opacity="0.75"/>
+
+<!-- Observatory platform/base -->
+<rect x="840" y="221" width="74" height="10" rx="3" fill="#1a1232"/>
+<rect x="843" y="224" width="68" height="7"  rx="2" fill="#150e28"
+     stroke="#261c42" stroke-width="1"/>
+
+<!-- Observatory building — dressed stone -->
+<rect x="847" y="175" width="62" height="48" fill="#15102a"/>
+<rect x="847" y="175" width="62" height="48" fill="none"
+     stroke="#221840" stroke-width="1.2"/>
+
+<!-- Stone courses (horizontal lines suggesting masonry) -->
+<g stroke="#1e1638" stroke-width="0.9" opacity="0.85">
+  <line x1="847" y1="190" x2="909" y2="190"/>
+  <line x1="847" y1="202" x2="909" y2="202"/>
+  <line x1="847" y1="214" x2="909" y2="214"/>
+</g>
+
+<!-- Arched doorway (dark, recessed) -->
+<path d="M 871,223 L 871,208 A 7,8 0 0 1 885,208 L 885,223 Z" fill="#0a0618"/>
+<path d="M 871,208 A 7,8 0 0 1 885,208" stroke="#1e1638" stroke-width="1" fill="none"/>
+
+<!-- LIT WINDOWS — the thing that makes you yearn -->
+<!-- Left window -->
+<rect x="853" y="183" width="13" height="12" rx="1" fill="#f8c838" class="obs-pulse" opacity="0.95"/>
+<line x1="853" y1="189" x2="866" y2="189" stroke="#b88018" stroke-width="1"/>
+<line x1="859" y1="183" x2="859" y2="195" stroke="#b88018" stroke-width="1"/>
+<!-- Right window -->
+<rect x="871" y="183" width="13" height="12" rx="1" fill="#f0b820" class="obs-pulse" opacity="0.9"/>
+<line x1="871" y1="189" x2="884" y2="189" stroke="#b07818" stroke-width="1"/>
+<line x1="877" y1="183" x2="877" y2="195" stroke="#b07818" stroke-width="1"/>
+<!-- Warm light cast below windows (spill on wall) -->
+<rect x="848" y="195" width="62" height="12"
+     fill="#c87820" opacity="0.1" filter="url(#fsm)"/>
+
+<!-- Dome base ring -->
+<rect x="842" y="170" width="72" height="9" rx="4.5" fill="#1e1848"/>
+<rect x="842" y="170" width="72" height="9" rx="4.5" fill="none"
+     stroke="#2c2460" stroke-width="1.2"/>
+
+<!-- Dome exterior structure -->
+<path d="M 842,175 A 36,36 0 0 1 914,175" fill="#141030" stroke="#24205a" stroke-width="2.2"/>
+
+<!-- Dome interior (darker — the open night sky inside) -->
+<path d="M 842,175 A 36,36 0 0 1 914,175 L 878,140 Z" fill="#0a0818"/>
+
+<!-- Dome observation slot (the opening, dark rectangle) -->
+<rect x="864" y="140" width="20" height="38" fill="#070514"/>
+
+<!-- Telescope tube (angled ~25° from vertical) -->
+<line x1="878" y1="174" x2="869" y2="146"
+      stroke="#35306a" stroke-width="6" stroke-linecap="round"/>
+<line x1="878" y1="174" x2="869" y2="146"
+      stroke="#4a4488" stroke-width="3.5" stroke-linecap="round"/>
+<!-- Objective lens end (slightly wider) -->
+<ellipse cx="869" cy="145" rx="5" ry="3.5" fill="#2a2858" stroke="#3c388a" stroke-width="1"/>
+
+<!-- Dome exterior highlight (catches last of western sky) -->
+<path d="M 842,175 A 36,36 0 0 1 862,144"
+     stroke="#383068" stroke-width="2.5" fill="none" opacity="0.7"/>
+<path d="M 842,175 A 36,36 0 0 1 858,150"
+     stroke="#7a4022" stroke-width="2" fill="none" opacity="0.28"/>
+
+<!-- Small vent / details on building roofline -->
+<rect x="896" y="168" width="9" height="7" rx="1.5" fill="#1c1848"/>
+<rect x="847" y="169" width="7" height="5" rx="1" fill="#1a1640"/>
+
+<!-- Red aviation beacon on dome tip -->
+<circle cx="878" cy="139" r="3" fill="#ff4422" filter="url(#fsm)">
+  <animate attributeName="opacity" values="0.8;0.08;0.8" dur="2.8s" repeatCount="indefinite"/>
+</circle>
+<!-- Tiny halo for beacon -->
+<circle cx="878" cy="139" r="7" fill="#ff4422" opacity="0.15" filter="url(#fmd)">
+  <animate attributeName="opacity" values="0.15;0.02;0.15" dur="2.8s" repeatCount="indefinite"/>
+</circle>
+
+<!-- ═══════════════════ ATMOSPHERE ═══════════════════ -->
+<!-- Thin mist at sea horizon -->
+<rect x="0" y="408" width="1200" height="18"
+     fill="#c8a882" opacity="0.04" filter="url(#fsm)"/>
+<rect x="0" y="412" width="1200" height="10"
+     fill="#d0b890" opacity="0.03"/>
+
+<!-- Subtle atmospheric glow around figure (tiny, gentle) -->
+<circle cx="788" cy="228" r="25" fill="#2a1848" opacity="0.12" filter="url(#fsm)"/>
+
+<!-- Vignette: edges darken, focus drawn to center -->
+<rect width="1200" height="750" fill="url(#vig)"/>
+
+<!-- Ultra-subtle color grade overlay (cinematic warmth in lower third) -->
+<rect x="0" y="500" width="1200" height="250" fill="#180a04" opacity="0.06"/>
+
+</svg>
+</body>
+</html>

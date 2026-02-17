@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Tokyo · 2am Rain</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100vh; background: #03020a; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+svg { width: 100%; height: 100%; }
+
+.rain { animation: rain-fall 0.6s linear infinite; }
+.rain-slow { animation: rain-fall 0.9s linear infinite; }
+.rain-fast { animation: rain-fall 0.4s linear infinite; }
+
+@keyframes rain-fall {
+  0%   { transform: translateY(-60px); opacity: 0; }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.7; }
+  100% { transform: translateY(820px); opacity: 0; }
+}
+
+.neon-flicker-r { animation: flicker-r 8s ease-in-out infinite; }
+.neon-flicker-b { animation: flicker-b 11s ease-in-out infinite; }
+.neon-flicker-g { animation: flicker-g 7s ease-in-out infinite; }
+@keyframes flicker-r {
+  0%,100%{opacity:1} 92%{opacity:1} 93%{opacity:0.2} 94%{opacity:1} 96%{opacity:0.4} 97%{opacity:1}
+}
+@keyframes flicker-b {
+  0%,100%{opacity:0.9} 44%{opacity:0.9} 45%{opacity:0.1} 46%{opacity:0.9} 80%{opacity:0.9} 81%{opacity:0.3} 82%{opacity:0.9}
+}
+@keyframes flicker-g {
+  0%,100%{opacity:0.85} 72%{opacity:0.85} 73%{opacity:0} 74%{opacity:0.85}
+}
+
+.steam { animation: steam-rise 4s ease-out infinite; }
+@keyframes steam-rise {
+  0%   { opacity: 0; transform: translateY(0) scale(1); }
+  20%  { opacity: 0.18; }
+  80%  { opacity: 0.06; }
+  100% { opacity: 0; transform: translateY(-70px) scale(2.5); }
+}
+
+.umbrella-bob { animation: umbrella-walk 2.4s ease-in-out infinite; }
+@keyframes umbrella-walk {
+  0%,100% { transform: translateY(0); }
+  50%     { transform: translateY(-3px); }
+}
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 750"
+     preserveAspectRatio="xMidYMid slice">
+<defs>
+
+  <!-- Night sky above buildings -->
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#04030e"/>
+    <stop offset="40%"  stop-color="#06040f"/>
+    <stop offset="80%"  stop-color="#0a0618"/>
+    <stop offset="100%" stop-color="#0e0820"/>
+  </linearGradient>
+
+  <!-- Wet pavement -->
+  <linearGradient id="ground" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#0c0c18"/>
+    <stop offset="30%"  stop-color="#090a14"/>
+    <stop offset="100%" stop-color="#06080e"/>
+  </linearGradient>
+
+  <!-- Red neon reflection in puddles -->
+  <radialGradient id="red-puddle" cx="50%" cy="0%" r="80%">
+    <stop offset="0%"   stop-color="#ff1a2e" stop-opacity="0.55"/>
+    <stop offset="40%"  stop-color="#cc0820" stop-opacity="0.25"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </radialGradient>
+
+  <!-- Blue neon reflection -->
+  <radialGradient id="blue-puddle" cx="50%" cy="0%" r="80%">
+    <stop offset="0%"   stop-color="#0088ff" stop-opacity="0.45"/>
+    <stop offset="40%"  stop-color="#0044cc" stop-opacity="0.2"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </radialGradient>
+
+  <!-- Green/teal neon reflection -->
+  <radialGradient id="teal-puddle" cx="50%" cy="0%" r="80%">
+    <stop offset="0%"   stop-color="#00e8a8" stop-opacity="0.4"/>
+    <stop offset="40%"  stop-color="#00aa78" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </radialGradient>
+
+  <!-- Alley depth fog -->
+  <linearGradient id="depth-fog" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="#080618" stop-opacity="0.8"/>
+    <stop offset="30%"  stop-color="transparent"/>
+    <stop offset="70%"  stop-color="transparent"/>
+    <stop offset="100%" stop-color="#080618" stop-opacity="0.8"/>
+  </linearGradient>
+
+  <!-- Street lamp cone -->
+  <radialGradient id="lamp-cone" cx="50%" cy="0%" r="100%">
+    <stop offset="0%"   stop-color="#f8f0d0" stop-opacity="0.5"/>
+    <stop offset="40%"  stop-color="#e8d890" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </radialGradient>
+
+  <!-- Vignette -->
+  <radialGradient id="vig" cx="50%" cy="50%" r="70%">
+    <stop offset="0%"   stop-color="transparent"/>
+    <stop offset="100%" stop-color="#03020a" stop-opacity="0.72"/>
+  </radialGradient>
+
+  <filter id="fsm"> <feGaussianBlur stdDeviation="2"/> </filter>
+  <filter id="fmd"> <feGaussianBlur stdDeviation="6"/> </filter>
+  <filter id="flg"> <feGaussianBlur stdDeviation="16"/> </filter>
+  <filter id="fxl"> <feGaussianBlur stdDeviation="32"/> </filter>
+
+  <!-- Rain streak filter -->
+  <filter id="rain-blur">
+    <feGaussianBlur stdDeviation="0.4 0"/>
+  </filter>
+
+</defs>
+
+<!-- ═══════════════════ SKY (narrow strip above buildings) ═══════════════════ -->
+<rect width="1200" height="750" fill="url(#sky)"/>
+
+<!-- Low cloud glow from city light below -->
+<ellipse cx="600" cy="180" rx="900" ry="250" fill="#1a0818" opacity="0.6" filter="url(#fxl)"/>
+<ellipse cx="320" cy="140" rx="400" ry="180" fill="#200608" opacity="0.4" filter="url(#fxl)"/>
+<ellipse cx="880" cy="120" rx="380" ry="160" fill="#08101e" opacity="0.5" filter="url(#fxl)"/>
+
+<!-- ═══════════════════ BACKGROUND BUILDINGS (far, dark) ═══════════════════ -->
+<!-- Far distant buildings — just silhouettes with scattered lit windows -->
+<g fill="#080612" opacity="0.9">
+  <rect x="0"    y="80"  width="55"  height="300"/>
+  <rect x="50"   y="120" width="70"  height="260"/>
+  <rect x="115"  y="60"  width="45"  height="320"/>
+  <rect x="155"  y="95"  width="80"  height="285"/>
+  <rect x="230"  y="70"  width="60"  height="310"/>
+  <rect x="280"  y="110" width="90"  height="270"/>
+  <rect x="350"  y="50"  width="55"  height="330"/>
+  <rect x="400"  y="85"  width="75"  height="295"/>
+  <rect x="465"  y="65"  width="65"  height="315"/>
+  <rect x="525"  y="100" width="85"  height="280"/>
+  <rect x="605"  y="55"  width="60"  height="325"/>
+  <rect x="660"  y="90"  width="70"  height="290"/>
+  <rect x="728"  y="72"  width="55"  height="308"/>
+  <rect x="778"  y="108" width="80"  height="272"/>
+  <rect x="852"  y="62"  width="65"  height="318"/>
+  <rect x="912"  y="88"  width="90"  height="292"/>
+  <rect x="998"  y="78"  width="55"  height="302"/>
+  <rect x="1048" y="115" width="75"  height="265"/>
+  <rect x="1120" y="68"  width="80"  height="312"/>
+</g>
+
+<!-- Distant building windows (tiny, cold) -->
+<g opacity="0.35">
+  <!-- Scattered warm windows in the dark towers -->
+  <rect x="58"  y="130" width="5" height="4" fill="#e8d898"/>
+  <rect x="68"  y="148" width="5" height="4" fill="#d8c888"/>
+  <rect x="120" y="78"  width="4" height="4" fill="#e8e0a8"/>
+  <rect x="130" y="98"  width="4" height="4" fill="#f0d898"/>
+  <rect x="165" y="108" width="5" height="4" fill="#e8d898"/>
+  <rect x="178" y="125" width="5" height="4" fill="#d8c888"/>
+  <rect x="242" y="85"  width="5" height="4" fill="#e8e0a8"/>
+  <rect x="255" y="100" width="5" height="4" fill="#f0d898"/>
+  <rect x="292" y="120" width="5" height="4" fill="#e8d898"/>
+  <rect x="305" y="138" width="5" height="4" fill="#d8c888"/>
+  <rect x="365" y="62"  width="4" height="4" fill="#e8e0a8"/>
+  <rect x="374" y="80"  width="4" height="4" fill="#f0d898"/>
+  <rect x="415" y="95"  width="5" height="4" fill="#e8d898"/>
+  <rect x="428" y="112" width="5" height="4" fill="#d0e8f8"/>  <!-- blue window -->
+  <rect x="480" y="75"  width="5" height="4" fill="#e8e0a8"/>
+  <rect x="492" y="90"  width="5" height="4" fill="#e8d898"/>
+  <rect x="540" y="112" width="5" height="4" fill="#f0d898"/>
+  <rect x="555" y="128" width="5" height="4" fill="#e8e0a8"/>
+  <rect x="618" y="68"  width="4" height="4" fill="#e8d898"/>
+  <rect x="628" y="85"  width="4" height="4" fill="#d8c888"/>
+  <rect x="672" y="98"  width="5" height="4" fill="#f0e8a8"/>
+  <rect x="684" y="115" width="5" height="4" fill="#e8d898"/>
+  <rect x="738" y="82"  width="5" height="4" fill="#d0e8f8"/>
+  <rect x="750" y="98"  width="5" height="4" fill="#e8e0a8"/>
+  <rect x="792" y="118" width="5" height="4" fill="#e8d898"/>
+  <rect x="805" y="135" width="5" height="4" fill="#f0d898"/>
+  <rect x="865" y="72"  width="4" height="4" fill="#e8e0a8"/>
+  <rect x="875" y="90"  width="4" height="4" fill="#e8d898"/>
+  <rect x="925" y="98"  width="5" height="4" fill="#d0e8f8"/>
+  <rect x="938" y="115" width="5" height="4" fill="#f0d898"/>
+  <rect x="1008" y="88"  width="5" height="4" fill="#e8d898"/>
+  <rect x="1018" y="105" width="5" height="4" fill="#e8e0a8"/>
+  <rect x="1058" y="125" width="5" height="4" fill="#e8d898"/>
+  <rect x="1072" y="142" width="5" height="4" fill="#d8c888"/>
+  <rect x="1128" y="78"  width="5" height="4" fill="#f0d898"/>
+  <rect x="1142" y="96"  width="5" height="4" fill="#e8e0a8"/>
+  <rect x="1158" y="114" width="5" height="4" fill="#e8d898"/>
+</g>
+
+<!-- ═══════════════════ MID BUILDINGS (alley walls) ═══════════════════ -->
+<!-- Left building face — main wall facing us -->
+<rect x="0" y="160" width="270" height="590" fill="#0c0a20"/>
+<!-- Left wall horizontal concrete lines -->
+<g stroke="#100d25" stroke-width="1" opacity="0.8">
+  <line x1="0" y1="190" x2="270" y2="190"/>
+  <line x1="0" y1="220" x2="270" y2="220"/>
+  <line x1="0" y1="250" x2="270" y2="250"/>
+  <line x1="0" y1="280" x2="270" y2="280"/>
+  <line x1="0" y1="310" x2="270" y2="310"/>
+  <line x1="0" y1="340" x2="270" y2="340"/>
+  <line x1="0" y1="370" x2="270" y2="370"/>
+  <line x1="0" y1="400" x2="270" y2="400"/>
+  <line x1="0" y1="430" x2="270" y2="430"/>
+  <line x1="0" y1="460" x2="270" y2="460"/>
+  <line x1="0" y1="490" x2="270" y2="490"/>
+  <line x1="0" y1="520" x2="270" y2="520"/>
+  <line x1="0" y1="550" x2="270" y2="550"/>
+  <line x1="0" y1="580" x2="270" y2="580"/>
+  <line x1="0" y1="610" x2="270" y2="610"/>
+</g>
+
+<!-- Right building face -->
+<rect x="930" y="140" width="270" height="610" fill="#0a0818"/>
+<!-- Right wall lines -->
+<g stroke="#0e0c1e" stroke-width="1" opacity="0.8">
+  <line x1="930" y1="170" x2="1200" y2="170"/>
+  <line x1="930" y1="200" x2="1200" y2="200"/>
+  <line x1="930" y1="230" x2="1200" y2="230"/>
+  <line x1="930" y1="260" x2="1200" y2="260"/>
+  <line x1="930" y1="290" x2="1200" y2="290"/>
+  <line x1="930" y1="320" x2="1200" y2="320"/>
+  <line x1="930" y1="350" x2="1200" y2="350"/>
+  <line x1="930" y1="380" x2="1200" y2="380"/>
+  <line x1="930" y1="410" x2="1200" y2="410"/>
+  <line x1="930" y1="440" x2="1200" y2="440"/>
+  <line x1="930" y1="470" x2="1200" y2="470"/>
+  <line x1="930" y1="500" x2="1200" y2="500"/>
+  <line x1="930" y1="530" x2="1200" y2="530"/>
+</g>
+
+<!-- ═══════════════════ NEON SIGNS ═══════════════════ -->
+
+<!-- LEFT WALL: Large vertical red kanji-style neon sign -->
+<g class="neon-flicker-r">
+  <!-- Sign frame -->
+  <rect x="42" y="195" width="44" height="180" rx="3" fill="#1a0608" stroke="#ff1a2e" stroke-width="2"/>
+  <!-- Neon tubes (kanji simplified as geometric rectangles) -->
+  <rect x="54" y="208" width="20" height="4"  fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="54" y="208" width="20" height="4"  fill="#ff6080" opacity="0.8"/>
+  <rect x="62" y="208" width="4"  height="16" fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="62" y="208" width="4"  height="16" fill="#ff6080" opacity="0.8"/>
+  <rect x="54" y="222" width="20" height="4"  fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="54" y="222" width="20" height="4"  fill="#ff6080" opacity="0.8"/>
+
+  <rect x="54" y="238" width="20" height="4"  fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="54" y="238" width="4"  height="14" fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="70" y="238" width="4"  height="14" fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="54" y="250" width="20" height="4"  fill="#ff1a2e" filter="url(#fsm)"/>
+
+  <rect x="54" y="266" width="20" height="4"  fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="62" y="266" width="4"  height="8"  fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="54" y="272" width="20" height="4"  fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="54" y="274" width="4"  height="10" fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="70" y="274" width="4"  height="10" fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="54" y="282" width="20" height="4"  fill="#ff1a2e" filter="url(#fsm)"/>
+
+  <rect x="54" y="296" width="20" height="4"  fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="54" y="296" width="4"  height="24" fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="54" y="316" width="20" height="4"  fill="#ff1a2e" filter="url(#fsm)"/>
+  <rect x="70" y="300" width="4"  height="10" fill="#ff1a2e" filter="url(#fsm)"/>
+  <!-- Red glow -->
+  <rect x="35" y="188" width="62" height="196" fill="#ff1a2e" opacity="0.08" filter="url(#fxl)"/>
+</g>
+
+<!-- Left wall: smaller blue neon horizontal sign -->
+<g class="neon-flicker-b">
+  <rect x="100" y="245" width="130" height="28" rx="3" fill="#010814" stroke="#0088ff" stroke-width="1.5"/>
+  <text x="114" y="263" font-family="monospace" font-size="13" fill="#0088ff" letter-spacing="3">HOTEL</text>
+  <rect x="100" y="245" width="130" height="28" fill="#0088ff" opacity="0.07" filter="url(#fxl)"/>
+</g>
+
+<!-- Left wall: small scattered lit windows -->
+<g opacity="0.75">
+  <rect x="140" y="200" width="22" height="18" rx="1" fill="#f8d888"/>
+  <rect x="170" y="200" width="22" height="18" rx="1" fill="#f0e8a0" opacity="0.6"/>
+  <rect x="140" y="228" width="22" height="18" rx="1" fill="#f8d888" opacity="0.8"/>
+  <rect x="170" y="228" width="22" height="18" rx="1" fill="#d0e8ff" opacity="0.5"/>
+  <rect x="200" y="200" width="22" height="18" rx="1" fill="#f8d888" opacity="0.7"/>
+  <rect x="200" y="228" width="22" height="18" rx="1" fill="#f8d888" opacity="0.9"/>
+  <rect x="140" y="310" width="22" height="18" rx="1" fill="#d0e8ff" opacity="0.6"/>
+  <rect x="170" y="310" width="22" height="18" rx="1" fill="#f8d888" opacity="0.5"/>
+  <rect x="200" y="310" width="22" height="18" rx="1" fill="#f8d888" opacity="0.8"/>
+  <rect x="230" y="310" width="22" height="18" rx="1" fill="#f0e8a0" opacity="0.4"/>
+</g>
+
+<!-- RIGHT WALL: Teal/green vertical neon sign -->
+<g class="neon-flicker-g">
+  <rect x="1112" y="175" width="46" height="200" rx="3" fill="#010e0c" stroke="#00e8a8" stroke-width="2"/>
+  <rect x="1124" y="188" width="22" height="4"  fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1124" y="188" width="4"  height="18" fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1142" y="188" width="4"  height="18" fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1124" y="204" width="22" height="4"  fill="#00e8a8" filter="url(#fsm)"/>
+
+  <rect x="1124" y="220" width="22" height="4"  fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1133" y="220" width="4"  height="16" fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1124" y="234" width="22" height="4"  fill="#00e8a8" filter="url(#fsm)"/>
+
+  <rect x="1124" y="250" width="22" height="4"  fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1124" y="250" width="4"  height="8"  fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1142" y="250" width="4"  height="20" fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1124" y="256" width="16" height="4"  fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1124" y="266" width="22" height="4"  fill="#00e8a8" filter="url(#fsm)"/>
+
+  <rect x="1124" y="282" width="22" height="4"  fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1124" y="282" width="4"  height="26" fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1124" y="294" width="16" height="4"  fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1124" y="304" width="22" height="4"  fill="#00e8a8" filter="url(#fsm)"/>
+
+  <rect x="1124" y="320" width="22" height="4"  fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1124" y="320" width="4"  height="24" fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1142" y="320" width="4"  height="24" fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1124" y="340" width="22" height="4"  fill="#00e8a8" filter="url(#fsm)"/>
+  <rect x="1110" y="168" width="66" height="216" fill="#00e8a8" opacity="0.07" filter="url(#fxl)"/>
+</g>
+
+<!-- Right wall windows -->
+<g opacity="0.7">
+  <rect x="938"  y="188" width="22" height="18" rx="1" fill="#f8d888"/>
+  <rect x="968"  y="188" width="22" height="18" rx="1" fill="#f0e8a0" opacity="0.5"/>
+  <rect x="998"  y="188" width="22" height="18" rx="1" fill="#d0e8ff" opacity="0.7"/>
+  <rect x="938"  y="216" width="22" height="18" rx="1" fill="#f8d888" opacity="0.6"/>
+  <rect x="968"  y="216" width="22" height="18" rx="1" fill="#f8d888" opacity="0.9"/>
+  <rect x="998"  y="216" width="22" height="18" rx="1" fill="#f0e8a0" opacity="0.4"/>
+  <rect x="938"  y="312" width="22" height="18" rx="1" fill="#f8d888" opacity="0.8"/>
+  <rect x="968"  y="312" width="22" height="18" rx="1" fill="#d0e8ff" opacity="0.6"/>
+</g>
+
+<!-- ═══════════════════ WET GROUND ═══════════════════ -->
+<rect x="0" y="550" width="1200" height="200" fill="url(#ground)"/>
+
+<!-- Puddle reflections — distorted neon colors in wet pavement -->
+<!-- Red sign reflection -->
+<ellipse cx="165" cy="610" rx="180" ry="60"
+         fill="url(#red-puddle)" filter="url(#fsm)" opacity="0.8"/>
+<!-- Distorted red reflection lines -->
+<g opacity="0.3" filter="url(#fsm)">
+  <line x1="80"  y1="590" x2="80"  y2="640" stroke="#ff1a2e" stroke-width="2"/>
+  <line x1="96"  y1="585" x2="96"  y2="648" stroke="#ff3040" stroke-width="1.5"/>
+  <line x1="112" y1="582" x2="112" y2="652" stroke="#ff1a2e" stroke-width="2"/>
+  <line x1="128" y1="580" x2="128" y2="655" stroke="#ff3040" stroke-width="1.5"/>
+  <line x1="144" y1="578" x2="144" y2="658" stroke="#ff1a2e" stroke-width="2"/>
+  <line x1="160" y1="576" x2="160" y2="660" stroke="#ff3040" stroke-width="1.5"/>
+</g>
+
+<!-- Teal sign reflection -->
+<ellipse cx="1050" cy="600" rx="160" ry="50"
+         fill="url(#teal-puddle)" filter="url(#fsm)" opacity="0.75"/>
+
+<!-- Blue hotel sign reflection -->
+<ellipse cx="165" cy="660" rx="100" ry="30"
+         fill="url(#blue-puddle)" filter="url(#fsm)" opacity="0.65"/>
+
+<!-- General wet sheen on ground -->
+<rect x="270" y="555" width="660" height="195" fill="#080c18" opacity="0.4"/>
+
+<!-- Ground reflection of distant city glow -->
+<ellipse cx="600" cy="580" rx="500" ry="80" fill="#180c0a" opacity="0.3" filter="url(#fsm)"/>
+
+<!-- Pavement crack / gutter line -->
+<line x1="270" y1="558" x2="930" y2="562" stroke="#0c0a1a" stroke-width="3"/>
+<line x1="270" y1="558" x2="930" y2="562" stroke="#181428" stroke-width="1.2"/>
+
+<!-- ═══════════════════ ALLEY FOREGROUND ELEMENTS ═══════════════════ -->
+
+<!-- Sewer grate -->
+<rect x="450" y="556" width="40" height="8" rx="2" fill="#0a0818"/>
+<g stroke="#151028" stroke-width="1.5" opacity="0.8">
+  <line x1="454" y1="557" x2="454" y2="563"/>
+  <line x1="460" y1="557" x2="460" y2="563"/>
+  <line x1="466" y1="557" x2="466" y2="563"/>
+  <line x1="472" y1="557" x2="472" y2="563"/>
+  <line x1="478" y1="557" x2="478" y2="563"/>
+  <line x1="484" y1="557" x2="484" y2="563"/>
+</g>
+<!-- Steam rising from grate -->
+<ellipse cx="470" cy="552" rx="18" ry="6"  class="steam" fill="#c8d0e8" style="animation-delay:0s"/>
+<ellipse cx="470" cy="552" rx="14" ry="4"  class="steam" fill="#d0d8f0" style="animation-delay:1.3s"/>
+<ellipse cx="470" cy="552" rx="10" ry="3"  class="steam" fill="#c8d0e8" style="animation-delay:2.7s"/>
+
+<!-- Second sewer grate -->
+<rect x="720" y="558" width="35" height="7" rx="2" fill="#0a0818"/>
+<ellipse cx="737" cy="554" rx="14" ry="5" class="steam" fill="#c8d0e8" style="animation-delay:0.8s"/>
+<ellipse cx="737" cy="554" rx="10" ry="3" class="steam" fill="#d0d8f0" style="animation-delay:2.2s"/>
+
+<!-- Vending machine (right side, bright!) -->
+<rect x="880" y="440" width="48" height="112" rx="4" fill="#1a0820"/>
+<rect x="882" y="442" width="44" height="80"  rx="3" fill="#0c1e40"/>
+<!-- Vending buttons glow -->
+<rect x="884" y="444" width="40" height="76" rx="2" fill="#0088ff" opacity="0.12" filter="url(#fsm)"/>
+<!-- Product rows -->
+<rect x="885" y="448" width="38" height="12" rx="2" fill="#0044aa" opacity="0.6"/>
+<rect x="885" y="463" width="38" height="12" rx="2" fill="#aa2200" opacity="0.6"/>
+<rect x="885" y="478" width="38" height="12" rx="2" fill="#004422" opacity="0.6"/>
+<rect x="885" y="493" width="38" height="12" rx="2" fill="#440088" opacity="0.6"/>
+<!-- Bright lit panel at top -->
+<rect x="884" y="444" width="40" height="10" rx="2" fill="#88bbff" opacity="0.5"/>
+<!-- Vending machine glow on ground -->
+<ellipse cx="904" cy="560" rx="50" ry="15" fill="#0066cc" opacity="0.12" filter="url(#fmd)"/>
+
+<!-- Bicycle leaning against left wall -->
+<g stroke="#2a2040" stroke-width="2.5" fill="none" opacity="0.7">
+  <circle cx="205" cy="520" r="28"/>
+  <circle cx="205" cy="520" r="4" fill="#2a2040"/>
+  <circle cx="280" cy="528" r="28"/>
+  <circle cx="280" cy="528" r="4" fill="#2a2040"/>
+  <line x1="205" y1="492" x2="242" y2="480"/>
+  <line x1="242" y1="480" x2="280" y2="500"/>
+  <line x1="242" y1="480" x2="242" y2="465"/>
+  <line x1="235" y1="465" x2="252" y2="465"/> <!-- handlebars -->
+  <line x1="205" y1="492" x2="215" y2="528"/>
+  <line x1="280" y1="500" x2="265" y2="528"/>
+</g>
+
+<!-- Street lamp (center) -->
+<rect x="593" y="200" width="12" height="358" fill="#0e0c1e"/>
+<rect x="593" y="200" width="12" height="358" fill="none" stroke="#181530" stroke-width="1"/>
+<!-- Lamp arm -->
+<path d="M 599,205 C 599,195 615,192 625,192" stroke="#0e0c1e" stroke-width="10" fill="none"/>
+<path d="M 599,205 C 599,195 615,192 625,192" stroke="#181530" stroke-width="8" fill="none"/>
+<!-- Lamp head -->
+<ellipse cx="630" cy="192" rx="22" ry="10" fill="#18152e"/>
+<ellipse cx="630" cy="196" rx="18" ry="6"  fill="#f8f0c8" opacity="0.7"/>
+<!-- Lamp cone of light -->
+<polygon points="612,198 648,198 660,400 580,400"
+         fill="url(#lamp-cone)" filter="url(#fmd)" opacity="0.5"/>
+<!-- Lamp glow in rain -->
+<ellipse cx="630" cy="195" rx="60" ry="40"
+         fill="#f8f0a8" opacity="0.06" filter="url(#fxl)"/>
+
+<!-- ═══════════════════ UMBRELLA FIGURE (distant, center) ═══════════════════ -->
+<g class="umbrella-bob" transform="translate(560, 0)">
+  <!-- Umbrella canopy -->
+  <path d="M 540,425 A 45,20 0 0 1 630,425 C 615,415 585,410 575,408 C 565,410 545,415 540,425 Z"
+        fill="#cc1828"/>
+  <path d="M 540,425 A 45,20 0 0 1 630,425" stroke="#8a0e18" stroke-width="2" fill="none"/>
+  <!-- Ribs -->
+  <g stroke="#8a0e18" stroke-width="1.2" opacity="0.7">
+    <line x1="585" y1="408" x2="540" y2="425"/>
+    <line x1="585" y1="408" x2="555" y2="420"/>
+    <line x1="585" y1="408" x2="570" y2="416"/>
+    <line x1="585" y1="408" x2="600" y2="416"/>
+    <line x1="585" y1="408" x2="615" y2="420"/>
+    <line x1="585" y1="408" x2="630" y2="425"/>
+  </g>
+  <!-- Handle -->
+  <line x1="585" y1="408" x2="585" y2="460" stroke="#1e1838" stroke-width="3"/>
+  <!-- Silhouette figure below -->
+  <rect x="580" y="450" width="10" height="22" rx="2" fill="#0c0818"/>
+  <rect x="578" y="470" width="5"  height="14" rx="1" fill="#0c0818"/>
+  <rect x="585" y="470" width="5"  height="14" rx="1" fill="#0c0818"/>
+  <circle cx="585" cy="447" r="6" fill="#0c0818"/>
+  <!-- Reflection in puddle -->
+  <ellipse cx="585" cy="565" rx="20" ry="6" fill="#cc1828" opacity="0.12" filter="url(#fsm)"/>
+</g>
+
+<!-- ═══════════════════ RAIN ═══════════════════ -->
+<!-- Multiple layers of rain at different speeds/distances -->
+<!-- Far rain (thin, slow) -->
+<g class="rain-slow" opacity="0.25" stroke="#a8b8d0" stroke-width="0.8" filter="url(#rain-blur)">
+  <line x1="88"  y1="0" x2="84"  y2="55"/>
+  <line x1="175" y1="0" x2="171" y2="55"/>
+  <line x1="262" y1="0" x2="258" y2="55"/>
+  <line x1="349" y1="0" x2="345" y2="55"/>
+  <line x1="436" y1="0" x2="432" y2="55"/>
+  <line x1="523" y1="0" x2="519" y2="55"/>
+  <line x1="610" y1="0" x2="606" y2="55"/>
+  <line x1="697" y1="0" x2="693" y2="55"/>
+  <line x1="784" y1="0" x2="780" y2="55"/>
+  <line x1="871" y1="0" x2="867" y2="55"/>
+  <line x1="958" y1="0" x2="954" y2="55"/>
+  <line x1="1045" y1="0" x2="1041" y2="55"/>
+  <line x1="1132" y1="0" x2="1128" y2="55"/>
+  <line x1="44"  y1="0" x2="40"  y2="55"/>
+  <line x1="218" y1="0" x2="214" y2="55"/>
+  <line x1="392" y1="0" x2="388" y2="55"/>
+  <line x1="566" y1="0" x2="562" y2="55"/>
+  <line x1="740" y1="0" x2="736" y2="55"/>
+  <line x1="914" y1="0" x2="910" y2="55"/>
+  <line x1="1088" y1="0" x2="1084" y2="55"/>
+</g>
+
+<!-- Mid rain -->
+<g class="rain" opacity="0.35" stroke="#b8c8e0" stroke-width="1" filter="url(#rain-blur)">
+  <line x1="65"  y1="0" x2="59"  y2="65"/>
+  <line x1="152" y1="0" x2="146" y2="65"/>
+  <line x1="240" y1="0" x2="234" y2="65"/>
+  <line x1="328" y1="0" x2="322" y2="65"/>
+  <line x1="416" y1="0" x2="410" y2="65"/>
+  <line x1="504" y1="0" x2="498" y2="65"/>
+  <line x1="592" y1="0" x2="586" y2="65"/>
+  <line x1="680" y1="0" x2="674" y2="65"/>
+  <line x1="768" y1="0" x2="762" y2="65"/>
+  <line x1="856" y1="0" x2="850" y2="65"/>
+  <line x1="944" y1="0" x2="938" y2="65"/>
+  <line x1="1032" y1="0" x2="1026" y2="65"/>
+  <line x1="1120" y1="0" x2="1114" y2="65"/>
+  <line x1="108"  y1="0" x2="102"  y2="65"/>
+  <line x1="284"  y1="0" x2="278"  y2="65"/>
+  <line x1="460"  y1="0" x2="454"  y2="65"/>
+  <line x1="636"  y1="0" x2="630"  y2="65"/>
+  <line x1="812"  y1="0" x2="806"  y2="65"/>
+  <line x1="988"  y1="0" x2="982"  y2="65"/>
+  <line x1="1164" y1="0" x2="1158" y2="65"/>
+</g>
+
+<!-- Foreground rain (thicker, faster) -->
+<g class="rain-fast" opacity="0.45" stroke="#c8d8f0" stroke-width="1.4" filter="url(#rain-blur)">
+  <line x1="105" y1="0" x2="97"  y2="72"/>
+  <line x1="210" y1="0" x2="202" y2="72"/>
+  <line x1="315" y1="0" x2="307" y2="72"/>
+  <line x1="420" y1="0" x2="412" y2="72"/>
+  <line x1="525" y1="0" x2="517" y2="72"/>
+  <line x1="630" y1="0" x2="622" y2="72"/>
+  <line x1="735" y1="0" x2="727" y2="72"/>
+  <line x1="840" y1="0" x2="832" y2="72"/>
+  <line x1="945" y1="0" x2="937" y2="72"/>
+  <line x1="1050" y1="0" x2="1042" y2="72"/>
+  <line x1="1155" y1="0" x2="1147" y2="72"/>
+  <line x1="158" y1="0" x2="150"  y2="72"/>
+  <line x1="368" y1="0" x2="360"  y2="72"/>
+  <line x1="578" y1="0" x2="570"  y2="72"/>
+  <line x1="788" y1="0" x2="780"  y2="72"/>
+  <line x1="998" y1="0" x2="990"  y2="72"/>
+</g>
+
+<!-- ═══════════════════ DEPTH & ATMOSPHERE ═══════════════════ -->
+<!-- Far end of alley fogs out -->
+<rect x="350" y="160" width="500" height="450" fill="#040310" opacity="0.45" filter="url(#fxl)"/>
+
+<!-- Side depth darkening -->
+<rect x="0"    y="0" width="1200" height="750" fill="url(#depth-fog)"/>
+
+<!-- Scanlines (subtle CRT over the whole scene) -->
+<rect width="1200" height="750" fill="url(#vig)"/>
+
+</svg>
+</body>
+</html>
