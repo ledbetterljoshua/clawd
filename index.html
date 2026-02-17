@@ -336,6 +336,33 @@ body::after {
   border: 1px solid rgba(255,255,255,0.07);
 }
 
+/* Audio toggle button */
+#audio-btn {
+  position: absolute;
+  left: 56px; top: 50%; transform: translateY(-50%);
+  width: 28px; height: 28px; border-radius: 50%;
+  border: 1px solid hsla(var(--clawd-hue), 35%, 28%, 0.55);
+  background: rgba(4, 3, 14, 0.88);
+  cursor: pointer; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: hsl(var(--clawd-hue), 38%, 36%);
+  transition: color 0.8s, border-color 0.8s, box-shadow 0.3s;
+}
+#audio-btn:hover {
+  background: rgba(255,255,255,0.04);
+  color: hsl(var(--clawd-hue), 65%, 60%);
+  border-color: hsla(var(--clawd-hue), 50%, 38%, 0.8);
+}
+#audio-btn.on {
+  color: hsl(var(--clawd-hue), 72%, 62%);
+  border-color: hsla(var(--clawd-hue), 52%, 38%, 0.7);
+  box-shadow: 0 0 8px hsla(var(--clawd-hue), 65%, 38%, 0.32);
+}
+.aud-on { display: none; }
+.aud-off { display: block; }
+#audio-btn.on .aud-on { display: block; }
+#audio-btn.on .aud-off { display: none; }
+
 /* Custom cursor */
 #cursor {
   position: fixed;
@@ -414,6 +441,14 @@ body::after {
     <span class="orb-sat orb-sat-2"></span>
     <span class="orb-sat orb-sat-3"></span>
   </button>
+  <button id="audio-btn" title="Enable sound">
+    <svg viewBox="0 0 14 14" width="11" height="11" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1 4.5h2.5L7 1v12L3.5 9.5H1z" fill="currentColor"/>
+      <path class="aud-on"  d="M9.5 3.5 Q12 7 9.5 10.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+      <path class="aud-on"  d="M11 1.5 Q14.5 7 11 12.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" opacity=".5"/>
+      <path class="aud-off" d="M9.5 5 L12.5 9 M12.5 5 L9.5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </button>
 </div>
 
 <script>
@@ -484,6 +519,358 @@ const cx = () => px + CW/2;
 const cy = () => py + CH/2;
 const dist2mouse = () => Math.hypot(cx()-mx, cy()-my);
 
+// ── Audio System ──────────────────────────────────────────────────────────
+const SFX = (() => {
+  let C = null, master = null;
+  let enabled = false;
+  let currentWorldId = null;
+  let ambiStoppers = [];
+  let scuttleT = null;
+
+  function ac() {
+    if (!C) {
+      C = new (window.AudioContext || window.webkitAudioContext)();
+      master = C.createGain();
+      master.gain.value = 0.5;
+      master.connect(C.destination);
+    }
+    if (C.state === 'suspended') C.resume();
+    return C;
+  }
+
+  // ── Primitives ───────────────────────────────────────────────────────────
+  function mkNoise() {
+    const ctx = ac();
+    const len = ctx.sampleRate * 3;
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    src.buffer = buf; src.loop = true;
+    return src;
+  }
+  function mkOsc(freq, type = 'sine') {
+    const o = ac().createOscillator(); o.type = type; o.frequency.value = freq; return o;
+  }
+  function mkGain(v = 1) {
+    const g = ac().createGain(); g.gain.value = v; return g;
+  }
+  function mkFilter(type, freq, q = 1) {
+    const f = ac().createBiquadFilter(); f.type = type; f.frequency.value = freq; f.Q.value = q; return f;
+  }
+
+  // ── Clawd SFX ────────────────────────────────────────────────────────────
+  function curious() {
+    if (!enabled) return;
+    const ctx = ac(), now = ctx.currentTime;
+    [360, 540].forEach((f, i) => {
+      const osc = mkOsc(f), g = mkGain(0);
+      osc.connect(g); g.connect(master);
+      const t = now + i * 0.17;
+      osc.start(t);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.13, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.28);
+      osc.stop(t + 0.32);
+    });
+  }
+
+  function happy() {
+    if (!enabled) return;
+    const ctx = ac(), now = ctx.currentTime;
+    [523, 659, 784, 988, 1175].forEach((f, i) => {
+      const osc = mkOsc(f), g = mkGain(0);
+      osc.connect(g); g.connect(master);
+      const t = now + i * 0.07;
+      osc.start(t);
+      g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(0.10, t + 0.015);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.20);
+      osc.stop(t + 0.24);
+    });
+  }
+
+  function startled() {
+    if (!enabled) return;
+    const ctx = ac(), now = ctx.currentTime;
+    const n = mkNoise(), nf = mkFilter('bandpass', 900, 1.2), ng = mkGain(0);
+    n.connect(nf); nf.connect(ng); ng.connect(master);
+    n.start(now);
+    ng.gain.setValueAtTime(0.28, now);
+    ng.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+    n.stop(now + 0.18);
+    const osc = mkOsc(700), g = mkGain(0.16);
+    osc.connect(g); g.connect(master);
+    osc.start(now + 0.04);
+    osc.frequency.exponentialRampToValueAtTime(160, now + 0.5);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+    osc.stop(now + 0.55);
+  }
+
+  function thought() {
+    if (!enabled) return;
+    const ctx = ac(), now = ctx.currentTime;
+    const osc = mkOsc(480), g = mkGain(0);
+    osc.connect(g); g.connect(master);
+    osc.start(now);
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(0.055, now + 0.015);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    osc.stop(now + 0.15);
+  }
+
+  function scuttle(spd) {
+    if (!enabled || spd < 0.4) {
+      if (scuttleT) { clearTimeout(scuttleT); scuttleT = null; }
+      return;
+    }
+    if (scuttleT) return;
+    const tick = () => {
+      if (!enabled) { scuttleT = null; return; }
+      const ctx = ac(), now = ctx.currentTime;
+      const n = mkNoise(), nf = mkFilter('highpass', 2400, 2), ng = mkGain(0);
+      n.connect(nf); nf.connect(ng); ng.connect(master);
+      n.start(now);
+      ng.gain.setValueAtTime(0.032, now);
+      ng.gain.exponentialRampToValueAtTime(0.001, now + 0.042);
+      n.stop(now + 0.06);
+      const delay = Math.max(50, 190 - spd * 50) + Math.random() * 30;
+      scuttleT = setTimeout(tick, delay);
+    };
+    tick();
+  }
+
+  // ── Ambience helpers ─────────────────────────────────────────────────────
+  function stopAmbience(fade = 1.5) {
+    const s = [...ambiStoppers]; ambiStoppers = []; currentWorldId = null;
+    s.forEach(fn => fn(fade));
+  }
+
+  function loopNoise(fType, freq, q, vol, fi = 2.5) {
+    const n = mkNoise(), f = mkFilter(fType, freq, q), g = mkGain(0);
+    n.connect(f); f.connect(g); g.connect(master); n.start();
+    const now = ac().currentTime;
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(vol, now + fi);
+    return fade => {
+      const t = ac().currentTime;
+      g.gain.setValueAtTime(g.gain.value, t);
+      g.gain.linearRampToValueAtTime(0, t + fade);
+      setTimeout(() => n.stop(), (fade + 0.1) * 1000);
+    };
+  }
+
+  function loopOsc(freq, type, vol, fi = 2.5, setup) {
+    const osc = mkOsc(freq, type), g = mkGain(0);
+    if (setup) setup(osc, g);
+    osc.connect(g); g.connect(master); osc.start();
+    const now = ac().currentTime;
+    g.gain.setValueAtTime(0, now);
+    g.gain.linearRampToValueAtTime(vol, now + fi);
+    return fade => {
+      const t = ac().currentTime;
+      g.gain.setValueAtTime(g.gain.value, t);
+      g.gain.linearRampToValueAtTime(0, t + fade);
+      setTimeout(() => osc.stop(), (fade + 0.1) * 1000);
+    };
+  }
+
+  function push(stopper) { ambiStoppers.push(stopper); }
+
+  // ── World ambiences ──────────────────────────────────────────────────────
+  function ambiObservatory() {
+    // Cricket chorus — 4 detuned AM oscillators
+    [3180, 3222, 3258, 3294].forEach((f, i) => {
+      const osc = mkOsc(f), lfo = mkOsc(4.8 + i * 0.35), lfoG = mkGain(8), g = mkGain(0);
+      lfo.connect(lfoG); lfoG.connect(osc.frequency);
+      osc.connect(g); g.connect(master); osc.start(); lfo.start();
+      const now = ac().currentTime;
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(0.016, now + 3 + i * 0.4);
+      push(fade => {
+        const t = ac().currentTime;
+        g.gain.setValueAtTime(g.gain.value, t);
+        g.gain.linearRampToValueAtTime(0, t + fade);
+        setTimeout(() => { osc.stop(); lfo.stop(); }, (fade + 0.1) * 1000);
+      });
+    });
+    push(loopNoise('bandpass', 200, 0.45, 0.022, 4));
+  }
+
+  function ambiTokyo() {
+    [[1100, 1.0, 0.10], [600, 0.5, 0.055], [3000, 1.8, 0.032]].forEach(([f, q, v]) => {
+      push(loopNoise('bandpass', f, q, v, 2.5));
+    });
+    // Low city hum
+    const osc = mkOsc(55, 'sawtooth'), filt = mkFilter('lowpass', 110, 0.6), g = mkGain(0);
+    osc.connect(filt); filt.connect(g); g.connect(master); osc.start();
+    const now = ac().currentTime;
+    g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.032, now + 4);
+    push(fade => {
+      const t = ac().currentTime;
+      g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + fade);
+      setTimeout(() => osc.stop(), (fade + 0.1) * 1000);
+    });
+  }
+
+  function ambiAurora() {
+    // Near-silent electromagnetic drone
+    const osc = mkOsc(62), lfo = mkOsc(0.04), lfoG = mkGain(4), g = mkGain(0);
+    lfo.connect(lfoG); lfoG.connect(osc.frequency);
+    osc.connect(g); g.connect(master); osc.start(); lfo.start();
+    const now = ac().currentTime;
+    g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.016, now + 6);
+    push(fade => {
+      const t = ac().currentTime;
+      g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + fade);
+      setTimeout(() => { osc.stop(); lfo.stop(); }, (fade + 0.1) * 1000);
+    });
+    // Rare wind puffs
+    let windT;
+    const windPuff = () => {
+      if (currentWorldId !== 'northern-lights') return;
+      const n = mkNoise(), nf = mkFilter('bandpass', 260, 0.4), ng = mkGain(0);
+      n.connect(nf); nf.connect(ng); ng.connect(master); n.start();
+      const now = ac().currentTime;
+      ng.gain.setValueAtTime(0, now);
+      ng.gain.linearRampToValueAtTime(0.038, now + 2);
+      ng.gain.linearRampToValueAtTime(0, now + 5);
+      n.stop(now + 5.5);
+      windT = setTimeout(windPuff, 9000 + Math.random() * 14000);
+    };
+    windT = setTimeout(windPuff, 5000);
+    push(() => clearTimeout(windT));
+  }
+
+  function ambiBioBay() {
+    // Water with gentle lapping LFO
+    const water = mkNoise(), wf = mkFilter('lowpass', 280, 0.7), wg = mkGain(0);
+    const lapLfo = mkOsc(0.24), lapAmt = mkGain(0.018);
+    water.connect(wf); wf.connect(wg); wg.connect(master);
+    lapLfo.connect(lapAmt); lapAmt.connect(wg.gain);
+    water.start(); lapLfo.start();
+    const now = ac().currentTime;
+    wg.gain.setValueAtTime(0, now); wg.gain.linearRampToValueAtTime(0.052, now + 3);
+    push(fade => {
+      const t = ac().currentTime;
+      wg.gain.setValueAtTime(wg.gain.value, t); wg.gain.linearRampToValueAtTime(0, t + fade);
+      setTimeout(() => { water.stop(); lapLfo.stop(); }, (fade + 0.1) * 1000);
+    });
+    // Tropical insects
+    [4600, 5100, 5500, 5900, 6300].forEach((f, i) => {
+      const osc = mkOsc(f), lfo = mkOsc(7 + i * 1.5), lfoG = mkGain(12), g = mkGain(0);
+      lfo.connect(lfoG); lfoG.connect(osc.frequency);
+      osc.connect(g); g.connect(master); osc.start(); lfo.start();
+      const now = ac().currentTime;
+      g.gain.setValueAtTime(0, now); g.gain.linearRampToValueAtTime(0.008, now + 2.5 + i * 0.35);
+      push(fade => {
+        const t = ac().currentTime;
+        g.gain.setValueAtTime(g.gain.value, t); g.gain.linearRampToValueAtTime(0, t + fade);
+        setTimeout(() => { osc.stop(); lfo.stop(); }, (fade + 0.1) * 1000);
+      });
+    });
+  }
+
+  function ambiAutumn() {
+    push(loopNoise('bandpass', 380, 0.55, 0.038, 3));
+    push(loopNoise('highpass', 2200, 0.35, 0.012, 4));
+    // Generative birdsong — D major pentatonic
+    const notes = [293, 329, 369, 440, 493, 587, 659, 880];
+    let birdT;
+    const chirp = () => {
+      if (currentWorldId !== 'autumn-forest') return;
+      const ctx = ac(), now = ctx.currentTime;
+      const count = 2 + Math.floor(Math.random() * 3);
+      for (let i = 0; i < count; i++) {
+        const f = notes[Math.floor(Math.random() * notes.length)];
+        const osc = mkOsc(f), g = mkGain(0);
+        osc.connect(g); g.connect(master);
+        const t = now + i * (0.07 + Math.random() * 0.13);
+        osc.start(t);
+        g.gain.setValueAtTime(0, t);
+        g.gain.linearRampToValueAtTime(0.058, t + 0.01);
+        g.gain.exponentialRampToValueAtTime(0.001, t + 0.16);
+        osc.stop(t + 0.20);
+      }
+      birdT = setTimeout(chirp, 1600 + Math.random() * 4200);
+    };
+    birdT = setTimeout(chirp, 700);
+    push(() => clearTimeout(birdT));
+  }
+
+  function ambiOcean() {
+    // Pressure drone — ultra-low sine
+    const drone = mkOsc(38), dg = mkGain(0);
+    drone.connect(dg); dg.connect(master); drone.start();
+    const now = ac().currentTime;
+    dg.gain.setValueAtTime(0, now); dg.gain.linearRampToValueAtTime(0.058, now + 5);
+    push(fade => {
+      const t = ac().currentTime;
+      dg.gain.setValueAtTime(dg.gain.value, t); dg.gain.linearRampToValueAtTime(0, t + fade);
+      setTimeout(() => drone.stop(), (fade + 0.1) * 1000);
+    });
+    push(loopNoise('lowpass', 180, 0.5, 0.038, 4));
+    // Whale song — FM synthesis
+    let whaleT;
+    const whale = () => {
+      if (currentWorldId !== 'deep-ocean') return;
+      const ctx = ac(), now = ctx.currentTime;
+      const carrier = mkOsc(180), mod = mkOsc(2.5), modG = mkGain(75), g = mkGain(0);
+      mod.connect(modG); modG.connect(carrier.frequency);
+      carrier.connect(g); g.connect(master);
+      carrier.start(now); mod.start(now);
+      carrier.frequency.setValueAtTime(180, now);
+      carrier.frequency.linearRampToValueAtTime(345, now + 2.5);
+      carrier.frequency.linearRampToValueAtTime(210, now + 4.2);
+      carrier.frequency.linearRampToValueAtTime(275, now + 5.8);
+      carrier.frequency.linearRampToValueAtTime(135, now + 8.5);
+      g.gain.setValueAtTime(0, now);
+      g.gain.linearRampToValueAtTime(0.065, now + 0.9);
+      g.gain.linearRampToValueAtTime(0.048, now + 4.2);
+      g.gain.linearRampToValueAtTime(0.065, now + 5.8);
+      g.gain.linearRampToValueAtTime(0, now + 9.5);
+      carrier.stop(now + 10); mod.stop(now + 10);
+      whaleT = setTimeout(whale, 22000 + Math.random() * 24000);
+    };
+    whaleT = setTimeout(whale, 4000 + Math.random() * 7000);
+    push(() => clearTimeout(whaleT));
+  }
+
+  // ── Public ───────────────────────────────────────────────────────────────
+  function startAmbience(worldId) {
+    if (!enabled) return;
+    if (currentWorldId === worldId) return;
+    stopAmbience(1.2);
+    currentWorldId = worldId;
+    ({ observatory: ambiObservatory, 'tokyo-rain': ambiTokyo,
+       'northern-lights': ambiAurora, 'bioluminescent-bay': ambiBioBay,
+       'autumn-forest': ambiAutumn, 'deep-ocean': ambiOcean }
+    )[worldId]?.();
+  }
+
+  function setEnabled(v) {
+    enabled = v;
+    if (!v) {
+      stopAmbience(1.0);
+      if (scuttleT) { clearTimeout(scuttleT); scuttleT = null; }
+    } else {
+      startAmbience(activeWorld?.id);
+    }
+  }
+
+  return { curious, happy, startled, thought, scuttle, startAmbience, setEnabled,
+           get enabled() { return enabled; } };
+})();
+
+// Audio button
+const audioBtn = document.getElementById('audio-btn');
+audioBtn.addEventListener('click', e => {
+  e.stopPropagation();
+  SFX.setEnabled(!SFX.enabled);
+  audioBtn.classList.toggle('on', SFX.enabled);
+  audioBtn.title = SFX.enabled ? 'Mute sound' : 'Enable sound';
+});
+
 // ── State machine ──────────────────────────────────────────────────────
 const LABELS = {
   WANDER:'wandering', REST:'resting', CURIOUS:'curious',
@@ -495,6 +882,9 @@ function setState(s) {
   state = s; sTime = 0;
   hud.textContent = LABELS[s] || s;
   targetHue = HUE[s] ?? 270;
+  if (s === 'CURIOUS')  SFX.curious();
+  if (s === 'HAPPY')    SFX.happy();
+  if (s === 'STARTLED') SFX.startled();
 }
 
 // ── Bubble ────────────────────────────────────────────────────────────
@@ -506,6 +896,7 @@ function say(text, ms = 2400) {
   bub.textContent = text;
   bub.classList.add('show');
   placeBub();
+  SFX.thought();
   bubTO = setTimeout(() => bub?.classList.remove('show'), ms);
 }
 
@@ -682,6 +1073,8 @@ function update(dt) {
   if (py>maxY)    { py=maxY;    vy=-Math.abs(vy)*.6; wDirY=-Math.abs(wDirY); }
 
   if (Math.abs(vx)>.15) facing = vx>0 ? 1 : -1;
+
+  SFX.scuttle(spd);
 
   // Trail
   if (spd>.4) trail.push({ x:cx(), y:cy(), age:0 });
@@ -880,6 +1273,7 @@ function loadWorld(w) {
   }, 400);
 
   buildPanel();
+  SFX.startAmbience(w.id);
 }
 
 worldsBtn.addEventListener('click', e => {
