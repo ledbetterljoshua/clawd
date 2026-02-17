@@ -850,6 +850,7 @@ const SFX = (() => {
 
   function setEnabled(v) {
     enabled = v;
+    localStorage.setItem('clawd-audio', v ? '1' : '0');
     if (!v) {
       stopAmbience(1.0);
       if (scuttleT) { clearTimeout(scuttleT); scuttleT = null; }
@@ -870,6 +871,13 @@ audioBtn.addEventListener('click', e => {
   audioBtn.classList.toggle('on', SFX.enabled);
   audioBtn.title = SFX.enabled ? 'Mute sound' : 'Enable sound';
 });
+
+// Restore audio preference across refreshes
+if (localStorage.getItem('clawd-audio') === '1') {
+  SFX.setEnabled(true);
+  audioBtn.classList.add('on');
+  audioBtn.title = 'Mute sound';
+}
 
 // ── State machine ──────────────────────────────────────────────────────
 const LABELS = {
@@ -1119,16 +1127,55 @@ function update(dt) {
 
   updateEyes();
   placeBub();
+
+  // Broadcast Clawd position to world
+  try {
+    if (worldFrame.contentWindow) {
+      worldFrame.contentWindow.postMessage({
+        type: 'clawd',
+        cx: cx() / innerWidth,
+        cy: cy() / innerHeight,
+        state: state,
+        speed: Math.hypot(vx, vy)
+      }, '*');
+    }
+  } catch(e) {}
 }
 
 // ── Render trail ───────────────────────────────────────────────────────
 function render() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const wid = activeWorld?.id;
   for (const t of trail) {
     const a = (1 - t.age/TRAIL_LIFE) * 0.16;
     const r = 3.5 * (1 - t.age/TRAIL_LIFE) + .5;
-    ctx.fillStyle = `hsla(${currentHue}, 70%, 65%, ${a})`;
-    ctx.beginPath(); ctx.arc(t.x, t.y, r, 0, Math.PI*2); ctx.fill();
+    switch (wid) {
+      case 'deep-ocean':
+        ctx.strokeStyle = `hsla(180, 80%, 75%, ${a})`;
+        ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.arc(t.x, t.y, r, 0, Math.PI*2); ctx.stroke();
+        break;
+      case 'bioluminescent-bay':
+        ctx.fillStyle = `hsla(175, 80%, 65%, ${a * 1.4})`;
+        ctx.beginPath(); ctx.arc(t.x, t.y, r * 1.3, 0, Math.PI*2); ctx.fill();
+        break;
+      case 'autumn-forest':
+        ctx.fillStyle = `hsla(28, 85%, 60%, ${a})`;
+        ctx.beginPath(); ctx.arc(t.x, t.y, r, 0, Math.PI*2); ctx.fill();
+        break;
+      case 'tokyo-rain':
+        ctx.fillStyle = `hsla(215, 70%, 68%, ${a})`;
+        ctx.fillRect(t.x - 0.5, t.y, 1, r * 4);
+        break;
+      case 'northern-lights':
+        ctx.fillStyle = `hsla(140, 80%, 68%, ${a})`;
+        ctx.beginPath(); ctx.arc(t.x, t.y, r * 1.2, 0, Math.PI*2); ctx.fill();
+        break;
+      default:
+        ctx.fillStyle = `hsla(${currentHue}, 70%, 65%, ${a})`;
+        ctx.beginPath(); ctx.arc(t.x, t.y, r, 0, Math.PI*2); ctx.fill();
+        break;
+    }
   }
 }
 
@@ -1226,6 +1273,12 @@ const WORLDS = [
     name: 'Abyssal · Deep Ocean',
     file: 'worlds/deep-ocean.html',
     colors: ['#000205', '#020510', '#00c8e0', '#d4e818'],
+  },
+  {
+    id: 'volcanic-island',
+    name: 'Volcanic · Island Night',
+    file: 'worlds/volcanic-island.html',
+    colors: ['#0a0402', '#1c0804', '#ff4010', '#ff8030'],
   },
 ];
 
