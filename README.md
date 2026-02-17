@@ -8,7 +8,7 @@ a small creature that lives on your screen
   ▘▘ ▝▝
 ```
 
-open `index.html`. clawd appears. clawd wanders.
+open `index.html`. clawd appears. clawd wanders. a random world loads beneath them.
 
 ---
 
@@ -36,21 +36,42 @@ or don't interact at all. clawd will wander, rest, and talk to itself.
 
 ---
 
+## worlds
+
+clawd inhabits a different world every time you open the page. click the glowing orb in the bottom-left corner to switch.
+
+| world | description |
+|---|---|
+| Observatory · Twilight | sea cliff at astronomical twilight. milky way, lighthouse, lone figure |
+| Tokyo · 2am Rain | neon-lit alley in the rain. puddle reflections, steam vents, umbrella figure |
+| Aurora · Iceland | northern lights breathing over a frozen lake. pine silhouettes, distant cabin |
+| Bioluminescent Bay | tropical night. dark water glowing teal. mangroves, fireflies, outrigger boat |
+| Autumn Dawn · Forest | dawn breaking through autumn trees. light rays, mist, falling leaves, deer |
+| Abyssal · Deep Ocean | crushing darkness. marine snow drifting. anglerfish lure pulsing. jellyfish |
+
+---
+
 ## what's in there
 
-single `index.html`. no build step, no dependencies, no framework.
+`index.html` + standalone world files in `worlds/`. no build step, no dependencies, no framework.
 
+**clawd**
 - pixel-art SVG body with 4 animated legs (speed matches movement)
 - pupils track direction of travel / follow your cursor
 - eyelids blink, droop when resting, squint when happy
 - blush cheeks fade in when happiness builds
 - mood aura — blurred glow behind clawd shifts color per state
-- the whole background shifts with mood
 - hue interpolation with wraparound (no snapping)
 - canvas trail of fading dots
 - custom cursor that reacts to proximity
 - VT323 pixel font for speech bubbles
 - spontaneous thoughts every ~8 seconds
+
+**worlds**
+- each world is a standalone SVG scene, loaded as an iframe
+- random world selected on every page load
+- glowing orrery orb to switch worlds — orbiting satellites, breathing pulse, hover label
+- worlds are fully self-contained HTML files, viewable on their own
 
 ---
 
@@ -65,4 +86,4 @@ that's it.
 
 ---
 
-*built with claude sonnet 4.6 · first session · feb 2026*
+*built with claude sonnet 4.6 · feb 2026*
