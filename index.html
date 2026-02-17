@@ -526,6 +526,8 @@ const SFX = (() => {
   let currentWorldId = null;
   let ambiStoppers = [];
   let scuttleT = null;
+  let gestureReceived = false;
+  let pendingWorldId  = null;
 
   function ac() {
     if (!C) {
@@ -837,15 +839,30 @@ const SFX = (() => {
   }
 
   // ── Public ───────────────────────────────────────────────────────────────
+  function _dispatch(worldId) {
+    ({ observatory: ambiObservatory, 'tokyo-rain': ambiTokyo,
+       'northern-lights': ambiAurora, 'bioluminescent-bay': ambiBioBay,
+       'autumn-forest': ambiAutumn, 'deep-ocean': ambiOcean }
+    )[worldId]?.();
+  }
+
   function startAmbience(worldId) {
     if (!enabled) return;
     if (currentWorldId === worldId) return;
     stopAmbience(1.2);
     currentWorldId = worldId;
-    ({ observatory: ambiObservatory, 'tokyo-rain': ambiTokyo,
-       'northern-lights': ambiAurora, 'bioluminescent-bay': ambiBioBay,
-       'autumn-forest': ambiAutumn, 'deep-ocean': ambiOcean }
-    )[worldId]?.();
+    if (!gestureReceived) { pendingWorldId = worldId; return; } // defer until gesture
+    _dispatch(worldId);
+  }
+
+  function onGesture() {
+    if (gestureReceived) return;
+    gestureReceived = true;
+    if (pendingWorldId && enabled) {
+      const w = pendingWorldId; pendingWorldId = null;
+      currentWorldId = null; // allow startAmbience to re-run
+      startAmbience(w);
+    }
   }
 
   function setEnabled(v) {
@@ -861,7 +878,7 @@ const SFX = (() => {
 
   function initEnabled(v) { enabled = v; }
 
-  return { curious, happy, startled, thought, scuttle, startAmbience, setEnabled, initEnabled,
+  return { curious, happy, startled, thought, scuttle, startAmbience, setEnabled, initEnabled, onGesture,
            get enabled() { return enabled; } };
 })();
 
@@ -869,10 +886,14 @@ const SFX = (() => {
 const audioBtn = document.getElementById('audio-btn');
 audioBtn.addEventListener('click', e => {
   e.stopPropagation();
+  SFX.onGesture();
   SFX.setEnabled(!SFX.enabled);
   audioBtn.classList.toggle('on', SFX.enabled);
   audioBtn.title = SFX.enabled ? 'Mute sound' : 'Enable sound';
 });
+
+// Mark first user gesture so AudioContext can be safely created
+document.addEventListener('pointerdown', SFX.onGesture);
 
 // Restore audio preference across refreshes (just set the flag; loadWorld starts the ambience)
 if (localStorage.getItem('clawd-audio') === '1') {
