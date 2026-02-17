@@ -563,7 +563,7 @@ const SFX = (() => {
 
   // ── Clawd SFX ────────────────────────────────────────────────────────────
   function curious() {
-    if (!enabled) return;
+    if (!enabled || !gestureReceived) return;
     const ctx = ac(), now = ctx.currentTime;
     [360, 540].forEach((f, i) => {
       const osc = mkOsc(f), g = mkGain(0);
@@ -578,7 +578,7 @@ const SFX = (() => {
   }
 
   function happy() {
-    if (!enabled) return;
+    if (!enabled || !gestureReceived) return;
     const ctx = ac(), now = ctx.currentTime;
     [523, 659, 784, 988, 1175].forEach((f, i) => {
       const osc = mkOsc(f), g = mkGain(0);
@@ -593,7 +593,7 @@ const SFX = (() => {
   }
 
   function startled() {
-    if (!enabled) return;
+    if (!enabled || !gestureReceived) return;
     const ctx = ac(), now = ctx.currentTime;
     const n = mkNoise(), nf = mkFilter('bandpass', 900, 1.2), ng = mkGain(0);
     n.connect(nf); nf.connect(ng); ng.connect(master);
@@ -610,7 +610,7 @@ const SFX = (() => {
   }
 
   function thought() {
-    if (!enabled) return;
+    if (!enabled || !gestureReceived) return;
     const ctx = ac(), now = ctx.currentTime;
     const osc = mkOsc(480), g = mkGain(0);
     osc.connect(g); g.connect(master);
@@ -622,7 +622,7 @@ const SFX = (() => {
   }
 
   function scuttle(spd) {
-    if (!enabled || spd < 0.4) {
+    if (!enabled || !gestureReceived || spd < 0.4) {
       if (scuttleT) { clearTimeout(scuttleT); scuttleT = null; }
       return;
     }
