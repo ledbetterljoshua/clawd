@@ -628,15 +628,17 @@ const SFX = (() => {
     }
     if (scuttleT) return;
     const tick = () => {
-      if (!enabled) { scuttleT = null; return; }
+      if (!enabled || !gestureReceived) { scuttleT = null; return; }
       const ctx = ac(), now = ctx.currentTime;
-      const n = mkNoise(), nf = mkFilter('highpass', 2400, 2), ng = mkGain(0);
-      n.connect(nf); nf.connect(ng); ng.connect(master);
-      n.start(now);
-      ng.gain.setValueAtTime(0.032, now);
-      ng.gain.exponentialRampToValueAtTime(0.001, now + 0.042);
-      n.stop(now + 0.06);
-      const delay = Math.max(50, 190 - spd * 50) + Math.random() * 30;
+      // Triangle wave: warm, soft, organic — no metallic noise
+      const freq = 280 + Math.random() * 220; // 280–500 Hz, varies per step
+      const osc = mkOsc(freq, 'triangle'), g = mkGain(0);
+      osc.connect(g); g.connect(master);
+      osc.start(now);
+      g.gain.setValueAtTime(0.055, now);
+      g.gain.exponentialRampToValueAtTime(0.001, now + 0.028);
+      osc.stop(now + 0.035);
+      const delay = Math.max(60, 200 - spd * 55) + Math.random() * 25;
       scuttleT = setTimeout(tick, delay);
     };
     tick();
