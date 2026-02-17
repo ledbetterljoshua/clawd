@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin:0; padding:0; }
+html, body { width:100%; height:100%; overflow:hidden; background:#000205; }
+svg { width:100%; height:100%; display:block; }
+
+/* Marine snow drift — different speeds and x-drifts */
+@keyframes snow-a { 0%{transform:translate(0,0) opacity:0} 5%{opacity:.75} 90%{opacity:.5} 100%{transform:translate(-18px,920px);opacity:0} }
+@keyframes snow-b { 0%{transform:translate(0,0);opacity:0} 5%{opacity:.60} 90%{opacity:.45} 100%{transform:translate(22px,920px);opacity:0} }
+@keyframes snow-c { 0%{transform:translate(0,0);opacity:0} 5%{opacity:.85} 90%{opacity:.55} 100%{transform:translate(-8px,920px);opacity:0} }
+@keyframes snow-d { 0%{transform:translate(0,0);opacity:0} 5%{opacity:.50} 90%{opacity:.35} 100%{transform:translate(14px,920px);opacity:0} }
+@keyframes snow-e { 0%{transform:translate(0,0);opacity:0} 5%{opacity:.70} 90%{opacity:.48} 100%{transform:translate(-25px,920px);opacity:0} }
+
+/* Anglerfish lure pulse */
+@keyframes lure-pulse {
+  0%,100% { r: 7; opacity: .95; filter: url(#lure-glow); }
+  40%      { r: 11; opacity: 1; }
+  60%      { r: 8; opacity: .80; }
+}
+@keyframes lure-trail { 0%,100%{opacity:.6} 50%{opacity:.15} }
+
+/* Anglerfish drift — slow side to side and up/down */
+@keyframes fish-drift {
+  0%,100% { transform: translate(0px, 0px); }
+  25%     { transform: translate(12px, -8px); }
+  50%     { transform: translate(25px, 4px); }
+  75%     { transform: translate(8px, -12px); }
+}
+
+/* Jellyfish drift upward with sway */
+@keyframes jelly-a {
+  0%   { transform: translate(0px, 0px) scaleX(1); }
+  20%  { transform: translate(12px, -80px) scaleX(1.04); }
+  40%  { transform: translate(8px, -155px) scaleX(0.97); }
+  60%  { transform: translate(18px, -225px) scaleX(1.03); }
+  80%  { transform: translate(6px, -300px) scaleX(0.98); }
+  100% { transform: translate(14px, -380px) scaleX(1); }
+}
+@keyframes jelly-b {
+  0%   { transform: translate(0px, 0px) scaleX(1); }
+  25%  { transform: translate(-10px, -95px) scaleX(0.96); }
+  50%  { transform: translate(-18px, -190px) scaleX(1.05); }
+  75%  { transform: translate(-6px, -285px) scaleX(0.97); }
+  100% { transform: translate(-14px, -380px) scaleX(1); }
+}
+
+/* Jellyfish bell pulsing */
+@keyframes bell-pulse {
+  0%,100% { transform: scaleY(1) scaleX(1); }
+  40%     { transform: scaleY(0.82) scaleX(1.12); }
+}
+
+/* Tendril sway */
+@keyframes tendril { 0%,100%{d:path("M0 0 Q 5 15 0 30 Q -5 45 0 60")} 50%{d:path("M0 0 Q -8 15 -3 30 Q 5 45 2 60")} }
+
+/* Deep glow pulse */
+@keyframes glow-pulse { 0%,100%{opacity:.45} 50%{opacity:.72} }
+
+/* Tube worm sway */
+@keyframes tube-sway { 0%,100%{transform:rotate(0deg)} 50%{transform:rotate(3deg)} }
+
+/* Distant whale drift */
+@keyframes whale-drift {
+  0%   { transform: translate(0px, 0px); opacity: .08; }
+  50%  { transform: translate(-180px, 25px); opacity: .12; }
+  100% { transform: translate(-360px, 0px); opacity: .06; }
+}
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="void-sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#000510" stop-opacity=".65"/>
+    <stop offset="22%"  stop-color="#000308"/>
+    <stop offset="60%"  stop-color="#000205"/>
+    <stop offset="100%" stop-color="#000102"/>
+  </linearGradient>
+
+  <!-- Very faint surface glow at absolute top — distant sunlight, impossibly far -->
+  <radialGradient id="surface-hint" cx="50%" cy="0%" r="45%">
+    <stop offset="0%"   stop-color="#082840" stop-opacity=".30"/>
+    <stop offset="100%" stop-color="#000205" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- Anglerfish lure glow -->
+  <filter id="lure-glow" x="-200%" y="-200%" width="500%" height="500%">
+    <feGaussianBlur stdDeviation="9" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="lure-core" x="-300%" y="-300%" width="700%" height="700%">
+    <feGaussianBlur stdDeviation="20"/>
+  </filter>
+  <filter id="bioglow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="10" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="jelly-glow" x="-60%" y="-60%" width="220%" height="220%">
+    <feGaussianBlur stdDeviation="7" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="big-blur"><feGaussianBlur stdDeviation="30"/></filter>
+  <filter id="med-blur"><feGaussianBlur stdDeviation="12"/></filter>
+  <filter id="sml-blur"><feGaussianBlur stdDeviation="4"/></filter>
+  <filter id="fish-shadow" x="-20%" y="-40%" width="140%" height="180%">
+    <feGaussianBlur stdDeviation="6"/>
+  </filter>
+
+  <!-- Jellyfish bell gradient -->
+  <radialGradient id="bell-1" cx="50%" cy="40%" r="60%">
+    <stop offset="0%"   stop-color="#60e8d0" stop-opacity=".55"/>
+    <stop offset="55%"  stop-color="#20a8b8" stop-opacity=".28"/>
+    <stop offset="100%" stop-color="#0888a0" stop-opacity=".08"/>
+  </radialGradient>
+  <radialGradient id="bell-2" cx="50%" cy="40%" r="60%">
+    <stop offset="0%"   stop-color="#8080f8" stop-opacity=".48"/>
+    <stop offset="55%"  stop-color="#4840c8" stop-opacity=".22"/>
+    <stop offset="100%" stop-color="#280898" stop-opacity=".06"/>
+  </radialGradient>
+
+  <!-- Ocean floor gradient -->
+  <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#020810"/>
+    <stop offset="100%" stop-color="#000102"/>
+  </linearGradient>
+</defs>
+
+<!-- ── ABYSS ───────────────────────────────────────────── -->
+<rect width="1440" height="900" fill="#000102"/>
+<rect width="1440" height="900" fill="url(#void-sky)"/>
+
+<!-- Impossible hint of surface light at top -->
+<rect width="1440" height="900" fill="url(#surface-hint)"/>
+
+<!-- ── BIOLUMINESCENT BACKGROUND PATCHES ─────────────── -->
+<!-- Distant colony patches — very dim, large -->
+<ellipse cx="220" cy="340" rx="160" ry="80"
+  fill="#004060" opacity=".06" filter="url(#big-blur)"/>
+<ellipse cx="1100" cy="250" rx="200" ry="90"
+  fill="#003848" opacity=".05" filter="url(#big-blur)"/>
+<ellipse cx="680" cy="180" rx="250" ry="100"
+  fill="#004455" opacity=".04" filter="url(#big-blur)"/>
+<ellipse cx="380" cy="620" rx="180" ry="70"
+  fill="#003040" opacity=".06" filter="url(#big-blur)"/>
+<ellipse cx="1050" cy="680" rx="220" ry="80"
+  fill="#002838" opacity=".05" filter="url(#big-blur)"/>
+
+<!-- ── MARINE SNOW ──────────────────────────────────────  -->
+<!-- Using different animation variants + delay for organic feel -->
+<!-- Batch A (slowest, large, faint) -->
+<g fill="#c0e8f8">
+  <circle cx="72"   cy="-20" r="1.8" opacity=".0" style="animation:snow-a 22s linear infinite 0s"/>
+  <circle cx="195"  cy="-50" r="1.4" opacity=".0" style="animation:snow-b 28s linear infinite 3.5s"/>
+  <circle cx="318"  cy="-35" r="2.0" opacity=".0" style="animation:snow-c 25s linear infinite 7.2s"/>
+  <circle cx="445"  cy="-60" r="1.5" opacity=".0" style="animation:snow-d 30s linear infinite 1.8s"/>
+  <circle cx="568"  cy="-25" r="1.9" opacity=".0" style="animation:snow-a 24s linear infinite 5.0s"/>
+  <circle cx="690"  cy="-45" r="1.3" opacity=".0" style="animation:snow-e 27s linear infinite 9.4s"/>
+  <circle cx="815"  cy="-30" r="2.1" opacity=".0" style="animation:snow-b 23s linear infinite 2.2s"/>
+  <circle cx="940"  cy="-55" r="1.6" opacity=".0" style="animation:snow-c 29s linear infinite 6.8s"/>
+  <circle cx="1065" cy="-40" r="1.8" opacity=".0" style="animation:snow-a 26s linear infinite 4.1s"/>
+  <circle cx="1188" cy="-20" r="1.4" opacity=".0" style="animation:snow-d 31s linear infinite 8.5s"/>
+  <circle cx="1312" cy="-50" r="2.0" opacity=".0" style="animation:snow-e 22s linear infinite 0.8s"/>
+  <circle cx="1400" cy="-35" r="1.5" opacity=".0" style="animation:snow-b 28s linear infinite 12s"/>
+</g>
+<!-- Batch B (medium speed) -->
+<g fill="#d0f0ff">
+  <circle cx="38"   cy="-30" r="1.2" opacity=".0" style="animation:snow-b 18s linear infinite 2.4s"/>
+  <circle cx="145"  cy="-55" r="1.0" opacity=".0" style="animation:snow-a 16s linear infinite 6.1s"/>
+  <circle cx="255"  cy="-20" r="1.4" opacity=".0" style="animation:snow-c 19s linear infinite 0.3s"/>
+  <circle cx="382"  cy="-45" r="1.1" opacity=".0" style="animation:snow-d 17s linear infinite 8.8s"/>
+  <circle cx="502"  cy="-32" r="1.3" opacity=".0" style="animation:snow-e 20s linear infinite 3.7s"/>
+  <circle cx="622"  cy="-58" r="0.9" opacity=".0" style="animation:snow-a 15s linear infinite 5.5s"/>
+  <circle cx="742"  cy="-28" r="1.5" opacity=".0" style="animation:snow-b 18s linear infinite 1.0s"/>
+  <circle cx="865"  cy="-42" r="1.0" opacity=".0" style="animation:snow-c 21s linear infinite 7.3s"/>
+  <circle cx="985"  cy="-18" r="1.3" opacity=".0" style="animation:snow-d 16s linear infinite 4.4s"/>
+  <circle cx="1105" cy="-50" r="1.1" opacity=".0" style="animation:snow-e 19s linear infinite 9.9s"/>
+  <circle cx="1228" cy="-35" r="1.4" opacity=".0" style="animation:snow-a 17s linear infinite 2.8s"/>
+  <circle cx="1352" cy="-22" r="1.0" opacity=".0" style="animation:snow-b 20s linear infinite 11s"/>
+  <circle cx="1432" cy="-48" r="1.2" opacity=".0" style="animation:snow-c 18s linear infinite 6.6s"/>
+</g>
+<!-- Batch C (fastest, smallest, densest) -->
+<g fill="#e8f8ff" opacity=".9">
+  <circle cx="95"   cy="-15" r="0.8" style="animation:snow-c 11s linear infinite 1.2s"/>
+  <circle cx="175"  cy="-38" r="0.6" style="animation:snow-a 13s linear infinite 4.8s"/>
+  <circle cx="268"  cy="-52" r="0.9" style="animation:snow-b 10s linear infinite 0.5s"/>
+  <circle cx="355"  cy="-22" r="0.7" style="animation:snow-d 12s linear infinite 7.0s"/>
+  <circle cx="462"  cy="-40" r="0.8" style="animation:snow-e 14s linear infinite 2.5s"/>
+  <circle cx="555"  cy="-18" r="0.6" style="animation:snow-a 11s linear infinite 5.8s"/>
+  <circle cx="648"  cy="-46" r="0.9" style="animation:snow-b 13s linear infinite 9.2s"/>
+  <circle cx="745"  cy="-28" r="0.7" style="animation:snow-c 10s linear infinite 3.1s"/>
+  <circle cx="842"  cy="-55" r="0.8" style="animation:snow-d 12s linear infinite 1.6s"/>
+  <circle cx="938"  cy="-20" r="0.6" style="animation:snow-e 14s linear infinite 6.4s"/>
+  <circle cx="1035" cy="-44" r="0.9" style="animation:snow-a 11s linear infinite 8.0s"/>
+  <circle cx="1132" cy="-30" r="0.7" style="animation:snow-b 13s linear infinite 0.2s"/>
+  <circle cx="1228" cy="-58" r="0.8" style="animation:snow-c 10s linear infinite 4.5s"/>
+  <circle cx="1325" cy="-24" r="0.6" style="animation:snow-d 12s linear infinite 7.8s"/>
+  <circle cx="1418" cy="-42" r="0.9" style="animation:snow-e 14s linear infinite 3.4s"/>
+</g>
+<!-- Extra mid-frame snow (already partway down, fills in gaps) -->
+<g fill="#d8f0ff">
+  <circle cx="112"  cy="200" r="1.0" style="animation:snow-a 24s linear infinite -8s"/>
+  <circle cx="285"  cy="350" r="1.3" style="animation:snow-b 18s linear infinite -5s"/>
+  <circle cx="468"  cy="150" r="0.8" style="animation:snow-c 21s linear infinite -12s"/>
+  <circle cx="655"  cy="420" r="1.1" style="animation:snow-d 16s linear infinite -3s"/>
+  <circle cx="845"  cy="280" r="0.9" style="animation:snow-e 22s linear infinite -9s"/>
+  <circle cx="1025" cy="500" r="1.2" style="animation:snow-a 19s linear infinite -6s"/>
+  <circle cx="1205" cy="180" r="0.8" style="animation:snow-b 25s linear infinite -15s"/>
+  <circle cx="1390" cy="360" r="1.0" style="animation:snow-c 17s linear infinite -2s"/>
+  <circle cx="50"   cy="480" r="1.1" style="animation:snow-d 20s linear infinite -11s"/>
+  <circle cx="720"  cy="130" r="0.9" style="animation:snow-e 23s linear infinite -7s"/>
+</g>
+
+<!-- ── DISTANT WHALE SILHOUETTE ──────────────────────── -->
+<g style="animation:whale-drift 45s linear infinite" transform="translate(1300,95)">
+  <ellipse cx="0" cy="0" rx="145" ry="38" fill="#010810" opacity=".10"
+    transform="rotate(-5)"/>
+  <!-- Flukes -->
+  <path d="M -140 -5 Q -170 -25 -155 -40 Q -145 -30 -140 -5
+           Q -140 -5 -145 -25 Q -130 -38 -118 -18 Z"
+    fill="#010810" opacity=".10"/>
+  <!-- Head -->
+  <ellipse cx="138" cy="-3" rx="22" ry="14" fill="#010810" opacity=".10" transform="rotate(-8 138 -3)"/>
+</g>
+
+<!-- ── JELLYFISH 1 (teal/cyan) ───────────────────────── -->
+<g transform="translate(320, 680)" style="animation:jelly-a 18s ease-in-out infinite alternate">
+  <!-- Tendril glow -->
+  <g filter="url(#jelly-glow)">
+    <!-- Bell -->
+    <g style="animation:bell-pulse 2.8s ease-in-out infinite" transform-origin="50px 0">
+      <ellipse cx="50" cy="0" rx="46" ry="36" fill="url(#bell-1)"/>
+      <ellipse cx="50" cy="0" rx="46" ry="36"
+        fill="none" stroke="#40d8c8" stroke-width="1.2" stroke-opacity=".55"/>
+      <!-- Inner bell ribs -->
+      <path d="M 15 0 Q 20 -18 50 -22 Q 80 -18 85 0"
+        fill="none" stroke="#30c0b8" stroke-width="0.8" stroke-opacity=".35"/>
+      <path d="M 25 0 Q 28 -16 50 -20 Q 72 -16 75 0"
+        fill="none" stroke="#40d0c0" stroke-width="0.7" stroke-opacity=".30"/>
+      <!-- Oral arms hanging from center -->
+      <path d="M 50 36 Q 44 55 42 72 Q 38 88 44 100"
+        fill="none" stroke="#30c0b0" stroke-width="2" stroke-opacity=".45" stroke-linecap="round"/>
+      <path d="M 50 36 Q 52 56 56 74 Q 60 90 54 104"
+        fill="none" stroke="#28b8a8" stroke-width="2" stroke-opacity=".40" stroke-linecap="round"/>
+      <path d="M 50 36 Q 40 58 36 80 Q 30 102 35 120"
+        fill="none" stroke="#38c8b8" stroke-width="1.5" stroke-opacity=".35" stroke-linecap="round"/>
+      <path d="M 50 36 Q 62 60 65 82 Q 68 104 62 122"
+        fill="none" stroke="#28b8a8" stroke-width="1.5" stroke-opacity=".32" stroke-linecap="round"/>
+    </g>
+    <!-- Tendrils (long, trailing) -->
+    <path d="M 30 36 Q 22 75 18 115 Q 12 160 20 200 Q 14 240 22 280"
+      fill="none" stroke="#20b0a0" stroke-width="1" stroke-opacity=".28" stroke-linecap="round"/>
+    <path d="M 42 38 Q 36 80 30 125 Q 22 175 28 220"
+      fill="none" stroke="#18a898" stroke-width="0.8" stroke-opacity=".22" stroke-linecap="round"/>
+    <path d="M 58 38 Q 65 82 62 130 Q 58 180 65 225"
+      fill="none" stroke="#20b0a0" stroke-width="1" stroke-opacity=".25" stroke-linecap="round"/>
+    <path d="M 70 36 Q 80 78 78 120 Q 75 168 82 210 Q 80 250 88 288"
+      fill="none" stroke="#18a898" stroke-width="0.8" stroke-opacity=".20" stroke-linecap="round"/>
+  </g>
+</g>
+
+<!-- ── JELLYFISH 2 (violet/purple, smaller) ──────────── -->
+<g transform="translate(1085, 720)" style="animation:jelly-b 22s ease-in-out infinite alternate-reverse">
+  <g filter="url(#jelly-glow)">
+    <g style="animation:bell-pulse 3.5s ease-in-out infinite 0.8s" transform-origin="32px 0">
+      <ellipse cx="32" cy="0" rx="30" ry="22" fill="url(#bell-2)"/>
+      <ellipse cx="32" cy="0" rx="30" ry="22"
+        fill="none" stroke="#8070e8" stroke-width="1" stroke-opacity=".48"/>
+      <path d="M 32 22 Q 28 38 26 52 Q 22 66 27 78"
+        fill="none" stroke="#7060d8" stroke-width="1.8" stroke-opacity=".38" stroke-linecap="round"/>
+      <path d="M 32 22 Q 36 40 38 55 Q 42 68 36 80"
+        fill="none" stroke="#6050c8" stroke-width="1.8" stroke-opacity=".34" stroke-linecap="round"/>
+    </g>
+    <path d="M 18 22 Q 12 60 14 100 Q 10 140 16 175"
+      fill="none" stroke="#6858c8" stroke-width="0.8" stroke-opacity=".22" stroke-linecap="round"/>
+    <path d="M 46 22 Q 52 62 50 104 Q 48 148 54 186"
+      fill="none" stroke="#7060d8" stroke-width="0.8" stroke-opacity=".20" stroke-linecap="round"/>
+    <path d="M 32 22 Q 28 70 24 116 Q 20 160 26 200 Q 22 238 28 275"
+      fill="none" stroke="#5848b8" stroke-width="0.7" stroke-opacity=".18" stroke-linecap="round"/>
+  </g>
+</g>
+
+<!-- ── ANGLERFISH ─────────────────────────────────────── -->
+<g transform="translate(480, 440)" style="animation:fish-drift 18s ease-in-out infinite">
+
+  <!-- Shadow/aura beneath the fish -->
+  <ellipse cx="80" cy="85" rx="95" ry="25" fill="#000510" opacity=".6" filter="url(#fish-shadow)"/>
+
+  <!-- Lure light cone — soft atmospheric spread -->
+  <circle cx="-48" cy="-155" r="90"
+    fill="#d0e820" opacity=".04" filter="url(#lure-core)"
+    style="animation:glow-pulse 2.8s ease-in-out infinite"/>
+
+  <!-- Bioluminescent scatter from lure on the body -->
+  <ellipse cx="30" cy="-40" rx="45" ry="20"
+    fill="#c0d818" opacity=".03" filter="url(#big-blur)"/>
+
+  <!-- DORSAL SPINE (ilicium) -->
+  <path d="M 45 -18 Q 30 -52 10 -88 Q -10 -120 -28 -148 Q -38 -158 -48 -155"
+    fill="none" stroke="#101408" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- BODY -->
+  <ellipse cx="80" cy="30" rx="95" ry="60" fill="#050c12"/>
+  <!-- Body texture — subtle pressure ridges -->
+  <path d="M 20 -5 Q 50 -22 80 -18 Q 110 -14 145 0"
+    fill="none" stroke="#080e16" stroke-width="1.5" stroke-opacity=".4"/>
+  <path d="M 10 15 Q 45 0 80 4 Q 115 8 158 22"
+    fill="none" stroke="#070d14" stroke-width="1.2" stroke-opacity=".3"/>
+  <!-- Photophores (small bioluminescent spots along body) -->
+  <circle cx="62"  cy="18" r="1.8" fill="#00c8e0" opacity=".45" filter="url(#sml-blur)"/>
+  <circle cx="90"  cy="8"  r="1.5" fill="#00b8d0" opacity=".38" filter="url(#sml-blur)"/>
+  <circle cx="118" cy="22" r="1.6" fill="#00c0d8" opacity=".42" filter="url(#sml-blur)"/>
+  <circle cx="142" cy="38" r="1.4" fill="#00b0c8" opacity=".35" filter="url(#sml-blur)"/>
+  <circle cx="55"  cy="40" r="1.3" fill="#00c8e0" opacity=".32" filter="url(#sml-blur)"/>
+
+  <!-- MASSIVE JAW (lower) -->
+  <path d="M 168 45 Q 155 75 120 90 Q 80 100 40 88 Q 8 78 -10 58 Q -24 40 -18 28 L 168 45 Z"
+    fill="#040a10"/>
+  <!-- Lower teeth -->
+  <path d="M 158 46 L 150 68 M 136 54 L 130 74 M 115 60 L 110 80 M 92 64 L 88 83 M 68 63 L 64 82 M 44 58 L 40 76 M 22 50 L 18 66 M 3 42 L 0 57"
+    stroke="#040c14" stroke-width="2.5" stroke-linecap="round" opacity=".8"/>
+  <!-- Upper jaw lip -->
+  <path d="M -18 28 Q -8 18 20 12 Q 60 5 100 8 Q 140 11 168 28"
+    fill="none" stroke="#040a10" stroke-width="3"/>
+  <!-- Upper teeth (smaller, pointing down) -->
+  <path d="M 155 30 L 148 44 M 135 24 L 128 38 M 112 20 L 106 34 M 88 18 L 82 30 M 64 19 L 58 32 M 40 22 L 34 35 M 18 26 L 12 38"
+    stroke="#030810" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+
+  <!-- LARGE EYE -->
+  <circle cx="158" cy="4" r="20" fill="#020408"/>
+  <circle cx="158" cy="4" r="18" fill="#040c18"/>
+  <!-- Iris with bioluminescent ring -->
+  <circle cx="158" cy="4" r="14" fill="#020304"/>
+  <circle cx="158" cy="4" r="14"
+    fill="none" stroke="#00406a" stroke-width="2" opacity=".6"/>
+  <circle cx="158" cy="4" r="14"
+    fill="none" stroke="#0068a0" stroke-width="1" opacity=".35" filter="url(#sml-blur)"/>
+  <!-- Pupil -->
+  <ellipse cx="158" cy="4" rx="7" ry="10" fill="#000102" transform="rotate(-5 158 4)"/>
+  <!-- Eye specular -->
+  <circle cx="163" cy="-3" r="3.5" fill="white" opacity=".18"/>
+
+  <!-- PECTORAL FINS -->
+  <path d="M 90 65 Q 115 90 140 100 Q 160 105 155 95 Q 145 80 120 75 Q 105 68 90 65 Z"
+    fill="#030810" opacity=".8"/>
+  <path d="M 70 62 Q 45 88 20 96 Q 5 100 8 90 Q 15 78 40 72 Q 58 66 70 62 Z"
+    fill="#030810" opacity=".8"/>
+
+  <!-- DORSAL FIN -->
+  <path d="M 100 -22 Q 115 -45 140 -55 Q 155 -58 158 -50 Q 155 -38 145 -28 Q 130 -15 115 -8"
+    fill="#030810"/>
+
+  <!-- TAIL FIN -->
+  <path d="M -8 30 Q -40 10 -55 25 Q -50 42 -8 52 Z" fill="#030810"/>
+  <path d="M -8 30 Q -42 20 -58 8 Q -55 -5 -8 10 Z" fill="#030810" opacity=".7"/>
+
+  <!-- ── LURE (esca) at spine tip ── -->
+  <!-- Deep glow spread -->
+  <circle cx="-48" cy="-155" r="28"
+    fill="#d4e818" opacity=".18" filter="url(#med-blur)"
+    style="animation:glow-pulse 2.8s ease-in-out infinite"/>
+  <!-- Lure body -->
+  <circle cx="-48" cy="-155" r="9"
+    fill="#e8f820"
+    filter="url(#lure-glow)"
+    style="animation:lure-pulse 2.8s ease-in-out infinite"/>
+  <!-- Lure core (brightest center) -->
+  <circle cx="-48" cy="-155" r="4" fill="white" opacity=".90"/>
+  <!-- Trailing spine filaments -->
+  <path d="M -52 -164 Q -58 -174 -56 -180" fill="none"
+    stroke="#c8e010" stroke-width="1" stroke-opacity=".4" stroke-linecap="round"/>
+  <path d="M -44 -164 Q -38 -172 -42 -178" fill="none"
+    stroke="#c0d810" stroke-width="0.8" stroke-opacity=".35" stroke-linecap="round"/>
+</g>
+
+<!-- ── OCEAN FLOOR ──────────────────────────────────────── -->
+<!-- Rock formation silhouette -->
+<path d="M-20 900 L-20 838 Q 40 820 80 828 Q 120 835 150 818
+         Q 188 800 225 812 Q 262 824 295 808
+         Q 335 792 372 808 Q 410 825 442 810
+         Q 480 794 518 812 Q 555 830 588 815
+         Q 625 800 660 820 Q 698 840 730 822
+         Q 762 804 795 818 Q 828 832 862 815
+         Q 898 798 935 815 Q 972 832 1005 816
+         Q 1040 800 1078 818 Q 1115 836 1148 820
+         Q 1182 804 1218 820 Q 1254 835 1288 818
+         Q 1325 800 1362 818 Q 1398 836 1432 820
+         L1460 828 L1460 900 Z"
+  fill="url(#floor)"/>
+
+<!-- Rock details and depth crevices -->
+<path d="M 155 820 Q 160 840 152 855 Q 145 848 150 835 Z" fill="#000102" opacity=".6"/>
+<path d="M 380 812 Q 386 830 378 845 Q 372 838 376 824 Z" fill="#000102" opacity=".5"/>
+<path d="M 665 822 Q 672 840 664 856 Q 657 848 662 835 Z" fill="#000102" opacity=".6"/>
+<path d="M 945 818 Q 952 836 944 852 Q 937 844 942 830 Z" fill="#000102" opacity=".5"/>
+<path d="M 1230 822 Q 1237 840 1230 856 Q 1222 847 1226 834 Z" fill="#000102" opacity=".6"/>
+
+<!-- Tube worms / hydrothermal vent life at floor -->
+<!-- Left cluster -->
+<g transform="translate(88, 820)" style="animation:tube-sway 4s ease-in-out infinite" transform-origin="0 8">
+  <rect x="-2" y="-28" width="4" height="30" rx="2" fill="#021015"/>
+  <ellipse cx="0" cy="-28" rx="5" ry="4" fill="#a82828" opacity=".6"/>
+  <ellipse cx="0" cy="-28" rx="5" ry="4" fill="#e04040" opacity=".3" filter="url(#sml-blur)"/>
+</g>
+<g transform="translate(102, 824)" style="animation:tube-sway 5s ease-in-out infinite 1s" transform-origin="0 8">
+  <rect x="-2" y="-22" width="3.5" height="24" rx="2" fill="#021015"/>
+  <ellipse cx="0" cy="-22" rx="4" ry="3" fill="#b83030" opacity=".55"/>
+</g>
+<g transform="translate(118, 818)" style="animation:tube-sway 3.5s ease-in-out infinite 0.5s" transform-origin="0 8">
+  <rect x="-2.5" y="-32" width="5" height="34" rx="2" fill="#021015"/>
+  <ellipse cx="0" cy="-32" rx="6" ry="4.5" fill="#983020" opacity=".58"/>
+  <ellipse cx="0" cy="-32" rx="6" ry="4.5" fill="#e04030" opacity=".25" filter="url(#sml-blur)"/>
+</g>
+
+<!-- Right cluster -->
+<g transform="translate(1355, 816)" style="animation:tube-sway 4.5s ease-in-out infinite 2s" transform-origin="0 8">
+  <rect x="-2" y="-26" width="4" height="28" rx="2" fill="#021015"/>
+  <ellipse cx="0" cy="-26" rx="5" ry="3.5" fill="#a82828" opacity=".58"/>
+  <ellipse cx="0" cy="-26" rx="5" ry="3.5" fill="#d83838" opacity=".28" filter="url(#sml-blur)"/>
+</g>
+<g transform="translate(1372, 822)" style="animation:tube-sway 3.8s ease-in-out infinite 0.8s" transform-origin="0 8">
+  <rect x="-2" y="-20" width="3.5" height="22" rx="2" fill="#021015"/>
+  <ellipse cx="0" cy="-20" rx="4" ry="3" fill="#b83030" opacity=".52"/>
+</g>
+
+<!-- Hydrothermal shimmer hints -->
+<ellipse cx="105" cy="830" rx="18" ry="6"
+  fill="#c03828" opacity=".06" filter="url(#med-blur)"
+  style="animation:glow-pulse 3.5s ease-in-out infinite"/>
+<ellipse cx="1365" cy="828" rx="18" ry="6"
+  fill="#c03828" opacity=".05" filter="url(#med-blur)"
+  style="animation:glow-pulse 4s ease-in-out infinite 1.5s"/>
+
+<!-- Scattered floor detritus (organic particles) -->
+<g fill="#021018" opacity=".7">
+  <circle cx="210" cy="865" r="3.5"/>
+  <circle cx="425" cy="872" r="2.8"/>
+  <circle cx="618" cy="858" r="3.2"/>
+  <circle cx="848" cy="870" r="2.5"/>
+  <circle cx="1040" cy="862" r="3.0"/>
+  <circle cx="1265" cy="868" r="2.6"/>
+</g>
+
+<!-- ── DEPTH VIGNETTE ──────────────────────────────────── -->
+<radialGradient id="vig" cx="50%" cy="50%" r="68%">
+  <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+  <stop offset="100%" stop-color="#000" stop-opacity=".60"/>
+</radialGradient>
+<rect width="1440" height="900" fill="url(#vig)"/>
+
+<!-- Extra deep darkness at bottom -->
+<linearGradient id="floor-dark" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+  <stop offset="100%" stop-color="#000" stop-opacity=".75"/>
+</linearGradient>
+<rect x="0" y="780" width="1440" height="120" fill="url(#floor-dark)"/>
+
+</svg>
+</body>
+</html>

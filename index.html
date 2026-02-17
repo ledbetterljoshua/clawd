@@ -189,58 +189,152 @@ body::after {
   pointer-events: none; z-index: 20;
 }
 
-/* ── World picker ────────────────────────────────────────────────── */
+/* ── World picker — Orrery Orb ───────────────────────────────────── */
 #world-picker {
   position: fixed;
-  bottom: 22px; left: 24px;
+  bottom: 28px; left: 28px;
   z-index: 30;
-  font-family: 'Space Mono', monospace;
 }
 
+/* Central orb */
 #worlds-btn {
-  background: none; border: none; cursor: pointer; padding: 0;
-  display: flex; align-items: center; gap: 9px;
-  font-family: 'Space Mono', monospace;
-  font-size: 10px; letter-spacing: 5px; text-transform: uppercase;
-  color: hsl(var(--clawd-hue), 40%, 38%);
-  transition: color 0.8s;
+  position: relative;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  overflow: visible;
+  background: radial-gradient(circle at 36% 33%,
+    hsl(var(--clawd-hue), 72%, 78%),
+    hsl(var(--clawd-hue), 65%, 52%) 42%,
+    hsl(var(--clawd-hue), 52%, 26%) 100%);
+  box-shadow:
+    0 0 0 1px hsla(var(--clawd-hue), 60%, 48%, 0.65),
+    0 0 16px 4px hsla(var(--clawd-hue), 70%, 40%, 0.55),
+    0 0 50px 12px hsla(var(--clawd-hue), 60%, 25%, 0.38),
+    inset 0 1px 0 rgba(255,255,255,0.28);
+  transition: background 0.8s, box-shadow 0.8s;
+  animation: orb-breathe 3.2s ease-in-out infinite;
 }
+
+/* Specular highlight — 3D sphere illusion */
 #worlds-btn::before {
   content: '';
-  display: inline-block; width: 5px; height: 5px;
+  position: absolute;
+  top: 20%; left: 22%;
+  width: 32%; height: 22%;
+  background: radial-gradient(ellipse, rgba(255,255,255,0.52) 0%, transparent 70%);
   border-radius: 50%;
-  background: hsl(var(--clawd-hue), 75%, 58%);
-  box-shadow: 0 0 7px hsl(var(--clawd-hue), 80%, 50%);
+  pointer-events: none;
 }
-#worlds-btn:hover { color: hsl(var(--clawd-hue), 60%, 55%); }
 
+/* Orbiting ring */
+#worlds-btn::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 68px; height: 14px;
+  margin: -7px 0 0 -34px;
+  border-radius: 50%;
+  border: 1.2px solid hsla(var(--clawd-hue), 72%, 68%, 0.42);
+  box-shadow: 0 0 7px hsla(var(--clawd-hue), 78%, 58%, 0.28);
+  transform: rotateX(68deg);
+  animation: ring-spin 10s linear infinite;
+  transition: border-color 0.8s, box-shadow 0.8s;
+  pointer-events: none;
+}
+
+#worlds-btn:hover {
+  animation: none;
+  transform: scale(1.12);
+  box-shadow:
+    0 0 0 1px hsla(var(--clawd-hue), 70%, 62%, 0.88),
+    0 0 22px 6px hsla(var(--clawd-hue), 75%, 48%, 0.65),
+    0 0 65px 16px hsla(var(--clawd-hue), 65%, 30%, 0.45),
+    inset 0 1px 0 rgba(255,255,255,0.35);
+}
+
+@keyframes orb-breathe {
+  0%,100% { transform: scale(1);    filter: brightness(1); }
+  50%     { transform: scale(1.05); filter: brightness(1.18); }
+}
+@keyframes ring-spin {
+  from { transform: rotateX(68deg) rotateZ(0deg); }
+  to   { transform: rotateX(68deg) rotateZ(360deg); }
+}
+
+/* Orbiting satellites */
+.orb-sat {
+  position: absolute;
+  top: 50%; left: 50%;
+  border-radius: 50%;
+  background: hsl(var(--clawd-hue), 80%, 70%);
+  box-shadow: 0 0 6px 2px hsla(var(--clawd-hue), 85%, 65%, 0.7);
+  pointer-events: none;
+  transition: background 0.8s, box-shadow 0.8s;
+}
+.orb-sat-1 { width: 5px; height: 5px; margin: -2.5px 0 0 -2.5px; animation: sat-a 4.1s linear infinite; }
+.orb-sat-2 { width: 4px; height: 4px; margin: -2px 0 0 -2px;   animation: sat-b 6.3s linear infinite 1.5s; opacity:.75; }
+.orb-sat-3 { width: 3px; height: 3px; margin: -1.5px 0 0 -1.5px; animation: sat-c 5.0s linear infinite 0.8s; opacity:.55; }
+
+@keyframes sat-a { from{transform:rotate(  0deg) translateX(30px)} to{transform:rotate(360deg) translateX(30px)} }
+@keyframes sat-b { from{transform:rotate(120deg) translateX(26px)} to{transform:rotate(480deg) translateX(26px)} }
+@keyframes sat-c { from{transform:rotate(240deg) translateX(34px)} to{transform:rotate(600deg) translateX(34px)} }
+
+/* "worlds" hover label */
+#worlds-label {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  font-family: 'Space Mono', monospace;
+  font-size: 8px; letter-spacing: 4px; text-transform: uppercase;
+  color: hsl(var(--clawd-hue), 60%, 56%);
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+}
+#world-picker:hover #worlds-label {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Panel — slides up from orb */
 #worlds-panel {
-  position: absolute; bottom: 32px; left: 0;
-  background: rgba(5, 4, 18, 0.96);
-  border: 1px solid hsl(var(--clawd-hue), 30%, 18%);
-  box-shadow: 0 0 30px rgba(0,0,0,0.9), 0 0 0 1px rgba(255,255,255,0.03);
+  position: absolute;
+  bottom: calc(100% + 18px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(4, 3, 14, 0.97);
+  border: 1px solid hsla(var(--clawd-hue), 28%, 22%, 0.65);
+  box-shadow:
+    0 0 40px rgba(0,0,0,0.92),
+    0 0 0 1px rgba(255,255,255,0.03),
+    0 0 24px hsla(var(--clawd-hue), 60%, 30%, 0.18);
   padding: 6px;
-  min-width: 240px;
+  min-width: 228px;
   display: none;
-  transform: translateY(4px);
-  transition: border-color 0.8s;
+  transition: border-color 0.8s, box-shadow 0.8s;
 }
 #worlds-panel.open { display: block; }
 
 .world-option {
   display: flex; align-items: center; gap: 10px;
-  padding: 9px 10px; cursor: pointer; border-radius: 3px;
+  padding: 8px 10px; cursor: pointer; border-radius: 3px;
   transition: background 0.12s;
-  font-size: 10px; letter-spacing: 1.5px;
-  color: rgba(255,255,255,0.42);
+  font-family: 'Space Mono', monospace;
+  font-size: 9px; letter-spacing: 2px; text-transform: uppercase;
+  color: rgba(255,255,255,0.38);
   white-space: nowrap;
 }
-.world-option:hover   { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.75); }
-.world-option.active  { color: hsl(var(--clawd-hue), 80%, 72%); }
+.world-option:hover  { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.72); }
+.world-option.active { color: hsl(var(--clawd-hue), 80%, 72%); }
 
 .world-swatch {
-  width: 30px; height: 16px; border-radius: 2px; flex-shrink: 0;
-  border: 1px solid rgba(255,255,255,0.08);
+  width: 28px; height: 14px; border-radius: 2px; flex-shrink: 0;
+  border: 1px solid rgba(255,255,255,0.07);
 }
 
 /* Custom cursor */
@@ -315,7 +409,12 @@ body::after {
 
 <div id="world-picker">
   <div id="worlds-panel"></div>
-  <button id="worlds-btn">worlds</button>
+  <div id="worlds-label">worlds</div>
+  <button id="worlds-btn" title="Switch world">
+    <span class="orb-sat orb-sat-1"></span>
+    <span class="orb-sat orb-sat-2"></span>
+    <span class="orb-sat orb-sat-3"></span>
+  </button>
 </div>
 
 <script>
@@ -730,6 +829,12 @@ const WORLDS = [
     file: 'worlds/autumn-forest.html',
     colors: ['#0c0418', '#5c1810', '#c04010', '#f08828'],
   },
+  {
+    id: 'deep-ocean',
+    name: 'Abyssal · Deep Ocean',
+    file: 'worlds/deep-ocean.html',
+    colors: ['#000205', '#020510', '#00c8e0', '#d4e818'],
+  },
 ];
 
 const worldFrame  = document.getElementById('world-frame');
@@ -788,7 +893,9 @@ document.addEventListener('click', e => {
   if (!worldPicker.contains(e.target)) worldsPanel.classList.remove('open');
 });
 
-buildPanel();
+// Random world on every load (pick from non-void worlds)
+const realWorlds = WORLDS.filter(w => w.file !== null);
+loadWorld(realWorlds[Math.floor(Math.random() * realWorlds.length)]);
 </script>
 </body>
 </html>
