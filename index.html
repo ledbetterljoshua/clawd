@@ -859,7 +859,9 @@ const SFX = (() => {
     }
   }
 
-  return { curious, happy, startled, thought, scuttle, startAmbience, setEnabled,
+  function initEnabled(v) { enabled = v; }
+
+  return { curious, happy, startled, thought, scuttle, startAmbience, setEnabled, initEnabled,
            get enabled() { return enabled; } };
 })();
 
@@ -872,9 +874,9 @@ audioBtn.addEventListener('click', e => {
   audioBtn.title = SFX.enabled ? 'Mute sound' : 'Enable sound';
 });
 
-// Restore audio preference across refreshes
+// Restore audio preference across refreshes (just set the flag; loadWorld starts the ambience)
 if (localStorage.getItem('clawd-audio') === '1') {
-  SFX.setEnabled(true);
+  SFX.initEnabled(true);
   audioBtn.classList.add('on');
   audioBtn.title = 'Mute sound';
 }
