@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin:0; padding:0; }
+html, body { width:100%; height:100%; overflow:hidden; background:#020508; }
+svg { width:100%; height:100%; display:block; }
+
+@keyframes tw-a { 0%,100%{opacity:.80} 52%{opacity:.10} }
+@keyframes tw-b { 0%,100%{opacity:.55} 44%{opacity:.05} }
+@keyframes tw-c { 0%,100%{opacity:.68} 60%{opacity:.12} }
+
+/* Bioluminescent pulse groups — many different timings */
+@keyframes bio-a { 0%,100%{opacity:.90} 50%{opacity:.15} }
+@keyframes bio-b { 0%,100%{opacity:.65} 40%{opacity:.05} }
+@keyframes bio-c { 0%,100%{opacity:.45} 55%{opacity:.80} }
+@keyframes bio-d { 0%,100%{opacity:.78} 35%{opacity:.12} }
+@keyframes bio-e { 0%,100%{opacity:.55} 60%{opacity:.92} }
+
+/* Wave shimmer */
+@keyframes wave-g { 0%,100%{stroke-opacity:.75} 50%{stroke-opacity:.18} }
+@keyframes wave-g2 { 0%,100%{stroke-opacity:.55} 40%{stroke-opacity:.12} }
+
+/* Firefly drift */
+@keyframes fly-a {
+  0%   { transform: translate(0, 0); opacity: .82; }
+  25%  { transform: translate(9px, -13px); opacity: 1; }
+  55%  { transform: translate(18px, -6px); opacity: .72; }
+  80%  { transform: translate(8px, -20px); opacity: .90; }
+  100% { transform: translate(0, 0); opacity: .82; }
+}
+@keyframes fly-b {
+  0%   { transform: translate(0, 0); opacity: .70; }
+  30%  { transform: translate(-7px, -10px); opacity: .92; }
+  60%  { transform: translate(-14px, -4px); opacity: .65; }
+  85%  { transform: translate(-5px, -16px); opacity: .85; }
+  100% { transform: translate(0, 0); opacity: .70; }
+}
+@keyframes fly-c {
+  0%   { transform: translate(0, 0); opacity: .60; }
+  35%  { transform: translate(5px, -8px); opacity: .85; }
+  65%  { transform: translate(12px, -14px); opacity: .72; }
+  100% { transform: translate(0, 0); opacity: .60; }
+}
+
+/* Boat bob */
+@keyframes bob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+
+/* Glow pulse on shore line */
+@keyframes shore-g { 0%,100%{opacity:.65} 50%{opacity:.90} }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#020508"/>
+    <stop offset="60%"  stop-color="#030c14"/>
+    <stop offset="100%" stop-color="#040e18"/>
+  </linearGradient>
+
+  <!-- Bay water gradients -->
+  <linearGradient id="water" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#030e16"/>
+    <stop offset="40%"  stop-color="#020c12"/>
+    <stop offset="100%" stop-color="#010810"/>
+  </linearGradient>
+  <linearGradient id="shore-glow" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#00d8e8" stop-opacity=".55"/>
+    <stop offset="100%" stop-color="#00c8d8" stop-opacity="0"/>
+  </linearGradient>
+  <!-- Foreground dock glow -->
+  <linearGradient id="dock-g" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#00e8c0" stop-opacity=".6"/>
+    <stop offset="100%" stop-color="#00d0b0" stop-opacity=".05"/>
+  </linearGradient>
+
+  <!-- City/sky glow (very faint, distant) -->
+  <radialGradient id="skyglow" cx="50%" cy="100%" r="50%">
+    <stop offset="0%"   stop-color="#102030" stop-opacity=".4"/>
+    <stop offset="100%" stop-color="#020508" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- Mangrove gradients -->
+  <linearGradient id="mang-l" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#010408"/>
+    <stop offset="100%" stop-color="#010306"/>
+  </linearGradient>
+
+  <!-- Bioluminescent glow filter -->
+  <filter id="bioglow" x="-40%" y="-40%" width="180%" height="180%">
+    <feGaussianBlur stdDeviation="5" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="biglow-soft" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="12"/>
+  </filter>
+  <filter id="fblur"><feGaussianBlur stdDeviation="5"/></filter>
+  <filter id="sblur"><feGaussianBlur stdDeviation="2"/></filter>
+  <filter id="xblur"><feGaussianBlur stdDeviation="18"/></filter>
+  <filter id="sglow">
+    <feGaussianBlur stdDeviation="1.4" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="fly-glow">
+    <feGaussianBlur stdDeviation="2.5" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+
+<!-- ── SKY ─────────────────────────────────────────────── -->
+<rect width="1440" height="900" fill="url(#sky)"/>
+
+<!-- Distant horizon glow from city/moon -->
+<ellipse cx="720" cy="480" rx="600" ry="80" fill="url(#skyglow)" filter="url(#xblur)"/>
+
+<!-- Stars -->
+<g filter="url(#sglow)">
+  <g style="animation:tw-a 3.4s ease-in-out infinite">
+    <circle cx="95"   cy="38"  r="1.0"  fill="#c8e8f8" opacity=".82"/>
+    <circle cx="268"  cy="22"  r="1.15" fill="#b8def5" opacity=".88"/>
+    <circle cx="455"  cy="55"  r=".86"  fill="#d8f0ff" opacity=".70"/>
+    <circle cx="625"  cy="28"  r="1.10" fill="#c0e4f8" opacity=".84"/>
+    <circle cx="815"  cy="12"  r=".94"  fill="#e0f0ff" opacity=".76"/>
+    <circle cx="968"  cy="48"  r="1.0"  fill="#c8e8f8" opacity=".80"/>
+    <circle cx="1145" cy="24"  r="1.10" fill="#b8e8f5" opacity=".86"/>
+    <circle cx="1325" cy="40"  r=".86"  fill="#d8f0ff" opacity=".70"/>
+    <circle cx="1410" cy="16"  r="1.0"  fill="#c0e4f8" opacity=".80"/>
+  </g>
+  <g style="animation:tw-b 5.1s ease-in-out infinite 1.5s">
+    <circle cx="168"  cy="66"  r=".82" fill="#d0e8f8" opacity=".64"/>
+    <circle cx="358"  cy="88"  r="1.10" fill="#c4e0f8" opacity=".78"/>
+    <circle cx="542"  cy="74"  r=".92" fill="#b8d8f5" opacity=".72"/>
+    <circle cx="728"  cy="58"  r=".82" fill="#d8f0ff" opacity=".60"/>
+    <circle cx="905"  cy="81"  r="1.0"  fill="#c8e8f8" opacity=".68"/>
+    <circle cx="1075" cy="68"  r="1.15" fill="#c0e8f5" opacity=".82"/>
+    <circle cx="1248" cy="92"  r=".82" fill="#e0f0ff" opacity=".64"/>
+    <circle cx="1392" cy="76"  r=".92" fill="#c4e0f8" opacity=".68"/>
+  </g>
+  <g style="animation:tw-c 6.2s ease-in-out infinite 0.9s">
+    <circle cx="58"   cy="108" r=".72" fill="#c8e8f8" opacity=".58"/>
+    <circle cx="205"  cy="130" r=".92" fill="#b8def5" opacity=".68"/>
+    <circle cx="382"  cy="115" r=".82" fill="#d8f0ff" opacity=".55"/>
+    <circle cx="568"  cy="138" r="1.0"  fill="#c0e4f8" opacity=".72"/>
+    <circle cx="745"  cy="104" r=".82" fill="#b8e8f5" opacity=".62"/>
+    <circle cx="922"  cy="133" r=".92" fill="#d0e8f8" opacity=".58"/>
+    <circle cx="1100" cy="118" r=".72" fill="#c8e8f8" opacity=".55"/>
+    <circle cx="1268" cy="148" r="1.10" fill="#c4e4f8" opacity=".76"/>
+    <circle cx="1436" cy="112" r=".82" fill="#e0f0ff" opacity=".60"/>
+  </g>
+  <!-- Scatter -->
+  <circle cx="122"  cy="82"  r=".62" fill="#c0e4f8" opacity=".48"/>
+  <circle cx="310"  cy="46"  r=".72" fill="#b8def5" opacity=".52"/>
+  <circle cx="492"  cy="100" r=".62" fill="#d8f0ff" opacity=".42"/>
+  <circle cx="674"  cy="73"  r=".72" fill="#c8e8f8" opacity=".48"/>
+  <circle cx="855"  cy="125" r=".52" fill="#c0e8f5" opacity=".38"/>
+  <circle cx="1035" cy="55"  r=".62" fill="#b8def5" opacity=".48"/>
+  <circle cx="1200" cy="103" r=".72" fill="#d0e8f8" opacity=".44"/>
+  <circle cx="1370" cy="63"  r=".52" fill="#c4e0f8" opacity=".38"/>
+  <circle cx="35"   cy="158" r=".52" fill="#c8e8f8" opacity=".36"/>
+  <circle cx="462"  cy="159" r=".62" fill="#b8def5" opacity=".42"/>
+  <circle cx="642"  cy="173" r=".52" fill="#c0e4f8" opacity=".38"/>
+  <circle cx="822"  cy="150" r=".62" fill="#d8f0ff" opacity=".42"/>
+  <circle cx="1002" cy="169" r=".52" fill="#c8e8f8" opacity=".38"/>
+  <circle cx="1165" cy="153" r=".62" fill="#b8e8f5" opacity=".36"/>
+  <circle cx="1336" cy="167" r=".52" fill="#c4e0f8" opacity=".32"/>
+</g>
+
+<!-- Milky Way (very subtle diagonal band) -->
+<rect x="0" y="0" width="1440" height="250" fill="none"
+  rx="0" ry="0" opacity="0"/>
+<ellipse cx="500" cy="120" rx="580" ry="55"
+  fill="#c0d8ff" opacity=".025" filter="url(#xblur)"
+  transform="rotate(-18 500 120)"/>
+
+<!-- ── LEFT MANGROVE ─────────────────────────────────── -->
+<!-- Main mass -->
+<path d="M-10 900 L-10 480 Q 30 440 65 420 Q 100 400 130 380
+         Q 160 360 185 320 Q 198 298 210 280
+         Q 198 305 192 330 Q 185 355 195 375
+         Q 210 355 228 338 Q 245 355 238 378
+         Q 252 360 272 345 Q 285 362 278 385
+         Q 295 368 315 355 Q 325 372 318 395
+         Q 298 412 275 418 Q 255 425 238 440
+         Q 222 458 215 478 Q 208 498 218 520
+         Q 225 510 240 502 Q 255 510 248 528
+         Q 262 516 278 508 Q 292 518 285 536
+         Q 272 548 258 560 Q 242 572 232 590
+         Q 220 608 215 628 Q 210 648 212 668
+         Q 215 688 212 708 Q 208 728 205 750
+         L200 900 Z"
+  fill="#010408"/>
+<!-- Secondary canopy shapes -->
+<path d="M 185 320 Q 162 290 148 262 Q 135 240 128 218
+         Q 135 235 145 252 Q 155 270 158 292
+         Q 168 274 180 258 Q 195 272 190 295 Z"
+  fill="#010408"/>
+<path d="M 210 280 Q 230 252 248 228 Q 265 206 275 185
+         Q 265 208 255 228 Q 245 248 242 270
+         Q 258 255 272 240 Q 285 255 278 278 Z"
+  fill="#010408"/>
+<path d="M 210 280 Q 190 260 175 238 Q 162 218 155 195
+         Q 165 215 172 238 Q 178 260 180 282 Z"
+  fill="#010508"/>
+<!-- Root tangles in water -->
+<path d="M 205 550 Q 185 540 165 528 Q 145 518 128 508
+         Q 115 500 105 490 Q 118 504 135 514 Q 150 525 168 534 Z"
+  fill="#010508" opacity=".8"/>
+<path d="M 215 580 Q 192 572 170 562 Q 150 554 132 542 Q 148 555 168 564 Z"
+  fill="#010508" opacity=".7"/>
+<path d="M 218 620 Q 195 614 175 605 Q 155 596 138 582 Q 156 595 178 605 Z"
+  fill="#010408" opacity=".6"/>
+
+<!-- Bioluminescent glow along left mangrove roots (water touching roots) -->
+<ellipse cx="155" cy="560" rx="55" ry="12"
+  fill="#00d8e0" opacity=".18" filter="url(#fblur)"/>
+<ellipse cx="145" cy="600" rx="42" ry="10"
+  fill="#00d0d8" opacity=".14" filter="url(#fblur)"/>
+
+<!-- ── RIGHT MANGROVE ────────────────────────────────── -->
+<path d="M1450 900 L1450 460 Q1415 428 1385 405
+         Q1355 382 1330 358 Q1308 336 1295 312
+         Q1310 338 1312 362 Q1315 386 1305 408
+         Q1290 390 1275 376 Q1262 390 1268 412
+         Q1250 394 1232 382 Q1220 396 1226 418
+         Q1240 432 1258 444 Q1275 458 1285 474
+         Q1292 492 1288 512 Q1282 502 1268 494
+         Q1255 503 1262 520 Q1248 508 1232 500
+         Q1220 512 1226 528 Q1238 540 1252 552
+         Q1265 565 1272 582 Q1280 600 1278 620
+         Q1275 640 1278 660 Q1282 680 1278 700
+         Q1275 720 1272 740 L1268 900 Z"
+  fill="#010408"/>
+<path d="M 1295 312 Q 1315 285 1328 260 Q 1342 238 1350 215
+         Q 1342 238 1332 258 Q 1322 278 1318 300 Z"
+  fill="#010408"/>
+<path d="M 1295 312 Q 1272 285 1258 258 Q 1245 234 1240 208
+         Q 1248 232 1255 255 Q 1262 278 1264 300 Z"
+  fill="#010508"/>
+<!-- Right mangrove roots -->
+<path d="M 1280 545 Q 1298 536 1315 524 Q 1330 514 1344 502
+         Q 1330 516 1314 526 Q 1298 535 1282 542 Z"
+  fill="#010508" opacity=".8"/>
+<path d="M 1274 582 Q 1292 574 1308 563 Q 1324 553 1336 540
+         Q 1320 554 1302 563 Z"
+  fill="#010508" opacity=".7"/>
+
+<!-- Bioluminescent glow right roots -->
+<ellipse cx="1308" cy="555" rx="50" ry="11"
+  fill="#00d8e0" opacity=".15" filter="url(#fblur)"/>
+
+<!-- ── BAY WATER ──────────────────────────────────────── -->
+<path d="M 220 460 Q 400 440 600 448 Q 720 452 840 448
+         Q 1050 440 1240 460 L1240 900 L220 900 Z"
+  fill="url(#water)"/>
+
+<!-- Diffuse glow beneath water surface (bioluminescent colony) -->
+<ellipse cx="580" cy="580" rx="180" ry="60"
+  fill="#00c8d8" opacity=".07" filter="url(#biglow-soft)"/>
+<ellipse cx="900" cy="650" rx="220" ry="70"
+  fill="#00d4e0" opacity=".06" filter="url(#biglow-soft)"/>
+<ellipse cx="420" cy="700" rx="140" ry="50"
+  fill="#20e0c0" opacity=".05" filter="url(#biglow-soft)"/>
+<ellipse cx="1050" cy="720" rx="160" ry="55"
+  fill="#00c8d8" opacity=".06" filter="url(#biglow-soft)"/>
+
+<!-- Shore glow line (where bio-water meets the mangrove) -->
+<g style="animation:shore-g 3.8s ease-in-out infinite">
+  <path d="M 225 470 Q 400 450 600 458 Q 720 462 840 458 Q 1040 450 1235 470"
+    fill="none" stroke="#00dce8" stroke-width="4" stroke-opacity=".55" filter="url(#sblur)"/>
+  <path d="M 225 470 Q 400 450 600 458 Q 720 462 840 458 Q 1040 450 1235 470"
+    fill="none" stroke="#00f0ff" stroke-width="1.5" stroke-opacity=".80"/>
+</g>
+
+<!-- ── BIOLUMINESCENT PARTICLES ──────────────────────── -->
+<!-- Group A - upper water -->
+<g filter="url(#bioglow)">
+  <g style="animation:bio-a 2.1s ease-in-out infinite">
+    <circle cx="310" cy="490" r="2.8" fill="#00e8f0" opacity=".85"/>
+    <circle cx="525" cy="472" r="2.2" fill="#20f0d8" opacity=".78"/>
+    <circle cx="738" cy="480" r="3.0" fill="#00e0e8" opacity=".90"/>
+    <circle cx="952" cy="475" r="2.4" fill="#40f0c8" opacity=".82"/>
+    <circle cx="1145" cy="488" r="2.6" fill="#00e8f0" opacity=".80"/>
+  </g>
+  <g style="animation:bio-b 3.2s ease-in-out infinite 0.8s">
+    <circle cx="268" cy="508" r="1.8" fill="#00f0e0" opacity=".65"/>
+    <circle cx="448" cy="495" r="2.4" fill="#20e8d8" opacity=".72"/>
+    <circle cx="662" cy="502" r="2.0" fill="#00e0f0" opacity=".68"/>
+    <circle cx="875" cy="496" r="2.6" fill="#40e8c0" opacity=".74"/>
+    <circle cx="1068" cy="505" r="2.2" fill="#00f0e8" opacity=".70"/>
+    <circle cx="1188" cy="498" r="1.9" fill="#20f0d0" opacity=".65"/>
+  </g>
+  <g style="animation:bio-c 4.0s ease-in-out infinite 1.4s">
+    <circle cx="342" cy="520" r="2.2" fill="#10e8e8" opacity=".55"/>
+    <circle cx="558" cy="514" r="3.2" fill="#00f8d8" opacity=".75"/>
+    <circle cx="772" cy="518" r="2.5" fill="#30e0f0" opacity=".60"/>
+    <circle cx="988" cy="512" r="2.8" fill="#00e8e0" opacity=".68"/>
+    <circle cx="1128" cy="522" r="2.0" fill="#20f0c8" opacity=".55"/>
+  </g>
+  <g style="animation:bio-d 2.8s ease-in-out infinite 0.4s">
+    <circle cx="282" cy="538" r="2.5" fill="#00e0f0" opacity=".75"/>
+    <circle cx="488" cy="530" r="1.8" fill="#20e8d0" opacity=".65"/>
+    <circle cx="695" cy="534" r="2.8" fill="#00f0e8" opacity=".78"/>
+    <circle cx="908" cy="528" r="2.2" fill="#40e0c8" opacity=".70"/>
+    <circle cx="1108" cy="536" r="2.4" fill="#00e8f0" opacity=".72"/>
+    <circle cx="1215" cy="530" r="1.8" fill="#20f0d8" opacity=".65"/>
+  </g>
+  <g style="animation:bio-e 3.6s ease-in-out infinite 2.0s">
+    <circle cx="322" cy="556" r="3.0" fill="#00f0d8" opacity=".88"/>
+    <circle cx="545" cy="548" r="2.0" fill="#20e8f0" opacity=".55"/>
+    <circle cx="758" cy="552" r="2.4" fill="#00e0e8" opacity=".65"/>
+    <circle cx="972" cy="546" r="2.8" fill="#40f0d0" opacity=".80"/>
+    <circle cx="1162" cy="554" r="2.2" fill="#00e8e0" opacity=".60"/>
+  </g>
+</g>
+
+<!-- Middle water particles (denser, more distributed) -->
+<g filter="url(#bioglow)">
+  <g style="animation:bio-a 2.6s ease-in-out infinite 0.3s">
+    <circle cx="255" cy="580" r="2.4" fill="#00e8f0" opacity=".80"/>
+    <circle cx="380" cy="570" r="1.8" fill="#20f0d8" opacity=".68"/>
+    <circle cx="512" cy="578" r="3.0" fill="#00e0e8" opacity=".85"/>
+    <circle cx="638" cy="572" r="2.2" fill="#40f0c8" opacity=".75"/>
+    <circle cx="768" cy="580" r="2.6" fill="#00e8f0" opacity=".80"/>
+    <circle cx="898" cy="574" r="2.0" fill="#20e8d8" opacity=".72"/>
+    <circle cx="1028" cy="580" r="2.8" fill="#00e0f0" opacity=".82"/>
+    <circle cx="1155" cy="574" r="2.4" fill="#40e8c8" opacity=".78"/>
+  </g>
+  <g style="animation:bio-b 3.8s ease-in-out infinite 1.1s">
+    <circle cx="298" cy="600" r="2.0" fill="#00f0e0" opacity=".60"/>
+    <circle cx="428" cy="594" r="2.6" fill="#20e8d8" opacity=".72"/>
+    <circle cx="562" cy="600" r="2.2" fill="#00e0f0" opacity=".65"/>
+    <circle cx="698" cy="596" r="2.8" fill="#40e8c0" opacity=".75"/>
+    <circle cx="832" cy="602" r="2.4" fill="#00f0e8" opacity=".70"/>
+    <circle cx="968" cy="598" r="2.0" fill="#20f0d0" opacity=".64"/>
+    <circle cx="1098" cy="604" r="2.6" fill="#00e8f0" opacity=".70"/>
+    <circle cx="1198" cy="598" r="1.9" fill="#30f0d8" opacity=".65"/>
+  </g>
+  <g style="animation:bio-d 2.3s ease-in-out infinite 0.7s">
+    <circle cx="275" cy="628" r="2.8" fill="#00e0e8" opacity=".78"/>
+    <circle cx="405" cy="620" r="2.0" fill="#20f0d0" opacity=".62"/>
+    <circle cx="538" cy="626" r="2.4" fill="#00e8f0" opacity=".72"/>
+    <circle cx="672" cy="622" r="3.0" fill="#40e0c8" opacity=".85"/>
+    <circle cx="808" cy="628" r="2.2" fill="#00f0e0" opacity=".68"/>
+    <circle cx="942" cy="624" r="2.6" fill="#20e8d8" opacity=".75"/>
+    <circle cx="1075" cy="630" r="2.0" fill="#00e0f0" opacity=".63"/>
+    <circle cx="1178" cy="624" r="2.4" fill="#40e8d0" opacity=".72"/>
+  </g>
+</g>
+
+<!-- Foreground water particles (close, brightest) -->
+<g filter="url(#bioglow)">
+  <g style="animation:bio-c 2.0s ease-in-out infinite 0.5s">
+    <circle cx="280" cy="680" r="3.4" fill="#00f0e8" opacity=".92"/>
+    <circle cx="448" cy="668" r="2.6" fill="#20f8d8" opacity=".80"/>
+    <circle cx="618" cy="676" r="3.0" fill="#00e8f8" opacity=".88"/>
+    <circle cx="788" cy="670" r="2.8" fill="#40f0c8" opacity=".85"/>
+    <circle cx="958" cy="678" r="3.2" fill="#00f0e0" opacity=".90"/>
+    <circle cx="1128" cy="672" r="2.6" fill="#20e8f0" opacity=".82"/>
+  </g>
+  <g style="animation:bio-e 2.8s ease-in-out infinite 1.8s">
+    <circle cx="355" cy="712" r="2.4" fill="#00e8f8" opacity=".75"/>
+    <circle cx="525" cy="706" r="3.2" fill="#20f0d8" opacity=".88"/>
+    <circle cx="695" cy="710" r="2.8" fill="#00f0e8" opacity=".80"/>
+    <circle cx="865" cy="706" r="2.4" fill="#40e8d0" opacity=".75"/>
+    <circle cx="1035" cy="712" r="3.0" fill="#00e0f0" opacity=".85"/>
+  </g>
+</g>
+
+<!-- Gentle bioluminescent waves (strokes at surface) -->
+<g style="animation:wave-g 3.5s ease-in-out infinite">
+  <path d="M 240 468 Q 340 462 440 468 Q 540 473 640 468" fill="none"
+    stroke="#00e8f0" stroke-width="2" filter="url(#sblur)"/>
+  <path d="M 700 465 Q 820 460 940 465 Q 1060 470 1180 465" fill="none"
+    stroke="#00e8e0" stroke-width="2" filter="url(#sblur)"/>
+</g>
+<g style="animation:wave-g2 4.2s ease-in-out infinite 1.5s">
+  <path d="M 280 485 Q 400 479 520 485 Q 640 490 760 485" fill="none"
+    stroke="#20f0d8" stroke-width="1.5" filter="url(#sblur)"/>
+  <path d="M 820 482 Q 940 477 1060 482 Q 1180 487 1220 482" fill="none"
+    stroke="#00e0e8" stroke-width="1.5" filter="url(#sblur)"/>
+</g>
+
+<!-- Star reflections in water -->
+<g opacity=".25">
+  <circle cx="350" cy="510" r=".8" fill="#c8e8f8"/>
+  <circle cx="520" cy="498" r=".6" fill="#d0eeff"/>
+  <circle cx="690" cy="505" r=".8" fill="#c0e4f8"/>
+  <circle cx="858" cy="500" r=".7" fill="#c8ecff"/>
+  <circle cx="1025" cy="508" r=".8" fill="#d0e8f8"/>
+  <circle cx="1180" cy="502" r=".6" fill="#c4e0f8"/>
+</g>
+
+<!-- ── DISTANT ISLAND / FAR SHORE ────────────────────── -->
+<path d="M 480 460 Q 520 445 560 448 Q 600 451 640 455 Q 680 458 720 455
+         Q 760 452 800 448 Q 840 444 880 446 Q 920 448 960 453 L 960 462
+         Q 920 458 880 456 Q 840 454 800 458 Q 760 462 720 465
+         Q 680 468 640 465 Q 600 461 560 458 Q 520 455 480 468 Z"
+  fill="#010608" opacity=".75"/>
+
+<!-- ── SMALL OUTRIGGER BOAT ──────────────────────────── -->
+<g transform="translate(830, 488)" style="animation:bob 4.5s ease-in-out infinite">
+  <!-- Hull -->
+  <path d="M-28 2 Q 0 8 28 2 L 22 10 Q 0 14 -22 10 Z" fill="#010508"/>
+  <!-- Outrigger arm + float -->
+  <line x1="0" y1="2" x2="0" y2="-12" stroke="#010508" stroke-width="1.5"/>
+  <line x1="-14" y1="-12" x2="14" y2="-12" stroke="#010508" stroke-width="1"/>
+  <ellipse cx="0" cy="-12" rx="18" ry="3" fill="#010508"/>
+  <!-- Mast -->
+  <line x1="0" y1="2" x2="0" y2="-28" stroke="#010608" stroke-width="1.2"/>
+  <!-- Boom light reflection -->
+  <ellipse cx="0" cy="14" rx="32" ry="5" fill="#00d8e8" opacity=".12" filter="url(#sblur)"/>
+</g>
+
+<!-- ── PERSON AT WATER'S EDGE ───────────────────────── -->
+<g transform="translate(388,468)">
+  <!-- Shadow/reflection -->
+  <ellipse cx="0" cy="12" rx="9" ry="4" fill="#010608" opacity=".4"/>
+  <!-- Body -->
+  <rect x="-6" y="-32" width="12" height="24" rx="3" fill="#010508"/>
+  <!-- Head -->
+  <circle cx="0" cy="-40" r="7" fill="#010508"/>
+  <!-- Bioluminescent glow at feet -->
+  <ellipse cx="0" cy="5" rx="20" ry="6" fill="#00e0e8" opacity=".30" filter="url(#fblur)"/>
+  <ellipse cx="0" cy="5" rx="12" ry="3.5" fill="#00f0f0" opacity=".20" filter="url(#sblur)"/>
+</g>
+
+<!-- ── FIREFLIES ABOVE MANGROVES ─────────────────────── -->
+<!-- Left side fireflies -->
+<g filter="url(#fly-glow)">
+  <circle cx="88"  cy="400" r="2.2" fill="#c0ff80" opacity=".78"
+    style="animation:fly-a 5.8s ease-in-out infinite"/>
+  <circle cx="145" cy="370" r="2.0" fill="#d0ff90" opacity=".70"
+    style="animation:fly-b 7.2s ease-in-out infinite 1.5s"/>
+  <circle cx="112" cy="340" r="1.8" fill="#c8ff88" opacity=".65"
+    style="animation:fly-c 6.4s ease-in-out infinite 0.8s"/>
+  <circle cx="172" cy="355" r="2.2" fill="#b8ff78" opacity=".72"
+    style="animation:fly-a 8.0s ease-in-out infinite 3.2s"/>
+  <circle cx="58"  cy="360" r="1.6" fill="#d4ff98" opacity=".58"
+    style="animation:fly-b 5.2s ease-in-out infinite 2.0s"/>
+</g>
+<!-- Right side fireflies -->
+<g filter="url(#fly-glow)">
+  <circle cx="1355" cy="390" r="2.0" fill="#c0ff80" opacity=".74"
+    style="animation:fly-b 6.6s ease-in-out infinite 0.5s"/>
+  <circle cx="1302" cy="362" r="2.4" fill="#d0ff90" opacity=".80"
+    style="animation:fly-a 7.8s ease-in-out infinite 2.4s"/>
+  <circle cx="1378" cy="345" r="1.8" fill="#c8ff88" opacity=".66"
+    style="animation:fly-c 5.5s ease-in-out infinite 1.2s"/>
+  <circle cx="1325" cy="328" r="2.0" fill="#b8ff78" opacity=".70"
+    style="animation:fly-b 8.4s ease-in-out infinite 3.8s"/>
+</g>
+
+<!-- ── FOREGROUND WATER ──────────────────────────────── -->
+<path d="M 0 820 Q 200 810 400 815 Q 600 820 720 815 Q 900 810 1100 816 Q 1300 822 1440 815 L1440 900 L0 900 Z"
+  fill="#020c12"/>
+
+<!-- ── VIGNETTE ───────────────────────────────────────── -->
+<radialGradient id="vig" cx="50%" cy="50%" r="72%">
+  <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+  <stop offset="100%" stop-color="#000" stop-opacity=".55"/>
+</radialGradient>
+<rect width="1440" height="900" fill="url(#vig)"/>
+
+</svg>
+</body>
+</html>

@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin:0; padding:0; }
+html, body { width:100%; height:100%; overflow:hidden; background:#0f0408; }
+svg { width:100%; height:100%; display:block; }
+
+/* Light rays pulse */
+@keyframes ray-a { 0%,100%{opacity:.10} 50%{opacity:.22} }
+@keyframes ray-b { 0%,100%{opacity:.08} 50%{opacity:.18} }
+@keyframes ray-c { 0%,100%{opacity:.06} 50%{opacity:.14} }
+
+/* Mist drift */
+@keyframes mist-l { 0%{transform:translateX(0)} 100%{transform:translateX(80px)} }
+@keyframes mist-r { 0%{transform:translateX(0)} 100%{transform:translateX(-60px)} }
+
+/* Falling leaves */
+@keyframes leaf-a {
+  0%   { transform: translate(0px, 0px)    rotate(0deg);   opacity: 0; }
+  5%   { opacity: .90; }
+  95%  { opacity: .80; }
+  100% { transform: translate(-55px, 520px) rotate(380deg); opacity: 0; }
+}
+@keyframes leaf-b {
+  0%   { transform: translate(0px, 0px)    rotate(20deg);  opacity: 0; }
+  5%   { opacity: .85; }
+  95%  { opacity: .75; }
+  100% { transform: translate(65px, 540px)  rotate(-340deg); opacity: 0; }
+}
+@keyframes leaf-c {
+  0%   { transform: translate(0px, 0px)    rotate(-10deg); opacity: 0; }
+  6%   { opacity: .88; }
+  95%  { opacity: .72; }
+  100% { transform: translate(-40px, 560px) rotate(420deg); opacity: 0; }
+}
+@keyframes leaf-d {
+  0%   { transform: translate(0px, 0px)    rotate(15deg);  opacity: 0; }
+  4%   { opacity: .92; }
+  95%  { opacity: .78; }
+  100% { transform: translate(80px, 500px)  rotate(-300deg); opacity: 0; }
+}
+@keyframes leaf-e {
+  0%   { transform: translate(0px, 0px)    rotate(-20deg); opacity: 0; }
+  6%   { opacity: .82; }
+  95%  { opacity: .70; }
+  100% { transform: translate(-70px, 580px) rotate(460deg); opacity: 0; }
+}
+@keyframes leaf-f {
+  0%   { transform: translate(0px, 0px)    rotate(8deg);   opacity: 0; }
+  5%   { opacity: .88; }
+  95%  { opacity: .74; }
+  100% { transform: translate(50px, 530px)  rotate(-380deg); opacity: 0; }
+}
+@keyframes leaf-g {
+  0%   { transform: translate(0px, 0px)    rotate(-15deg); opacity: 0; }
+  5%   { opacity: .85; }
+  95%  { opacity: .72; }
+  100% { transform: translate(-45px, 545px) rotate(400deg); opacity: 0; }
+}
+@keyframes leaf-h {
+  0%   { transform: translate(0px, 0px)    rotate(12deg);  opacity: 0; }
+  4%   { opacity: .90; }
+  95%  { opacity: .80; }
+  100% { transform: translate(72px, 510px)  rotate(-360deg); opacity: 0; }
+}
+
+/* Subtle birdsong light flicker */
+@keyframes dawn-pulse { 0%,100%{opacity:.88} 50%{opacity:1} }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <!-- Sky — cold deep blue at zenith, warm dawn gold at horizon -->
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#0c0418"/>
+    <stop offset="25%"  stop-color="#1a0828"/>
+    <stop offset="55%"  stop-color="#5c1810"/>
+    <stop offset="75%"  stop-color="#c04010"/>
+    <stop offset="88%"  stop-color="#e06018"/>
+    <stop offset="100%" stop-color="#f08828"/>
+  </linearGradient>
+
+  <!-- Dawn glow behind trees -->
+  <radialGradient id="dawn-glow" cx="50%" cy="100%" r="60%">
+    <stop offset="0%"   stop-color="#f08828" stop-opacity=".75"/>
+    <stop offset="40%"  stop-color="#c04010" stop-opacity=".40"/>
+    <stop offset="100%" stop-color="#1a0828" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- Forest floor -->
+  <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#2a0e04"/>
+    <stop offset="40%"  stop-color="#1c0a02"/>
+    <stop offset="100%" stop-color="#120600"/>
+  </linearGradient>
+
+  <!-- Far trees (very dark, hint of silhouette) -->
+  <linearGradient id="far-tree" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#1a0a08"/>
+    <stop offset="100%" stop-color="#0e0504"/>
+  </linearGradient>
+
+  <!-- Mid trees -->
+  <linearGradient id="mid-tree" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#120604"/>
+    <stop offset="100%" stop-color="#080300"/>
+  </linearGradient>
+
+  <!-- Leaf colors -->
+  <linearGradient id="leaf-amber" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%"   stop-color="#e88018"/>
+    <stop offset="100%" stop-color="#c84010"/>
+  </linearGradient>
+  <linearGradient id="leaf-gold" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%"   stop-color="#f0a020"/>
+    <stop offset="100%" stop-color="#d07010"/>
+  </linearGradient>
+  <linearGradient id="leaf-crimson" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%"   stop-color="#c01820"/>
+    <stop offset="100%" stop-color="#880c14"/>
+  </linearGradient>
+  <linearGradient id="leaf-orange" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0%"   stop-color="#e05010"/>
+    <stop offset="100%" stop-color="#a82e08"/>
+  </linearGradient>
+
+  <!-- Mist -->
+  <linearGradient id="mist-g" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="#d08058" stop-opacity="0"/>
+    <stop offset="25%"  stop-color="#d09070" stop-opacity=".22"/>
+    <stop offset="50%"  stop-color="#c88060" stop-opacity=".30"/>
+    <stop offset="75%"  stop-color="#c07050" stop-opacity=".22"/>
+    <stop offset="100%" stop-color="#c08058" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="mist-g2" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%"   stop-color="#c08058" stop-opacity="0"/>
+    <stop offset="30%"  stop-color="#d09068" stop-opacity=".18"/>
+    <stop offset="70%"  stop-color="#c07858" stop-opacity=".25"/>
+    <stop offset="100%" stop-color="#b07050" stop-opacity="0"/>
+  </linearGradient>
+
+  <filter id="mist-blur"><feGaussianBlur stdDeviation="22"/></filter>
+  <filter id="fblur"><feGaussianBlur stdDeviation="6"/></filter>
+  <filter id="sblur"><feGaussianBlur stdDeviation="3"/></filter>
+  <filter id="ray-blur"><feGaussianBlur stdDeviation="28"/></filter>
+  <filter id="canopy-blur"><feGaussianBlur stdDeviation="2"/></filter>
+  <filter id="glow-warm">
+    <feGaussianBlur stdDeviation="14" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+</defs>
+
+<!-- ── SKY ─────────────────────────────────────────────── -->
+<rect width="1440" height="900" fill="url(#sky)"/>
+
+<!-- Dawn radial glow from horizon through trees -->
+<rect x="0" y="400" width="1440" height="500" fill="url(#dawn-glow)"/>
+
+<!-- ── LIGHT RAYS (emanating from horizon, low angle) ── -->
+<!-- Far left ray -->
+<g style="animation:ray-a 7.2s ease-in-out infinite">
+  <polygon points="200,900 260,900 600,400 540,400"
+    fill="#f09030" filter="url(#ray-blur)"/>
+</g>
+<!-- Center-left ray -->
+<g style="animation:ray-b 8.8s ease-in-out infinite 2.5s">
+  <polygon points="540,900 600,900 820,460 760,460"
+    fill="#f08028" filter="url(#ray-blur)"/>
+</g>
+<!-- Center ray -->
+<g style="animation:ray-a 6.5s ease-in-out infinite 1.2s">
+  <polygon points="680,900 760,900 900,440 820,440"
+    fill="#e87820" filter="url(#ray-blur)"/>
+</g>
+<!-- Center-right ray -->
+<g style="animation:ray-c 9.4s ease-in-out infinite 3.8s">
+  <polygon points="860,900 920,900 1060,450 1000,450"
+    fill="#f08828" filter="url(#ray-blur)"/>
+</g>
+<!-- Right ray -->
+<g style="animation:ray-b 7.8s ease-in-out infinite 0.6s">
+  <polygon points="1100,900 1160,900 1260,420 1200,420"
+    fill="#e87020" filter="url(#ray-blur)"/>
+</g>
+
+<!-- ── FAR FOREST LAYER (background trees, misty) ────── -->
+<!-- Very dark trunks, barely visible through mist -->
+<g fill="#1a0a06" opacity=".65">
+  <!-- Far tree trunks, very thin -->
+  <rect x="84"  y="380" width="6"  height="220" rx="2"/>
+  <rect x="158" y="360" width="8"  height="240" rx="2"/>
+  <rect x="248" y="348" width="7"  height="252" rx="2"/>
+  <rect x="342" y="355" width="6"  height="245" rx="2"/>
+  <rect x="432" y="362" width="8"  height="238" rx="2"/>
+  <rect x="528" y="345" width="7"  height="255" rx="2"/>
+  <rect x="620" y="352" width="6"  height="248" rx="2"/>
+  <rect x="718" y="340" width="8"  height="260" rx="2"/>
+  <rect x="818" y="348" width="6"  height="252" rx="2"/>
+  <rect x="912" y="355" width="7"  height="245" rx="2"/>
+  <rect x="1005" y="342" width="6" height="258" rx="2"/>
+  <rect x="1098" y="358" width="8" height="242" rx="2"/>
+  <rect x="1195" y="350" width="6" height="250" rx="2"/>
+  <rect x="1285" y="362" width="7" height="238" rx="2"/>
+  <rect x="1372" y="345" width="6" height="255" rx="2"/>
+</g>
+
+<!-- Far foliage canopy clusters (orange/gold, soft, far distance) -->
+<g filter="url(#canopy-blur)" opacity=".55">
+  <ellipse cx="84"   cy="362" rx="42" ry="28" fill="#8c2a0c"/>
+  <ellipse cx="158"  cy="340" rx="52" ry="32" fill="#7a2008"/>
+  <ellipse cx="248"  cy="326" rx="48" ry="30" fill="#902e10"/>
+  <ellipse cx="342"  cy="334" rx="44" ry="28" fill="#7c2208"/>
+  <ellipse cx="432"  cy="342" rx="50" ry="30" fill="#883008"/>
+  <ellipse cx="528"  cy="322" rx="46" ry="28" fill="#8c2a0c"/>
+  <ellipse cx="620"  cy="330" rx="44" ry="28" fill="#7a2008"/>
+  <ellipse cx="718"  cy="318" rx="52" ry="32" fill="#903010"/>
+  <ellipse cx="818"  cy="326" rx="46" ry="28" fill="#7c2208"/>
+  <ellipse cx="912"  cy="334" rx="48" ry="30" fill="#882808"/>
+  <ellipse cx="1005" cy="320" rx="44" ry="28" fill="#8a2e0a"/>
+  <ellipse cx="1098" cy="336" rx="50" ry="30" fill="#7e2208"/>
+  <ellipse cx="1195" cy="328" rx="46" ry="28" fill="#8c2a0c"/>
+  <ellipse cx="1285" cy="340" rx="44" ry="28" fill="#7a2008"/>
+  <ellipse cx="1372" cy="322" rx="48" ry="30" fill="#902e10"/>
+</g>
+
+<!-- ── MIST LAYERS ────────────────────────────────────── -->
+<g style="animation:mist-l 18s linear infinite alternate">
+  <rect x="-100" y="460" width="1640" height="80" fill="url(#mist-g)" filter="url(#mist-blur)"/>
+</g>
+<g style="animation:mist-r 24s linear infinite alternate">
+  <rect x="-80"  y="500" width="1600" height="60" fill="url(#mist-g2)" filter="url(#mist-blur)"/>
+</g>
+<g style="animation:mist-l 31s linear infinite alternate-reverse">
+  <rect x="-60"  y="530" width="1560" height="50" fill="url(#mist-g)"  filter="url(#mist-blur)" opacity=".7"/>
+</g>
+
+<!-- ── MID FOREST LAYER ───────────────────────────────── -->
+<g fill="#0e0502">
+  <rect x="62"   y="400" width="14" height="340" rx="3"/>
+  <rect x="182"  y="382" width="18" height="358" rx="3"/>
+  <rect x="302"  y="390" width="15" height="350" rx="3"/>
+  <rect x="418"  y="378" width="16" height="362" rx="3"/>
+  <rect x="535"  y="385" width="15" height="355" rx="3"/>
+  <rect x="648"  y="372" width="18" height="368" rx="3"/>
+  <rect x="762"  y="380" width="16" height="360" rx="3"/>
+  <rect x="878"  y="375" width="15" height="365" rx="3"/>
+  <rect x="992"  y="382" width="18" height="358" rx="3"/>
+  <rect x="1108" y="370" width="15" height="370" rx="3"/>
+  <rect x="1222" y="378" width="16" height="362" rx="3"/>
+  <rect x="1335" y="385" width="15" height="355" rx="3"/>
+  <rect x="1398" y="374" width="14" height="366" rx="3"/>
+</g>
+
+<!-- Mid canopy (more colorful, closer) -->
+<g opacity=".80">
+  <ellipse cx="62"   cy="382" rx="62" ry="38" fill="#b83a0e"/>
+  <ellipse cx="62"   cy="368" rx="44" ry="25" fill="#d04818"/>
+  <ellipse cx="182"  cy="360" rx="72" ry="44" fill="#c84010"/>
+  <ellipse cx="182"  cy="345" rx="52" ry="28" fill="#e85820"/>
+  <ellipse cx="302"  cy="368" rx="65" ry="40" fill="#a83008"/>
+  <ellipse cx="302"  cy="354" rx="46" ry="26" fill="#c84010"/>
+  <ellipse cx="418"  cy="356" rx="70" ry="42" fill="#d04818"/>
+  <ellipse cx="418"  cy="342" rx="48" ry="28" fill="#f06828"/>
+  <ellipse cx="535"  cy="363" rx="64" ry="38" fill="#bc3c0e"/>
+  <ellipse cx="535"  cy="350" rx="46" ry="26" fill="#d84e18"/>
+  <ellipse cx="648"  cy="350" rx="74" ry="45" fill="#c04010"/>
+  <ellipse cx="648"  cy="334" rx="54" ry="30" fill="#e86020"/>
+  <ellipse cx="762"  cy="358" rx="68" ry="40" fill="#aa3008"/>
+  <ellipse cx="762"  cy="344" rx="48" ry="27" fill="#cc4418"/>
+  <ellipse cx="878"  cy="353" rx="66" ry="38" fill="#d04818"/>
+  <ellipse cx="878"  cy="340" rx="46" ry="26" fill="#f07030"/>
+  <ellipse cx="992"  cy="360" rx="70" ry="42" fill="#b83a0e"/>
+  <ellipse cx="992"  cy="346" rx="50" ry="28" fill="#d85220"/>
+  <ellipse cx="1108" cy="348" rx="66" ry="40" fill="#c04010"/>
+  <ellipse cx="1108" cy="334" rx="48" ry="27" fill="#e86828"/>
+  <ellipse cx="1222" cy="356" rx="68" ry="38" fill="#aa3008"/>
+  <ellipse cx="1222" cy="342" rx="48" ry="26" fill="#cc4818"/>
+  <ellipse cx="1335" cy="363" rx="64" ry="38" fill="#b83a0e"/>
+  <ellipse cx="1335" cy="350" rx="45" ry="25" fill="#d85220"/>
+  <ellipse cx="1398" cy="352" rx="60" ry="36" fill="#c04010"/>
+  <ellipse cx="1398" cy="340" rx="43" ry="24" fill="#e06028"/>
+</g>
+
+<!-- Amber and gold highlights on canopy -->
+<g opacity=".55">
+  <ellipse cx="62"   cy="360" rx="28" ry="14" fill="#f0a030"/>
+  <ellipse cx="182"  cy="338" rx="32" ry="16" fill="#e89020"/>
+  <ellipse cx="302"  cy="348" rx="28" ry="13" fill="#f0a828"/>
+  <ellipse cx="418"  cy="334" rx="34" ry="16" fill="#e89820"/>
+  <ellipse cx="535"  cy="342" rx="30" ry="14" fill="#f0a030"/>
+  <ellipse cx="648"  cy="326" rx="36" ry="18" fill="#e88820"/>
+  <ellipse cx="762"  cy="336" rx="30" ry="14" fill="#f0a828"/>
+  <ellipse cx="878"  cy="330" rx="28" ry="14" fill="#e89020"/>
+  <ellipse cx="992"  cy="338" rx="32" ry="16" fill="#f0a030"/>
+  <ellipse cx="1108" cy="326" rx="30" ry="15" fill="#e88820"/>
+  <ellipse cx="1222" cy="334" rx="30" ry="14" fill="#f0a828"/>
+  <ellipse cx="1335" cy="342" rx="28" ry="13" fill="#e89020"/>
+  <ellipse cx="1398" cy="332" rx="26" ry="12" fill="#f0a030"/>
+</g>
+
+<!-- ── FOREST FLOOR ───────────────────────────────────── -->
+<path d="M 0 680 Q 200 665 400 672 Q 600 678 800 668 Q 1000 658 1200 668 Q 1400 678 1440 672 L1440 900 L0 900 Z"
+  fill="url(#floor)"/>
+
+<!-- Leaf litter on ground -->
+<!-- Crimson leaves -->
+<ellipse cx="85"   cy="695" rx="12" ry="6"  fill="#a01518" transform="rotate(-15 85 695)"  opacity=".75"/>
+<ellipse cx="192"  cy="702" rx="10" ry="5"  fill="#c82020" transform="rotate(20 192 702)"  opacity=".70"/>
+<ellipse cx="315"  cy="688" rx="14" ry="6"  fill="#9c1215" transform="rotate(-8 315 688)"  opacity=".78"/>
+<ellipse cx="445"  cy="698" rx="11" ry="5"  fill="#b01c1c" transform="rotate(25 445 698)"  opacity=".72"/>
+<ellipse cx="568"  cy="692" rx="13" ry="6"  fill="#a01518" transform="rotate(-18 568 692)" opacity=".76"/>
+<ellipse cx="695"  cy="704" rx="10" ry="5"  fill="#c01a1e" transform="rotate(12 695 704)"  opacity=".70"/>
+<ellipse cx="822"  cy="690" rx="14" ry="6"  fill="#9c1215" transform="rotate(-5 822 690)"  opacity=".78"/>
+<ellipse cx="952"  cy="700" rx="11" ry="5"  fill="#b01c1c" transform="rotate(22 952 700)"  opacity=".72"/>
+<ellipse cx="1078" cy="694" rx="13" ry="6"  fill="#a01518" transform="rotate(-14 1078 694)" opacity=".75"/>
+<ellipse cx="1205" cy="706" rx="10" ry="5"  fill="#c01a1e" transform="rotate(18 1205 706)" opacity=".70"/>
+<ellipse cx="1328" cy="691" rx="12" ry="6"  fill="#9c1215" transform="rotate(-22 1328 691)" opacity=".76"/>
+<ellipse cx="1412" cy="700" rx="11" ry="5"  fill="#b01c1c" transform="rotate(8 1412 700)"  opacity=".72"/>
+<!-- Gold leaves -->
+<ellipse cx="128"  cy="710" rx="11" ry="5"  fill="#d08010" transform="rotate(18 128 710)"  opacity=".70"/>
+<ellipse cx="258"  cy="700" rx="13" ry="6"  fill="#e09018" transform="rotate(-12 258 700)" opacity=".75"/>
+<ellipse cx="382"  cy="712" rx="10" ry="5"  fill="#d08818" transform="rotate(28 382 712)"  opacity=".68"/>
+<ellipse cx="508"  cy="703" rx="12" ry="6"  fill="#c87810" transform="rotate(-6 508 703)"  opacity=".72"/>
+<ellipse cx="635"  cy="715" rx="10" ry="5"  fill="#d88818" transform="rotate(15 635 715)"  opacity=".68"/>
+<ellipse cx="760"  cy="706" rx="13" ry="6"  fill="#e09018" transform="rotate(-20 760 706)" opacity=".74"/>
+<ellipse cx="888"  cy="718" rx="11" ry="5"  fill="#d08010" transform="rotate(10 888 718)"  opacity=".70"/>
+<ellipse cx="1012" cy="708" rx="12" ry="6"  fill="#c87810" transform="rotate(-8 1012 708)" opacity=".72"/>
+<ellipse cx="1138" cy="720" rx="10" ry="5"  fill="#d88818" transform="rotate(24 1138 720)" opacity=".68"/>
+<ellipse cx="1262" cy="710" rx="13" ry="6"  fill="#e09018" transform="rotate(-16 1262 710)" opacity=".74"/>
+<ellipse cx="1385" cy="714" rx="11" ry="5"  fill="#d08010" transform="rotate(6 1385 714)"  opacity=".70"/>
+
+<!-- ── FOREGROUND TREE TRUNKS (close, dominant) ──────── -->
+<g fill="#080200">
+  <!-- Far left edge trunk -->
+  <rect x="-8"   y="300" width="28" height="600" rx="5"/>
+  <!-- Left trunks -->
+  <rect x="42"   y="320" width="22" height="580" rx="4"/>
+  <rect x="148"  y="295" width="26" height="605" rx="5"/>
+  <rect x="262"  y="308" width="22" height="592" rx="4"/>
+  <rect x="375"  y="300" width="24" height="600" rx="5"/>
+  <!-- Near center left -->
+  <rect x="492"  y="288" width="28" height="612" rx="5"/>
+  <!-- Center pair (framing path) -->
+  <rect x="615"  y="275" width="32" height="625" rx="5"/>
+  <rect x="798"  y="278" width="30" height="622" rx="5"/>
+  <!-- Near center right -->
+  <rect x="928"  y="288" width="26" height="612" rx="5"/>
+  <!-- Right trunks -->
+  <rect x="1058" y="300" width="24" height="600" rx="5"/>
+  <rect x="1175" y="308" width="22" height="592" rx="4"/>
+  <rect x="1295" y="295" width="26" height="605" rx="5"/>
+  <!-- Far right trunks -->
+  <rect x="1390" y="302" width="22" height="598" rx="4"/>
+  <rect x="1425" y="298" width="24" height="602" rx="5"/>
+</g>
+
+<!-- Foreground canopy (close, rich colors, partially framing top) -->
+<g>
+  <!-- Left side -->
+  <ellipse cx="148"  cy="275" rx="105" ry="70" fill="#9c2208" opacity=".92"/>
+  <ellipse cx="148"  cy="252" rx="78"  ry="48" fill="#c43c12" opacity=".85"/>
+  <ellipse cx="148"  cy="235" rx="55"  ry="33" fill="#e8601a" opacity=".75"/>
+  <ellipse cx="148"  cy="222" rx="35"  ry="20" fill="#f0a030" opacity=".60"/>
+  <!-- Left of center -->
+  <ellipse cx="492"  cy="268" rx="115" ry="72" fill="#b03010" opacity=".90"/>
+  <ellipse cx="492"  cy="244" rx="85"  ry="52" fill="#d04820" opacity=".82"/>
+  <ellipse cx="492"  cy="225" rx="62"  ry="36" fill="#ec7028" opacity=".72"/>
+  <ellipse cx="492"  cy="210" rx="40"  ry="22" fill="#f0a028" opacity=".58"/>
+  <!-- Center-left framing trunk -->
+  <ellipse cx="615"  cy="255" rx="120" ry="75" fill="#a82808" opacity=".94"/>
+  <ellipse cx="615"  cy="230" rx="90"  ry="55" fill="#cc4018" opacity=".85"/>
+  <ellipse cx="615"  cy="210" rx="65"  ry="38" fill="#e86828" opacity=".74"/>
+  <ellipse cx="615"  cy="195" rx="42"  ry="24" fill="#f09830" opacity=".58"/>
+  <!-- Center-right framing trunk -->
+  <ellipse cx="828"  cy="258" rx="118" ry="74" fill="#a42808" opacity=".94"/>
+  <ellipse cx="828"  cy="233" rx="88"  ry="54" fill="#c83c18" opacity=".85"/>
+  <ellipse cx="828"  cy="213" rx="63"  ry="37" fill="#e46428" opacity=".74"/>
+  <ellipse cx="828"  cy="198" rx="40"  ry="23" fill="#f09428" opacity=".58"/>
+  <!-- Right of center -->
+  <ellipse cx="928"  cy="268" rx="115" ry="72" fill="#b03010" opacity=".90"/>
+  <ellipse cx="928"  cy="244" rx="85"  ry="52" fill="#d04820" opacity=".82"/>
+  <ellipse cx="928"  cy="225" rx="62"  ry="36" fill="#ea6c28" opacity=".72"/>
+  <!-- Right side -->
+  <ellipse cx="1295" cy="275" rx="105" ry="70" fill="#9c2208" opacity=".92"/>
+  <ellipse cx="1295" cy="252" rx="78"  ry="48" fill="#c43c12" opacity=".85"/>
+  <ellipse cx="1295" cy="235" rx="55"  ry="33" fill="#e8601a" opacity=".75"/>
+  <ellipse cx="1295" cy="222" rx="35"  ry="20" fill="#f0a030" opacity=".60"/>
+</g>
+
+<!-- Golden foliage backlight glow (dawn light catches canopy edges) -->
+<g filter="url(#glow-warm)" opacity=".55" style="animation:dawn-pulse 5s ease-in-out infinite">
+  <ellipse cx="148"  cy="252" rx="60" ry="28" fill="#f09820"/>
+  <ellipse cx="492"  cy="244" rx="65" ry="30" fill="#f08818"/>
+  <ellipse cx="615"  cy="232" rx="68" ry="32" fill="#f09020"/>
+  <ellipse cx="828"  cy="234" rx="66" ry="31" fill="#f08a18"/>
+  <ellipse cx="928"  cy="244" rx="64" ry="29" fill="#f09020"/>
+  <ellipse cx="1295" cy="252" rx="60" ry="28" fill="#f09820"/>
+</g>
+
+<!-- ── FALLING LEAVES ─────────────────────────────────── -->
+<!-- Leaf shapes: small diamond/oval + stem -->
+<g>
+  <!-- Leaf A: crimson, left-center -->
+  <g style="animation:leaf-a 6.8s ease-in-out infinite 0s" transform="translate(380, 200)">
+    <ellipse cx="0" cy="0" rx="10" ry="6" fill="#c01820" transform="rotate(-15)"/>
+    <line x1="0" y1="0" x2="4" y2="8" stroke="#801010" stroke-width="1"/>
+  </g>
+  <!-- Leaf B: amber, center -->
+  <g style="animation:leaf-b 8.2s ease-in-out infinite 1.4s" transform="translate(680, 165)">
+    <ellipse cx="0" cy="0" rx="9" ry="5" fill="#e08018" transform="rotate(20)"/>
+    <line x1="0" y1="0" x2="-3" y2="7" stroke="#a05010" stroke-width="1"/>
+  </g>
+  <!-- Leaf C: orange, right -->
+  <g style="animation:leaf-c 7.5s ease-in-out infinite 2.8s" transform="translate(920, 180)">
+    <ellipse cx="0" cy="0" rx="11" ry="6" fill="#e05012" transform="rotate(-10)"/>
+    <line x1="0" y1="0" x2="3" y2="8" stroke="#903010" stroke-width="1"/>
+  </g>
+  <!-- Leaf D: gold, far left -->
+  <g style="animation:leaf-d 9.0s ease-in-out infinite 0.6s" transform="translate(220, 190)">
+    <ellipse cx="0" cy="0" rx="9" ry="5" fill="#f0a020" transform="rotate(15)"/>
+    <line x1="0" y1="0" x2="-2" y2="7" stroke="#c07010" stroke-width="1"/>
+  </g>
+  <!-- Leaf E: crimson, far right -->
+  <g style="animation:leaf-e 7.2s ease-in-out infinite 3.5s" transform="translate(1180, 175)">
+    <ellipse cx="0" cy="0" rx="10" ry="6" fill="#b01418" transform="rotate(-20)"/>
+    <line x1="0" y1="0" x2="4" y2="8" stroke="#780e10" stroke-width="1"/>
+  </g>
+  <!-- Leaf F: amber, center-left -->
+  <g style="animation:leaf-f 8.6s ease-in-out infinite 5.0s" transform="translate(510, 210)">
+    <ellipse cx="0" cy="0" rx="10" ry="5" fill="#e07015" transform="rotate(8)"/>
+    <line x1="0" y1="0" x2="-3" y2="7" stroke="#a04010" stroke-width="1"/>
+  </g>
+  <!-- Leaf G: orange-red, center-right -->
+  <g style="animation:leaf-g 6.4s ease-in-out infinite 1.0s" transform="translate(845, 195)">
+    <ellipse cx="0" cy="0" rx="9" ry="5" fill="#d03c0c" transform="rotate(-15)"/>
+    <line x1="0" y1="0" x2="2" y2="7" stroke="#8c2808" stroke-width="1"/>
+  </g>
+  <!-- Leaf H: gold, right side -->
+  <g style="animation:leaf-h 7.9s ease-in-out infinite 4.2s" transform="translate(1065, 185)">
+    <ellipse cx="0" cy="0" rx="11" ry="6" fill="#f09820" transform="rotate(12)"/>
+    <line x1="0" y1="0" x2="-4" y2="8" stroke="#c06810" stroke-width="1"/>
+  </g>
+</g>
+
+<!-- ── DEER (subtle, mid-distance, behind mist) ──────── -->
+<g transform="translate(718, 615)" opacity=".45" fill="#1a0806">
+  <!-- Body -->
+  <ellipse cx="0" cy="0" rx="22" ry="11" transform="rotate(-8)"/>
+  <!-- Head + neck -->
+  <ellipse cx="22" cy="-10" rx="8" ry="6" transform="rotate(-25 22 -10)"/>
+  <path d="M 16 -6 L 22 -14" stroke="#1a0806" stroke-width="5" stroke-linecap="round"/>
+  <!-- Ear -->
+  <ellipse cx="28" cy="-16" rx="4" ry="6" fill="#1a0806" transform="rotate(-30 28 -16)"/>
+  <!-- Legs -->
+  <line x1="-12" y1="8"  x2="-14" y2="28" stroke="#1a0806" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="-4"  y1="10" x2="-5"  y2="30" stroke="#1a0806" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="8"   y1="10" x2="9"   y2="30" stroke="#1a0806" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="16"  y1="8"  x2="18"  y2="28" stroke="#1a0806" stroke-width="3.5" stroke-linecap="round"/>
+</g>
+
+<!-- Ground vignette at bottom -->
+<linearGradient id="floor-vig" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+  <stop offset="100%" stop-color="#000" stop-opacity=".65"/>
+</linearGradient>
+<rect x="0" y="750" width="1440" height="150" fill="url(#floor-vig)"/>
+
+<!-- Edge vignette (sides) -->
+<linearGradient id="left-vig" x1="0" y1="0" x2="1" y2="0">
+  <stop offset="0%" stop-color="#000" stop-opacity=".70"/>
+  <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+</linearGradient>
+<linearGradient id="right-vig" x1="0" y1="0" x2="1" y2="0">
+  <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+  <stop offset="100%" stop-color="#000" stop-opacity=".70"/>
+</linearGradient>
+<rect x="0"    y="0" width="180" height="900" fill="url(#left-vig)"/>
+<rect x="1260" y="0" width="180" height="900" fill="url(#right-vig)"/>
+
+<!-- Top vignette -->
+<linearGradient id="top-vig" x1="0" y1="0" x2="0" y2="1">
+  <stop offset="0%" stop-color="#000" stop-opacity=".45"/>
+  <stop offset="100%" stop-color="#000" stop-opacity="0"/>
+</linearGradient>
+<rect x="0" y="0" width="1440" height="120" fill="url(#top-vig)"/>
+
+</svg>
+</body>
+</html>

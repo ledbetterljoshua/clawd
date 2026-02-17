@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin:0; padding:0; }
+html, body { width:100%; height:100%; overflow:hidden; background:#010208; }
+svg { width:100%; height:100%; display:block; }
+
+@keyframes tw-a { 0%,100%{opacity:.85} 50%{opacity:.12} }
+@keyframes tw-b { 0%,100%{opacity:.58} 45%{opacity:.05} }
+@keyframes tw-c { 0%,100%{opacity:.72} 62%{opacity:.10} }
+
+@keyframes aur-a {
+  0%,100% { transform: translateY(0px) skewX(1.8deg); opacity: .72; }
+  38%     { transform: translateY(-24px) skewX(-1.2deg); opacity: .90; }
+  72%     { transform: translateY(9px) skewX(2.4deg); opacity: .58; }
+}
+@keyframes aur-b {
+  0%,100% { transform: translateY(5px) skewX(-2.2deg); opacity: .56; }
+  42%     { transform: translateY(-20px) skewX(1.8deg); opacity: .74; }
+  74%     { transform: translateY(11px) skewX(-2.8deg); opacity: .42; }
+}
+@keyframes aur-c {
+  0%,100% { transform: translateY(-5px) skewX(1.2deg); opacity: .38; }
+  50%     { transform: translateY(16px) skewX(-1.6deg); opacity: .54; }
+}
+@keyframes aur-d {
+  0%,100% { transform: translateY(2px); opacity: .28; }
+  45%     { transform: translateY(-12px); opacity: .42; }
+}
+@keyframes aur-pulse { 0%,100%{opacity:.55} 50%{opacity:.82} }
+@keyframes shimmer   { 0%,100%{opacity:.28} 50%{opacity:.46} }
+@keyframes cabin-f   { 0%,100%{opacity:.88} 52%{opacity:.65} 78%{opacity:1} }
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#010208"/>
+    <stop offset="100%" stop-color="#020d20"/>
+  </linearGradient>
+  <linearGradient id="aur-green" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#00c870" stop-opacity="0"/>
+    <stop offset="10%"  stop-color="#00d876" stop-opacity=".90"/>
+    <stop offset="52%"  stop-color="#18e882" stop-opacity=".42"/>
+    <stop offset="100%" stop-color="#00ff88" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="aur-teal" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#00b0c4" stop-opacity="0"/>
+    <stop offset="8%"   stop-color="#00d8dc" stop-opacity=".74"/>
+    <stop offset="50%"  stop-color="#00eae6" stop-opacity=".34"/>
+    <stop offset="100%" stop-color="#00ffff" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="aur-purple" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#5818b0" stop-opacity="0"/>
+    <stop offset="16%"  stop-color="#7030c8" stop-opacity=".54"/>
+    <stop offset="60%"  stop-color="#b060f8" stop-opacity=".20"/>
+    <stop offset="100%" stop-color="#8838e0" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="aur-pink" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#e04880" stop-opacity="0"/>
+    <stop offset="22%"  stop-color="#f06090" stop-opacity=".28"/>
+    <stop offset="68%"  stop-color="#f890b0" stop-opacity=".10"/>
+    <stop offset="100%" stop-color="#ffb0c8" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="snow" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#05152c"/>
+    <stop offset="100%" stop-color="#010810"/>
+  </linearGradient>
+  <linearGradient id="lake" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#082040"/>
+    <stop offset="100%" stop-color="#020c18"/>
+  </linearGradient>
+
+  <!-- Aurora glow filter — keeps source but adds big blur halo -->
+  <filter id="aglow" x="-25%" y="-25%" width="150%" height="150%">
+    <feGaussianBlur stdDeviation="15" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <!-- Deep diffuse blur -->
+  <filter id="asoft" x="-20%" y="-20%" width="140%" height="140%">
+    <feGaussianBlur stdDeviation="22"/>
+  </filter>
+  <filter id="fblur"><feGaussianBlur stdDeviation="4.5"/></filter>
+  <filter id="lblur"><feGaussianBlur stdDeviation="3.5"/></filter>
+  <filter id="sglow">
+    <feGaussianBlur stdDeviation="1.5" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+
+  <clipPath id="sky-clip"><rect width="1440" height="622"/></clipPath>
+</defs>
+
+<!-- ── SKY ─────────────────────────────────────────────── -->
+<rect width="1440" height="900" fill="url(#sky)"/>
+
+<!-- Stars -->
+<g filter="url(#sglow)">
+  <g style="animation:tw-a 3.1s ease-in-out infinite">
+    <circle cx="82"  cy="40"  r="1.05" fill="#d4ecff" opacity=".84"/>
+    <circle cx="250" cy="24"  r="1.18" fill="#c8e4ff" opacity=".92"/>
+    <circle cx="440" cy="56"  r=".88"  fill="#e4f0ff" opacity=".74"/>
+    <circle cx="614" cy="30"  r="1.12" fill="#d0e8ff" opacity=".88"/>
+    <circle cx="802" cy="14"  r=".96"  fill="#eaecff" opacity=".80"/>
+    <circle cx="958" cy="50"  r="1.02" fill="#d4ecff" opacity=".82"/>
+    <circle cx="1134" cy="26" r="1.12" fill="#c8ecf8" opacity=".90"/>
+    <circle cx="1318" cy="42" r=".88"  fill="#e4f0ff" opacity=".74"/>
+    <circle cx="1406" cy="18" r="1.02" fill="#d0e8ff" opacity=".82"/>
+  </g>
+  <g style="animation:tw-b 4.9s ease-in-out infinite 1.4s">
+    <circle cx="162"  cy="68"  r=".84" fill="#e0f0ff" opacity=".66"/>
+    <circle cx="348"  cy="90"  r="1.12" fill="#d4e8ff" opacity=".82"/>
+    <circle cx="535"  cy="76"  r=".94" fill="#c8dfff" opacity=".76"/>
+    <circle cx="720"  cy="60"  r=".84" fill="#e4f0ff" opacity=".64"/>
+    <circle cx="898"  cy="83"  r="1.02" fill="#d4ecff" opacity=".72"/>
+    <circle cx="1068" cy="70"  r="1.18" fill="#d0ecf8" opacity=".86"/>
+    <circle cx="1240" cy="94"  r=".84" fill="#eaecff" opacity=".66"/>
+    <circle cx="1388" cy="78"  r=".94" fill="#d4e8ff" opacity=".72"/>
+  </g>
+  <g style="animation:tw-c 6.0s ease-in-out infinite 0.8s">
+    <circle cx="54"   cy="110" r=".74" fill="#d4ecff" opacity=".60"/>
+    <circle cx="195"  cy="134" r=".94" fill="#c8e4ff" opacity=".70"/>
+    <circle cx="375"  cy="117" r=".84" fill="#e4f0ff" opacity=".57"/>
+    <circle cx="562"  cy="141" r="1.02" fill="#d0e8ff" opacity=".76"/>
+    <circle cx="738"  cy="106" r=".84" fill="#c8ecf8" opacity=".66"/>
+    <circle cx="916"  cy="137" r=".94" fill="#e0f0ff" opacity=".62"/>
+    <circle cx="1095" cy="120" r=".74" fill="#d4ecff" opacity=".57"/>
+    <circle cx="1262" cy="151" r="1.12" fill="#d0e4ff" opacity=".80"/>
+    <circle cx="1432" cy="114" r=".84" fill="#eaecff" opacity=".62"/>
+  </g>
+  <!-- Scatter -->
+  <circle cx="118"  cy="84"  r=".64" fill="#d0e8ff" opacity=".50"/>
+  <circle cx="302"  cy="48"  r=".74" fill="#c8e4ff" opacity=".55"/>
+  <circle cx="484"  cy="102" r=".64" fill="#e4f0ff" opacity=".45"/>
+  <circle cx="666"  cy="75"  r=".74" fill="#d4ecff" opacity=".51"/>
+  <circle cx="846"  cy="127" r=".54" fill="#d0ecf8" opacity=".41"/>
+  <circle cx="1026" cy="57"  r=".64" fill="#c8e4ff" opacity=".51"/>
+  <circle cx="1192" cy="105" r=".74" fill="#e0f0ff" opacity=".46"/>
+  <circle cx="1362" cy="65"  r=".54" fill="#d4e8ff" opacity=".41"/>
+  <circle cx="30"   cy="160" r=".54" fill="#d4ecff" opacity=".39"/>
+  <circle cx="452"  cy="161" r=".64" fill="#c8e4ff" opacity=".45"/>
+  <circle cx="632"  cy="174" r=".54" fill="#d0e8ff" opacity=".41"/>
+  <circle cx="812"  cy="152" r=".64" fill="#e4f0ff" opacity=".45"/>
+  <circle cx="992"  cy="171" r=".54" fill="#d4ecff" opacity=".41"/>
+  <circle cx="1158" cy="155" r=".64" fill="#c8ecf8" opacity=".39"/>
+  <circle cx="1328" cy="169" r=".54" fill="#d4e8ff" opacity=".35"/>
+</g>
+
+<!-- ── AURORA ───────────────────────────────────────────── -->
+
+<!-- Deep atmospheric glow -->
+<g style="animation:aur-pulse 6.8s ease-in-out infinite" clip-path="url(#sky-clip)">
+  <ellipse cx="720" cy="295" rx="1000" ry="230" fill="#00c870" opacity=".055" filter="url(#asoft)"/>
+</g>
+
+<!-- Green primary curtain -->
+<g style="animation:aur-a 7.6s ease-in-out infinite" clip-path="url(#sky-clip)">
+  <path d="M-100 202 Q 72 158 280 178 Q 458 196 642 165
+           Q 826 137 1005 170 Q 1184 200 1365 168 L1540 175
+           L1540 358 Q1365 326 1184 348 Q1005 368 826 338
+           Q642 308 458 342 Q278 374 72 340 L-100 355 Z"
+    fill="url(#aur-green)" filter="url(#aglow)"/>
+</g>
+
+<!-- Teal secondary curtain -->
+<g style="animation:aur-b 9.3s ease-in-out infinite 1.7s" clip-path="url(#sky-clip)">
+  <path d="M-100 132 Q 95 98 308 116 Q 520 135 730 100
+           Q 940 68 1148 107 Q 1356 142 1540 105 L1540 298
+           Q1356 262 1148 284 Q940 305 730 272
+           Q520 241 308 268 Q95 292 -100 268 Z"
+    fill="url(#aur-teal)" filter="url(#aglow)" opacity=".84"/>
+</g>
+
+<!-- Purple accent curtain -->
+<g style="animation:aur-c 11.4s ease-in-out infinite 3.4s" clip-path="url(#sky-clip)">
+  <path d="M-100 74 Q 155 49 422 67 Q 690 86 958 53
+           Q 1226 22 1540 60 L1540 215
+           Q1250 188 988 206 Q726 222 464 192
+           Q202 162 -100 190 Z"
+    fill="url(#aur-purple)" filter="url(#asoft)" opacity=".60"/>
+</g>
+
+<!-- Pink/red top edge (rare phenomenon) -->
+<g style="animation:aur-d 13.5s ease-in-out infinite 5.5s" clip-path="url(#sky-clip)">
+  <path d="M 180 36 Q 455 16 730 33 Q 1005 50 1260 28 L1440 32
+           L1440 132 Q1210 116 968 126 Q726 136 484 116 Q242 98 180 118 Z"
+    fill="url(#aur-pink)" filter="url(#asoft)" opacity=".44"/>
+</g>
+
+<!-- ── FAR MOUNTAINS ─────────────────────────────────────── -->
+<path d="M-20 550 L 75 490 L 158 518 L 242 460 L 338 497
+         L 432 442 L 528 480 L 624 434 L 720 465
+         L 818 424 L 922 460 L 1022 438 L 1122 472
+         L 1204 442 L 1304 470 L 1388 452 L 1462 474
+         L1462 614 L-20 614 Z"
+  fill="#020c1e" opacity=".94"/>
+<!-- Snow caps -->
+<path d="M 242 460 L 257 474 L 228 472 Z
+         M 432 442 L 448 460 L 417 458 Z
+         M 624 434 L 642 452 L 607 450 Z
+         M 818 424 L 838 445 L 800 447 Z
+         M 1022 438 L 1040 456 L 1006 454 Z
+         M 1204 442 L 1222 461 L 1187 459 Z"
+  fill="#7090b8" opacity=".30"/>
+
+<!-- ── NEAR HILLS ──────────────────────────────────────── -->
+<path d="M-20 602 L 94 544 L 198 570 L 312 528 L 424 554
+         L 544 514 L 654 546 L 764 524 L 874 550
+         L 984 520 L 1094 548 L 1204 526 L 1314 552
+         L 1424 530 L1462 540 L1462 650 L-20 650 Z"
+  fill="#020810"/>
+
+<!-- ── PINE FOREST ─────────────────────────────────────── -->
+<g fill="#01070e">
+  <path d="M  5 605 L  34 551 L  63 605 Z"/>
+  <path d="M 44 605 L  78 542 L 112 605 Z"/>
+  <path d="M 86 605 L 124 531 L 162 605 Z"/>
+  <path d="M128 605 L 160 547 L 192 605 Z"/>
+  <path d="M165 605 L 193 555 L 221 605 Z"/>
+  <path d="M198 605 L 224 561 L 250 605 Z"/>
+  <path d="M228 608 L 252 566 L 276 608 Z"/>
+  <path d="M255 610 L 275 572 L 295 610 Z"/>
+  <!-- Right -->
+  <path d="M1146 610 L1166 572 L1186 610 Z"/>
+  <path d="M1172 608 L1196 566 L1220 608 Z"/>
+  <path d="M1202 605 L1228 561 L1254 605 Z"/>
+  <path d="M1236 605 L1262 555 L1288 605 Z"/>
+  <path d="M1272 605 L1302 547 L1332 605 Z"/>
+  <path d="M1314 605 L1348 531 L1382 605 Z"/>
+  <path d="M1356 605 L1390 542 L1424 605 Z"/>
+  <path d="M1396 605 L1426 551 L1456 605 Z"/>
+</g>
+
+<!-- ── SNOW PLAIN ─────────────────────────────────────── -->
+<path d="M0 640 Q 235 620 475 634 Q 720 648 960 630 Q 1200 614 1440 634 L1440 900 L0 900 Z"
+  fill="url(#snow)"/>
+
+<!-- Frozen lake -->
+<ellipse cx="720" cy="732" rx="372" ry="76" fill="url(#lake)" filter="url(#lblur)"/>
+<ellipse cx="720" cy="732" rx="372" ry="76"
+  fill="none" stroke="#1a3a5c" stroke-width="1.4" opacity=".36"/>
+
+<!-- Aurora lake reflection -->
+<g style="animation:shimmer 4.2s ease-in-out infinite">
+  <ellipse cx="700" cy="726" rx="215" ry="22" fill="#00c870" opacity=".28" filter="url(#fblur)"/>
+  <ellipse cx="755" cy="740" rx="165" ry="17" fill="#00ccd8" opacity=".23" filter="url(#fblur)"/>
+  <ellipse cx="645" cy="750" rx="125" ry="14" fill="#7030c8" opacity=".18" filter="url(#fblur)"/>
+</g>
+
+<!-- Distant cabin light -->
+<g style="animation:cabin-f 2.9s ease-in-out infinite">
+  <rect x="1093" y="568" width="12" height="8" rx="1.5" fill="#f0a030" opacity=".45" filter="url(#fblur)"/>
+  <rect x="1096" y="570" width="7"  height="5" rx="1"   fill="#ffc840"/>
+</g>
+
+<!-- Lone figure (left, looking up) -->
+<g transform="translate(352,640)">
+  <ellipse cx="0" cy="2" rx="7" ry="2.5" fill="#01060a" opacity=".55"/>
+  <rect x="-6" y="-30" width="12" height="22" rx="2.5" fill="#01060a"/>
+  <circle cx="0" cy="-37.5" r="6.2" fill="#01060a"/>
+  <path d="M 5.5 -22 L 19 -35" stroke="#01060a" stroke-width="3.2" stroke-linecap="round"/>
+</g>
+
+<!-- Vignette -->
+<radialGradient id="vig" cx="50%" cy="50%" r="72%">
+  <stop offset="0%" stop-color="#000" stop-opacity="0"/>
+  <stop offset="100%" stop-color="#000" stop-opacity=".48"/>
+</radialGradient>
+<rect width="1440" height="900" fill="url(#vig)"/>
+
+</svg>
+</body>
+</html>
