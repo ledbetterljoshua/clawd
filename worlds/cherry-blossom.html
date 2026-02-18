@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Cherry Blossom · Dusk Rain</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; height: 100vh; background: #1a1220; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+svg { width: 100%; height: 100%; }
+
+/* ═══ MIST DRIFT ═══ */
+@keyframes mist-l { 0% { transform: translateX(0); } 100% { transform: translateX(120px); } }
+@keyframes mist-r { 0% { transform: translateX(0); } 100% { transform: translateX(-100px); } }
+@keyframes mist-u { 0% { transform: translateX(0) translateY(0); } 100% { transform: translateX(60px) translateY(-20px); } }
+.mist-l { animation: mist-l 28s ease-in-out infinite alternate; }
+.mist-r { animation: mist-r 35s ease-in-out infinite alternate; }
+.mist-u { animation: mist-u 40s ease-in-out infinite alternate; }
+
+/* ═══ LANTERN BREATHE ═══ */
+@keyframes lantern-breathe {
+  0%, 100% { opacity: 0.85; }
+  50%       { opacity: 0.65; }
+}
+@keyframes lantern-glow-breathe {
+  0%, 100% { opacity: 0.35; }
+  50%       { opacity: 0.18; }
+}
+@keyframes lantern-halo-breathe {
+  0%, 100% { opacity: 0.22; }
+  50%       { opacity: 0.10; }
+}
+.lantern-flame { animation: lantern-breathe 8s ease-in-out infinite; }
+.lantern-glow  { animation: lantern-glow-breathe 8s ease-in-out infinite; }
+.lantern-halo  { animation: lantern-halo-breathe 8s ease-in-out infinite; }
+
+/* ═══ POND REFLECTION BREATHE ═══ */
+@keyframes pond-reflect {
+  0%, 100% { opacity: 0.18; }
+  50%       { opacity: 0.08; }
+}
+.pond-reflect { animation: pond-reflect 8s ease-in-out infinite; }
+
+/* ═══ RAIN ═══ */
+@keyframes rain-fall {
+  0%   { transform: translate(0px, -80px); opacity: 0; }
+  8%   { opacity: 0.10; }
+  90%  { opacity: 0.08; }
+  100% { transform: translate(40px, 980px); opacity: 0; }
+}
+.rain { animation: rain-fall 3.2s linear infinite; }
+.rain-b { animation: rain-fall 4.1s linear infinite; }
+.rain-c { animation: rain-fall 2.8s linear infinite; }
+
+/* ═══ PETAL KEYFRAMES (6 variations) ═══ */
+@keyframes petal-a {
+  0%   { transform: translate(0px, 0px)   rotate(0deg);   opacity: 0; }
+  6%   { opacity: 0.85; }
+  94%  { opacity: 0.70; }
+  100% { transform: translate(-80px, 640px)  rotate(220deg); opacity: 0; }
+}
+@keyframes petal-b {
+  0%   { transform: translate(0px, 0px)   rotate(15deg);  opacity: 0; }
+  8%   { opacity: 0.78; }
+  93%  { opacity: 0.65; }
+  100% { transform: translate(70px, 680px)  rotate(-260deg); opacity: 0; }
+}
+@keyframes petal-c {
+  0%   { transform: translate(0px, 0px)   rotate(-10deg); opacity: 0; }
+  5%   { opacity: 0.90; }
+  94%  { opacity: 0.72; }
+  100% { transform: translate(-50px, 620px) rotate(300deg); opacity: 0; }
+}
+@keyframes petal-d {
+  0%   { transform: translate(0px, 0px)   rotate(8deg);   opacity: 0; }
+  7%   { opacity: 0.82; }
+  92%  { opacity: 0.68; }
+  100% { transform: translate(90px, 660px)  rotate(-180deg); opacity: 0; }
+}
+@keyframes petal-e {
+  0%   { transform: translate(0px, 0px)   rotate(-20deg); opacity: 0; }
+  6%   { opacity: 0.75; }
+  93%  { opacity: 0.60; }
+  100% { transform: translate(-65px, 700px) rotate(240deg); opacity: 0; }
+}
+@keyframes petal-f {
+  0%   { transform: translate(0px, 0px)   rotate(12deg);  opacity: 0; }
+  5%   { opacity: 0.88; }
+  94%  { opacity: 0.74; }
+  100% { transform: translate(55px, 650px)  rotate(-320deg); opacity: 0; }
+}
+
+/* ═══ GUST OVERRIDE ═══ */
+@keyframes petal-gust {
+  0%   { transform: translate(0px, 0px)   rotate(0deg);   opacity: 0.80; }
+  40%  { transform: translate(200px, 200px) rotate(120deg); opacity: 0.80; }
+  100% { transform: translate(380px, 700px) rotate(280deg); opacity: 0; }
+}
+.gust { animation: petal-gust 1.8s ease-in forwards !important; }
+
+.petal-a { animation: petal-a linear infinite; }
+.petal-b { animation: petal-b linear infinite; }
+.petal-c { animation: petal-c linear infinite; }
+.petal-d { animation: petal-d linear infinite; }
+.petal-e { animation: petal-e linear infinite; }
+.petal-f { animation: petal-f linear infinite; }
+
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900"
+     preserveAspectRatio="xMidYMid slice">
+<defs>
+
+  <!-- ═══ SKY GRADIENT ═══ -->
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#1a1220"/>
+    <stop offset="30%"  stop-color="#2e1e30"/>
+    <stop offset="65%"  stop-color="#3c2840"/>
+    <stop offset="100%" stop-color="#4a3050"/>
+  </linearGradient>
+
+  <!-- ═══ GROUND / PATH ═══ -->
+  <linearGradient id="ground-grad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#2a1e2e"/>
+    <stop offset="50%"  stop-color="#1e1428"/>
+    <stop offset="100%" stop-color="#150f1e"/>
+  </linearGradient>
+
+  <!-- ═══ POND ═══ -->
+  <linearGradient id="pond-grad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#1c1428"/>
+    <stop offset="100%" stop-color="#0e0c18"/>
+  </linearGradient>
+
+  <!-- ═══ LANTERN GLOW (radial) ═══ -->
+  <radialGradient id="lantern-window" cx="50%" cy="50%" r="50%">
+    <stop offset="0%"   stop-color="#ffd080" stop-opacity="1"/>
+    <stop offset="60%"  stop-color="#e8a040" stop-opacity="0.9"/>
+    <stop offset="100%" stop-color="#c07020" stop-opacity="0.6"/>
+  </radialGradient>
+
+  <radialGradient id="lantern-outer-glow" cx="50%" cy="50%" r="50%">
+    <stop offset="0%"   stop-color="#f8c060" stop-opacity="0.5"/>
+    <stop offset="40%"  stop-color="#e09030" stop-opacity="0.22"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </radialGradient>
+
+  <radialGradient id="lantern-halo-grad" cx="50%" cy="50%" r="50%">
+    <stop offset="0%"   stop-color="#ffc840" stop-opacity="0.20"/>
+    <stop offset="50%"  stop-color="#e08020" stop-opacity="0.08"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </radialGradient>
+
+  <!-- ═══ POND LANTERN REFLECTION ═══ -->
+  <radialGradient id="pond-lantern-reflect" cx="50%" cy="0%" r="80%">
+    <stop offset="0%"   stop-color="#e89030" stop-opacity="0.45"/>
+    <stop offset="45%"  stop-color="#c06010" stop-opacity="0.18"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </radialGradient>
+
+  <!-- ═══ TORII GATE GRADIENT (desaturated vermillion, misty) ═══ -->
+  <linearGradient id="torii-grad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#6a3040" stop-opacity="0.55"/>
+    <stop offset="70%"  stop-color="#5a2838" stop-opacity="0.40"/>
+    <stop offset="100%" stop-color="#4a2030" stop-opacity="0.20"/>
+  </linearGradient>
+
+  <!-- ═══ BLOSSOM CANOPY GRADIENTS ═══ -->
+  <radialGradient id="blossom-l" cx="55%" cy="60%" r="50%">
+    <stop offset="0%"   stop-color="#d87090" stop-opacity="0.75"/>
+    <stop offset="50%"  stop-color="#c06080" stop-opacity="0.55"/>
+    <stop offset="100%" stop-color="#a04868" stop-opacity="0.30"/>
+  </radialGradient>
+  <radialGradient id="blossom-c" cx="45%" cy="55%" r="50%">
+    <stop offset="0%"   stop-color="#f0a0b8" stop-opacity="0.70"/>
+    <stop offset="45%"  stop-color="#d880a0" stop-opacity="0.50"/>
+    <stop offset="100%" stop-color="#b86080" stop-opacity="0.28"/>
+  </radialGradient>
+  <radialGradient id="blossom-r" cx="40%" cy="58%" r="50%">
+    <stop offset="0%"   stop-color="#f8d8e0" stop-opacity="0.65"/>
+    <stop offset="50%"  stop-color="#e0a8c0" stop-opacity="0.45"/>
+    <stop offset="100%" stop-color="#c08098" stop-opacity="0.25"/>
+  </radialGradient>
+
+  <!-- ═══ VIGNETTE ═══ -->
+  <radialGradient id="vig" cx="50%" cy="50%" r="70%">
+    <stop offset="0%"   stop-color="transparent"/>
+    <stop offset="100%" stop-color="#0e0818" stop-opacity="0.75"/>
+  </radialGradient>
+
+  <!-- ═══ BLUR FILTERS ═══ -->
+  <filter id="fsm">  <feGaussianBlur stdDeviation="2"/>   </filter>
+  <filter id="fmd">  <feGaussianBlur stdDeviation="6"/>   </filter>
+  <filter id="flg">  <feGaussianBlur stdDeviation="14"/>  </filter>
+  <filter id="fxl">  <feGaussianBlur stdDeviation="28"/>  </filter>
+  <filter id="fxxl"> <feGaussianBlur stdDeviation="50"/>  </filter>
+  <filter id="rain-blur"> <feGaussianBlur stdDeviation="0.3 0"/> </filter>
+
+</defs>
+
+<!-- ═══════════════════ SKY ═══════════════════ -->
+<rect width="1440" height="900" fill="url(#sky)"/>
+
+<!-- Ambient dusk warmth near horizon -->
+<ellipse cx="720" cy="750" rx="900" ry="280" fill="#5a2840" opacity="0.22" filter="url(#fxxl)"/>
+<ellipse cx="360" cy="680" rx="500" ry="200" fill="#3a1e38" opacity="0.18" filter="url(#fxl)"/>
+<ellipse cx="1080" cy="700" rx="420" ry="180" fill="#3c1e34" opacity="0.16" filter="url(#fxl)"/>
+
+<!-- ═══════════════════ DISTANT MIST HILLS ═══════════════════ -->
+<!-- Back layer: far pale hills/tree mass in fog -->
+<g class="mist-r" opacity="0.28">
+  <ellipse cx="200"  cy="440" rx="280" ry="90"  fill="#5a4060"/>
+  <ellipse cx="550"  cy="400" rx="360" ry="110" fill="#6a4870"/>
+  <ellipse cx="900"  cy="420" rx="300" ry="95"  fill="#5c4268"/>
+  <ellipse cx="1250" cy="410" rx="320" ry="100" fill="#644870"/>
+</g>
+<g class="mist-l" opacity="0.22">
+  <ellipse cx="80"   cy="460" rx="200" ry="70"  fill="#483858"/>
+  <ellipse cx="380"  cy="430" rx="280" ry="85"  fill="#503c62"/>
+  <ellipse cx="760"  cy="415" rx="340" ry="100" fill="#5a4268"/>
+  <ellipse cx="1150" cy="435" rx="260" ry="80"  fill="#4c3a5c"/>
+  <ellipse cx="1400" cy="450" rx="180" ry="65"  fill="#483858"/>
+</g>
+
+<!-- Mid mist veil across scene -->
+<g class="mist-u" opacity="0.18">
+  <rect x="0" y="380" width="1440" height="180" fill="#4a3058" filter="url(#fxl)"/>
+  <ellipse cx="400"  cy="500" rx="500" ry="80"  fill="#5a3868" filter="url(#flg)"/>
+  <ellipse cx="1100" cy="490" rx="450" ry="75"  fill="#503460" filter="url(#flg)"/>
+</g>
+
+<!-- ═══════════════════ TORII GATE (distant, misty) ═══════════════════ -->
+<!-- Uprights -->
+<rect x="190" y="250" width="22" height="320" fill="url(#torii-grad)" filter="url(#fmd)"/>
+<rect x="340" y="250" width="22" height="320" fill="url(#torii-grad)" filter="url(#fmd)"/>
+<!-- Upper horizontal beam (kasagi) -->
+<rect x="152" y="248" width="258" height="20" rx="4" fill="url(#torii-grad)" filter="url(#fmd)"/>
+<!-- Slight upcurved ends — left -->
+<ellipse cx="152" cy="252" rx="18" ry="7" fill="#6a3040" opacity="0.35" filter="url(#fmd)"/>
+<!-- right -->
+<ellipse cx="410" cy="252" rx="18" ry="7" fill="#6a3040" opacity="0.35" filter="url(#fmd)"/>
+<!-- Lower crossbeam (nuki) -->
+<rect x="178" y="306" width="202" height="12" rx="3" fill="#5a2838" opacity="0.35" filter="url(#fmd)"/>
+<!-- Mist overlay softening torii -->
+<rect x="120" y="230" width="330" height="380" fill="#3c2840" opacity="0.35" filter="url(#flg)"/>
+
+<!-- ═══════════════════ CHERRY TREES — LEFT ═══════════════════ -->
+<!-- Trunk and main branches — left tree -->
+<g fill="#281828" opacity="0.80">
+  <rect x="148" y="540" width="22" height="220" rx="6"/>
+  <!-- branch left -->
+  <path d="M 159,560 C 140,520 80,490 40,470" stroke="#281828" stroke-width="12" fill="none" stroke-linecap="round"/>
+  <!-- branch right -->
+  <path d="M 162,540 C 180,500 220,465 255,445" stroke="#281828" stroke-width="10" fill="none" stroke-linecap="round"/>
+  <!-- branch up -->
+  <path d="M 159,555 C 155,510 148,475 152,440" stroke="#281828" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <!-- sub-branch -->
+  <path d="M 40,470 C 20,455 5,442 -10,428" stroke="#281828" stroke-width="7" fill="none" stroke-linecap="round"/>
+  <path d="M 140,490 C 110,475 88,460 65,448" stroke="#281828" stroke-width="6" fill="none" stroke-linecap="round"/>
+</g>
+<!-- Blossom cloud — left tree -->
+<ellipse cx="120" cy="440" rx="180" ry="90" fill="url(#blossom-l)" filter="url(#fmd)"/>
+<ellipse cx="200" cy="400" rx="130" ry="70" fill="url(#blossom-l)" filter="url(#fmd)" opacity="0.75"/>
+<ellipse cx="60"  cy="460" rx="110" ry="60" fill="url(#blossom-l)" filter="url(#fmd)" opacity="0.60"/>
+<ellipse cx="260" cy="420" rx="95"  ry="55" fill="url(#blossom-c)" filter="url(#fmd)" opacity="0.65"/>
+
+<!-- ═══════════════════ CHERRY TREES — CENTRE-BACK ═══════════════════ -->
+<!-- Trunk -->
+<g fill="#241520" opacity="0.70">
+  <rect x="698" y="510" width="18" height="200" rx="5"/>
+  <path d="M 707,525 C 695,490 660,460 630,440" stroke="#241520" stroke-width="11" fill="none" stroke-linecap="round"/>
+  <path d="M 707,520 C 718,482 750,454 775,436" stroke="#241520" stroke-width="9" fill="none" stroke-linecap="round"/>
+  <path d="M 707,530 C 704,500 700,470 702,442" stroke="#241520" stroke-width="13" fill="none" stroke-linecap="round"/>
+</g>
+<!-- Blossom cloud — centre tree (palest, most misty) -->
+<ellipse cx="700" cy="390" rx="200" ry="95"  fill="url(#blossom-r)" filter="url(#fmd)" opacity="0.60"/>
+<ellipse cx="640" cy="420" rx="130" ry="65"  fill="url(#blossom-c)" filter="url(#fmd)" opacity="0.45"/>
+<ellipse cx="760" cy="405" rx="120" ry="60"  fill="url(#blossom-r)" filter="url(#fmd)" opacity="0.50"/>
+
+<!-- ═══════════════════ CHERRY TREES — RIGHT ═══════════════════ -->
+<g fill="none" stroke="#281828" stroke-linecap="round" opacity="0.80">
+  <rect x="1245" y="530" width="20" height="230" rx="5" fill="#281828" stroke="none"/>
+  <path d="M 1255,545 C 1278,505 1330,478 1370,460" stroke-width="10"/>
+  <path d="M 1252,540 C 1235,500 1198,468 1170,448" stroke-width="11"/>
+  <path d="M 1255,550 C 1258,510 1260,478 1256,448" stroke-width="13"/>
+  <path d="M 1370,460 C 1390,450 1415,440 1440,428" stroke-width="7"/>
+</g>
+<!-- Blossom — right -->
+<ellipse cx="1295" cy="430" rx="175" ry="88" fill="url(#blossom-c)" filter="url(#fmd)" opacity="0.68"/>
+<ellipse cx="1370" cy="400" rx="120" ry="62" fill="url(#blossom-r)" filter="url(#fmd)" opacity="0.55"/>
+<ellipse cx="1200" cy="445" rx="100" ry="55" fill="url(#blossom-l)" filter="url(#fmd)" opacity="0.60"/>
+
+<!-- ═══════════════════ GROUND / GARDEN PATH ═══════════════════ -->
+<rect x="0" y="660" width="1440" height="240" fill="url(#ground-grad)"/>
+
+<!-- Moss / grass edge suggestion -->
+<ellipse cx="720" cy="662" rx="900" ry="30" fill="#2a1c30" opacity="0.65" filter="url(#fsm)"/>
+
+<!-- Stone path down centre -->
+<path d="M 580,665 Q 620,700 640,750 Q 650,790 645,900"
+      stroke="#2e2038" stroke-width="32" fill="none" stroke-linecap="round" opacity="0.55"/>
+<path d="M 580,665 Q 620,700 640,750 Q 650,790 645,900"
+      stroke="#382840" stroke-width="28" fill="none" stroke-linecap="round" opacity="0.30"/>
+
+<!-- Path stone texture -->
+<g opacity="0.25" fill="#3c2e48">
+  <ellipse cx="614" cy="690" rx="20" ry="8" transform="rotate(-5,614,690)"/>
+  <ellipse cx="630" cy="720" rx="22" ry="9" transform="rotate(3,630,720)"/>
+  <ellipse cx="638" cy="752" rx="19" ry="8" transform="rotate(-2,638,752)"/>
+  <ellipse cx="642" cy="782" rx="21" ry="9" transform="rotate(4,642,782)"/>
+</g>
+
+<!-- ═══════════════════ POND ═══════════════════ -->
+<!-- Dark glassy pond, left of centre -->
+<ellipse cx="500" cy="750" rx="280" ry="70" fill="url(#pond-grad)"/>
+<ellipse cx="500" cy="750" rx="280" ry="70" fill="#1a0f28" opacity="0.65"/>
+<!-- Pond edge shimmer -->
+<ellipse cx="500" cy="750" rx="280" ry="70" fill="none" stroke="#3a2848" stroke-width="2" opacity="0.50"/>
+<ellipse cx="500" cy="748" rx="275" ry="66" fill="none" stroke="#4a3458" stroke-width="1" opacity="0.30"/>
+
+<!-- Pink blossom reflection in pond (faint) -->
+<ellipse cx="480" cy="745" rx="160" ry="30" fill="#d87090" opacity="0.06" filter="url(#fmd)"/>
+
+<!-- ═══════════════════ CURVED STONE BRIDGE ═══════════════════ -->
+<!-- Bridge arch shadow -->
+<path d="M 340,740 Q 500,680 660,740" stroke="#1c1228" stroke-width="36" fill="none" opacity="0.70"/>
+<!-- Bridge deck -->
+<path d="M 340,740 Q 500,680 660,740" stroke="#382a44" stroke-width="28" fill="none" opacity="0.85"/>
+<!-- Bridge highlight edge -->
+<path d="M 340,740 Q 500,680 660,740" stroke="#4a3858" stroke-width="14" fill="none" opacity="0.45"/>
+<!-- Bridge top surface (pale stone) -->
+<path d="M 340,740 Q 500,680 660,740" stroke="#5a4868" stroke-width="6" fill="none" opacity="0.40"/>
+<!-- Stone railing posts (small nubs along the arc) -->
+<g fill="#4a3858" opacity="0.60">
+  <rect x="355" y="732" width="7" height="16" rx="2" transform="rotate(-5,358,740)"/>
+  <rect x="400" y="710" width="7" height="16" rx="2" transform="rotate(-3,403,718)"/>
+  <rect x="450" y="694" width="7" height="16" rx="2"/>
+  <rect x="500" y="688" width="7" height="16" rx="2"/>
+  <rect x="550" y="694" width="7" height="16" rx="2"/>
+  <rect x="598" y="710" width="7" height="16" rx="2" transform="rotate(3,601,718)"/>
+  <rect x="640" y="730" width="7" height="16" rx="2" transform="rotate(5,643,738)"/>
+</g>
+<!-- Rail line top -->
+<path d="M 355,730 Q 500,672 648,730" stroke="#6a5878" stroke-width="3" fill="none" opacity="0.50"/>
+
+<!-- Bridge reflection in pond -->
+<path d="M 355,755 Q 500,790 645,755" stroke="#2e2040" stroke-width="10" fill="none" opacity="0.40" filter="url(#fsm)"/>
+
+<!-- ═══════════════════ STONE LANTERN ═══════════════════ -->
+<!-- Post base -->
+<rect x="918" y="740" width="28" height="50" rx="3" fill="#3a2e48" opacity="0.85"/>
+<!-- Post shaft -->
+<rect x="922" y="630" width="20" height="115" rx="4" fill="#3c3050" opacity="0.80"/>
+<!-- Lantern body (ishi-doro) -->
+<!-- Roof cap (kasa) -->
+<path d="M 900,610 L 962,610 L 978,628 L 882,628 Z" fill="#2e2440" opacity="0.90"/>
+<path d="M 900,610 L 962,610" stroke="#4a3c58" stroke-width="2" opacity="0.60"/>
+<!-- Roof edges upswept -->
+<path d="M 882,628 Q 878,635 876,640" stroke="#2e2440" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.80"/>
+<path d="M 978,628 Q 982,635 984,640" stroke="#2e2440" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.80"/>
+<!-- Main body box -->
+<rect x="892" y="628" width="76" height="62" rx="3" fill="#2a2038" opacity="0.90"/>
+<!-- Windows — warm amber glow -->
+<rect class="lantern-flame" x="906" y="638" width="18" height="42" rx="2" fill="url(#lantern-window)"/>
+<rect class="lantern-flame" x="936" y="638" width="18" height="42" rx="2" fill="url(#lantern-window)"/>
+<!-- Between window strut -->
+<rect x="924" y="638" width="12" height="42" fill="#2a2038" opacity="0.90"/>
+<!-- Window glow bleed -->
+<rect class="lantern-glow" x="890" y="630" width="80" height="60" rx="3" fill="#f0a030" opacity="0"/>
+<ellipse class="lantern-glow" cx="932" cy="659" rx="55" ry="38" fill="#f0a030" filter="url(#fmd)"/>
+<!-- Halo on surroundings -->
+<ellipse class="lantern-halo" cx="932" cy="665" rx="130" ry="90" fill="url(#lantern-halo-grad)" filter="url(#flg)"/>
+<!-- Ground wash from lantern -->
+<ellipse cx="930" cy="780" rx="110" ry="40" fill="#c07020" opacity="0.10" filter="url(#fmd)"/>
+<!-- Lantern base pedestal -->
+<rect x="910" y="690" width="44" height="14" rx="3" fill="#342848" opacity="0.90"/>
+<rect x="904" y="700" width="56" height="10" rx="3" fill="#2e2040" opacity="0.90"/>
+
+<!-- Lantern reflection in pond (id=pond-lantern-r for JS) -->
+<ellipse id="pond-lantern-r" class="pond-reflect" cx="932" cy="775" rx="90" ry="22" fill="url(#pond-lantern-reflect)" filter="url(#fsm)"/>
+<!-- Ripple line reflection -->
+<g class="pond-reflect" opacity="0.20">
+  <line x1="880" y1="765" x2="985" y2="765" stroke="#e89030" stroke-width="1.5" filter="url(#fsm)"/>
+  <line x1="890" y1="772" x2="975" y2="772" stroke="#e89030" stroke-width="1"   filter="url(#fsm)"/>
+  <line x1="900" y1="779" x2="965" y2="779" stroke="#e89030" stroke-width="0.8" filter="url(#fsm)"/>
+</g>
+
+<!-- ═══════════════════ RAIN (fine, diagonal, very soft) ═══════════════════ -->
+<!-- Far rain layer -->
+<g class="rain-b" opacity="0.08" stroke="rgba(200,180,210,0.9)" stroke-width="0.7" filter="url(#rain-blur)">
+  <line x1="72"   y1="0" x2="112"  y2="55"/>
+  <line x1="180"  y1="0" x2="220"  y2="55"/>
+  <line x1="288"  y1="0" x2="328"  y2="55"/>
+  <line x1="396"  y1="0" x2="436"  y2="55"/>
+  <line x1="504"  y1="0" x2="544"  y2="55"/>
+  <line x1="612"  y1="0" x2="652"  y2="55"/>
+  <line x1="720"  y1="0" x2="760"  y2="55"/>
+  <line x1="828"  y1="0" x2="868"  y2="55"/>
+  <line x1="936"  y1="0" x2="976"  y2="55"/>
+  <line x1="1044" y1="0" x2="1084" y2="55"/>
+  <line x1="1152" y1="0" x2="1192" y2="55"/>
+  <line x1="1260" y1="0" x2="1300" y2="55"/>
+  <line x1="1368" y1="0" x2="1408" y2="55"/>
+  <line x1="36"   y1="0" x2="76"   y2="55"/>
+  <line x1="144"  y1="0" x2="184"  y2="55"/>
+  <line x1="252"  y1="0" x2="292"  y2="55"/>
+  <line x1="468"  y1="0" x2="508"  y2="55"/>
+  <line x1="684"  y1="0" x2="724"  y2="55"/>
+  <line x1="900"  y1="0" x2="940"  y2="55"/>
+  <line x1="1116" y1="0" x2="1156" y2="55"/>
+  <line x1="1332" y1="0" x2="1372" y2="55"/>
+</g>
+
+<!-- Mid rain -->
+<g class="rain" opacity="0.10" stroke="rgba(210,190,220,0.9)" stroke-width="0.9" filter="url(#rain-blur)">
+  <line x1="55"   y1="0" x2="100"  y2="62"/>
+  <line x1="165"  y1="0" x2="210"  y2="62"/>
+  <line x1="275"  y1="0" x2="320"  y2="62"/>
+  <line x1="385"  y1="0" x2="430"  y2="62"/>
+  <line x1="495"  y1="0" x2="540"  y2="62"/>
+  <line x1="605"  y1="0" x2="650"  y2="62"/>
+  <line x1="715"  y1="0" x2="760"  y2="62"/>
+  <line x1="825"  y1="0" x2="870"  y2="62"/>
+  <line x1="935"  y1="0" x2="980"  y2="62"/>
+  <line x1="1045" y1="0" x2="1090" y2="62"/>
+  <line x1="1155" y1="0" x2="1200" y2="62"/>
+  <line x1="1265" y1="0" x2="1310" y2="62"/>
+  <line x1="1375" y1="0" x2="1420" y2="62"/>
+  <line x1="110"  y1="0" x2="155"  y2="62"/>
+  <line x1="330"  y1="0" x2="375"  y2="62"/>
+  <line x1="550"  y1="0" x2="595"  y2="62"/>
+  <line x1="770"  y1="0" x2="815"  y2="62"/>
+  <line x1="990"  y1="0" x2="1035" y2="62"/>
+  <line x1="1210" y1="0" x2="1255" y2="62"/>
+</g>
+
+<!-- Foreground rain (slightly more visible) -->
+<g class="rain-c" opacity="0.12" stroke="rgba(215,195,225,0.9)" stroke-width="1.1" filter="url(#rain-blur)">
+  <line x1="90"   y1="0" x2="140"  y2="70"/>
+  <line x1="220"  y1="0" x2="270"  y2="70"/>
+  <line x1="350"  y1="0" x2="400"  y2="70"/>
+  <line x1="480"  y1="0" x2="530"  y2="70"/>
+  <line x1="610"  y1="0" x2="660"  y2="70"/>
+  <line x1="740"  y1="0" x2="790"  y2="70"/>
+  <line x1="870"  y1="0" x2="920"  y2="70"/>
+  <line x1="1000" y1="0" x2="1050" y2="70"/>
+  <line x1="1130" y1="0" x2="1180" y2="70"/>
+  <line x1="1260" y1="0" x2="1310" y2="70"/>
+  <line x1="1390" y1="0" x2="1440" y2="70"/>
+  <line x1="160"  y1="0" x2="210"  y2="70"/>
+  <line x1="420"  y1="0" x2="470"  y2="70"/>
+  <line x1="680"  y1="0" x2="730"  y2="70"/>
+  <line x1="940"  y1="0" x2="990"  y2="70"/>
+  <line x1="1200" y1="0" x2="1250" y2="70"/>
+</g>
+
+<!-- ═══════════════════ BLOSSOM PETALS ═══════════════════ -->
+<!-- 40 petals, small ellipses 8x4, varied pink colours, staggered delays -->
+<!-- petal-a: rotate left + drift left -->
+<g id="petals">
+
+<!-- Group 1: soft pink #f0a0b8 -->
+<ellipse class="petal-a" cx="120" cy="80"  rx="8" ry="4" fill="#f0a0b8" style="animation-duration:9.2s;  animation-delay:0s"/>
+<ellipse class="petal-b" cx="280" cy="60"  rx="8" ry="4" fill="#f0a0b8" style="animation-duration:7.8s;  animation-delay:1.4s"/>
+<ellipse class="petal-c" cx="450" cy="90"  rx="8" ry="4" fill="#f0a0b8" style="animation-duration:10.5s; animation-delay:3.2s"/>
+<ellipse class="petal-d" cx="620" cy="50"  rx="8" ry="4" fill="#f0a0b8" style="animation-duration:8.6s;  animation-delay:5.7s"/>
+<ellipse class="petal-e" cx="800" cy="75"  rx="8" ry="4" fill="#f0a0b8" style="animation-duration:11.1s; animation-delay:0.8s"/>
+<ellipse class="petal-f" cx="980" cy="65"  rx="8" ry="4" fill="#f0a0b8" style="animation-duration:9.8s;  animation-delay:7.3s"/>
+<ellipse class="petal-a" cx="1150" cy="85" rx="8" ry="4" fill="#f0a0b8" style="animation-duration:7.4s;  animation-delay:2.5s"/>
+<ellipse class="petal-b" cx="1320" cy="55" rx="8" ry="4" fill="#f0a0b8" style="animation-duration:10.2s; animation-delay:9.1s"/>
+
+<!-- Group 2: dusty rose #d87090 -->
+<ellipse class="petal-c" cx="70"  cy="110" rx="8" ry="4" fill="#d87090" style="animation-duration:8.8s;  animation-delay:4.6s"/>
+<ellipse class="petal-d" cx="210" cy="95"  rx="8" ry="4" fill="#d87090" style="animation-duration:11.5s; animation-delay:1.9s"/>
+<ellipse class="petal-e" cx="380" cy="120" rx="8" ry="4" fill="#d87090" style="animation-duration:9.0s;  animation-delay:11.2s"/>
+<ellipse class="petal-f" cx="540" cy="100" rx="8" ry="4" fill="#d87090" style="animation-duration:7.6s;  animation-delay:6.4s"/>
+<ellipse class="petal-a" cx="710" cy="115" rx="8" ry="4" fill="#d87090" style="animation-duration:10.8s; animation-delay:14.0s"/>
+<ellipse class="petal-b" cx="870" cy="95"  rx="8" ry="4" fill="#d87090" style="animation-duration:8.2s;  animation-delay:3.8s"/>
+<ellipse class="petal-c" cx="1040" cy="105" rx="8" ry="4" fill="#d87090" style="animation-duration:11.8s; animation-delay:8.5s"/>
+<ellipse class="petal-d" cx="1230" cy="90" rx="8" ry="4" fill="#d87090" style="animation-duration:9.4s;  animation-delay:16.3s"/>
+<ellipse class="petal-e" cx="1400" cy="112" rx="8" ry="4" fill="#d87090" style="animation-duration:7.9s;  animation-delay:12.7s"/>
+
+<!-- Group 3: pale white-pink #f8d8e0 -->
+<ellipse class="petal-f" cx="160" cy="70"  rx="8" ry="4" fill="#f8d8e0" style="animation-duration:9.6s;  animation-delay:17.4s"/>
+<ellipse class="petal-a" cx="330" cy="50"  rx="8" ry="4" fill="#f8d8e0" style="animation-duration:11.0s; animation-delay:5.2s"/>
+<ellipse class="petal-b" cx="500" cy="80"  rx="8" ry="4" fill="#f8d8e0" style="animation-duration:8.0s;  animation-delay:10.1s"/>
+<ellipse class="petal-c" cx="670" cy="60"  rx="8" ry="4" fill="#f8d8e0" style="animation-duration:10.3s; animation-delay:0.5s"/>
+<ellipse class="petal-d" cx="840" cy="90"  rx="8" ry="4" fill="#f8d8e0" style="animation-duration:9.1s;  animation-delay:13.8s"/>
+<ellipse class="petal-e" cx="1010" cy="70" rx="8" ry="4" fill="#f8d8e0" style="animation-duration:7.7s;  animation-delay:19.2s"/>
+<ellipse class="petal-f" cx="1180" cy="55" rx="8" ry="4" fill="#f8d8e0" style="animation-duration:11.4s; animation-delay:7.0s"/>
+<ellipse class="petal-a" cx="1360" cy="80" rx="8" ry="4" fill="#f8d8e0" style="animation-duration:8.5s;  animation-delay:15.6s"/>
+
+<!-- Group 4: mid-toned mix — more scattered positions -->
+<ellipse class="petal-b" cx="100" cy="140" rx="8" ry="4" fill="#e890a8" style="animation-duration:10.7s; animation-delay:4.0s"/>
+<ellipse class="petal-c" cx="260" cy="130" rx="8" ry="4" fill="#f0a0b8" style="animation-duration:8.4s;  animation-delay:18.5s"/>
+<ellipse class="petal-d" cx="430" cy="145" rx="8" ry="4" fill="#d87090" style="animation-duration:9.9s;  animation-delay:2.2s"/>
+<ellipse class="petal-e" cx="590" cy="135" rx="8" ry="4" fill="#f8d8e0" style="animation-duration:7.5s;  animation-delay:11.7s"/>
+<ellipse class="petal-f" cx="760" cy="150" rx="8" ry="4" fill="#e890a8" style="animation-duration:11.3s; animation-delay:6.8s"/>
+<ellipse class="petal-a" cx="930" cy="130" rx="8" ry="4" fill="#f0a0b8" style="animation-duration:8.9s;  animation-delay:20.0s"/>
+<ellipse class="petal-b" cx="1100" cy="145" rx="8" ry="4" fill="#d87090" style="animation-duration:10.0s; animation-delay:9.5s"/>
+<ellipse class="petal-c" cx="1280" cy="128" rx="8" ry="4" fill="#f8d8e0" style="animation-duration:9.3s;  animation-delay:3.3s"/>
+<ellipse class="petal-d" cx="1430" cy="142" rx="8" ry="4" fill="#e890a8" style="animation-duration:8.1s;  animation-delay:15.1s"/>
+
+<!-- Group 5: a few more scattered, shallower start (lower on screen) -->
+<ellipse class="petal-e" cx="190" cy="200" rx="8" ry="4" fill="#f0a0b8" style="animation-duration:6.8s;  animation-delay:1.0s"/>
+<ellipse class="petal-f" cx="470" cy="220" rx="8" ry="4" fill="#d87090" style="animation-duration:7.2s;  animation-delay:8.0s"/>
+<ellipse class="petal-a" cx="750" cy="210" rx="8" ry="4" fill="#f8d8e0" style="animation-duration:6.5s;  animation-delay:4.5s"/>
+<ellipse class="petal-b" cx="1050" cy="195" rx="8" ry="4" fill="#e890a8" style="animation-duration:7.1s;  animation-delay:12.0s"/>
+<ellipse class="petal-c" cx="1340" cy="215" rx="8" ry="4" fill="#f0a0b8" style="animation-duration:6.9s;  animation-delay:16.8s"/>
+
+<!-- Extra petals around blossom clusters (fall short, ~mid-path, slower) -->
+<ellipse class="petal-d" cx="30"  cy="250" rx="8" ry="4" fill="#d87090" style="animation-duration:12.0s; animation-delay:7.5s"/>
+<ellipse class="petal-e" cx="1410" cy="240" rx="8" ry="4" fill="#f8d8e0" style="animation-duration:11.7s; animation-delay:14.5s"/>
+
+</g>
+
+<!-- ═══════════════════ ATMOSPHERIC DEPTH LAYERS ═══════════════════ -->
+<!-- Mist pooling at base of scene -->
+<rect x="0" y="640" width="1440" height="120" fill="#3a2848" opacity="0.18" filter="url(#flg)"/>
+
+<!-- Far depth veil (mid-distance softening) -->
+<rect x="0" y="300" width="1440" height="300" fill="#2e1e38" opacity="0.25" filter="url(#fxl)"/>
+
+<!-- Vignette -->
+<rect width="1440" height="900" fill="url(#vig)"/>
+
+<!-- Top vignette darkening -->
+<rect x="0" y="0" width="1440" height="80" fill="#0e0818" opacity="0.45"/>
+
+</svg>
+
+<script>
+(function() {
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const svg = document.querySelector('svg');
+
+  // ── Gust system ──────────────────────────────────────────────────────────
+  let gustActive = false;
+
+  function triggerGust() {
+    if (gustActive) return;
+    gustActive = true;
+
+    const petals = document.querySelectorAll('#petals ellipse');
+    petals.forEach(p => p.classList.add('gust'));
+
+    setTimeout(function() {
+      petals.forEach(p => p.classList.remove('gust'));
+      // Stagger re-entry so petals don't all restart at once
+      gustActive = false;
+    }, 3000);
+  }
+
+  // Rare gust every ~75 seconds, with slight jitter
+  function scheduleGust() {
+    const delay = 70000 + Math.random() * 10000;
+    setTimeout(function() {
+      triggerGust();
+      scheduleGust();
+    }, delay);
+  }
+  scheduleGust();
+
+  // ── Pond lantern reflection (intensify when Clawd near pond) ─────────────
+  const pondReflect = document.getElementById('pond-lantern-r');
+  let pondIntensified = false;
+
+  function setPondIntensity(intense) {
+    if (intense === pondIntensified) return;
+    pondIntensified = intense;
+    // Boost rx and opacity of the reflection ellipse
+    if (intense) {
+      pondReflect.setAttribute('rx', '130');
+      pondReflect.setAttribute('ry', '32');
+      pondReflect.style.opacity = '0.65';
+    } else {
+      pondReflect.setAttribute('rx', '90');
+      pondReflect.setAttribute('ry', '22');
+      pondReflect.style.opacity = '';
+    }
+  }
+
+  // ── Happy burst petals ────────────────────────────────────────────────────
+  function spawnHappyPetals() {
+    const colours = ['#f0a0b8', '#d87090', '#f8d8e0', '#e890a8', '#f8c0d0'];
+    const anims   = ['petal-a', 'petal-b', 'petal-c', 'petal-d', 'petal-e', 'petal-f'];
+
+    for (let i = 0; i < 5; i++) {
+      const el = document.createElementNS(svgNS, 'ellipse');
+      el.setAttribute('rx', '8');
+      el.setAttribute('ry', '4');
+      el.setAttribute('cx', 200 + Math.random() * 1040); // spread across scene
+      el.setAttribute('cy', 50 + Math.random() * 120);
+      el.setAttribute('fill', colours[Math.floor(Math.random() * colours.length)]);
+      const anim = anims[Math.floor(Math.random() * anims.length)];
+      el.classList.add(anim);
+      const dur = 6 + Math.random() * 3;
+      el.style.animationDuration = dur + 's';
+      el.style.animationDelay    = (Math.random() * 0.8) + 's';
+      el.style.animationIterationCount = '1';
+      el.style.opacity = '0';
+      svg.appendChild(el);
+
+      // Remove after one cycle
+      setTimeout(function() { el.remove(); }, (dur + 1.2) * 1000);
+    }
+  }
+
+  // ── postMessage listener ──────────────────────────────────────────────────
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'clawd') return;
+    const { cx, cy, state } = e.data;
+
+    // Happy state: burst extra petals
+    if (state === 'HAPPY') {
+      spawnHappyPetals();
+    }
+
+    // Near pond (cy > 0.6 and cx roughly left-centre 0.2–0.55)
+    const nearPond = cy > 0.60 && cx > 0.18 && cx < 0.56;
+    setPondIntensity(nearPond);
+  });
+
+})();
+</script>
+
+</body>
+</html>

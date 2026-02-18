@@ -464,5 +464,88 @@ svg { width:100%; height:100%; display:block; }
 <rect width="1440" height="900" fill="url(#vig)"/>
 
 </svg>
+<script>
+(function() {
+  var svg = document.querySelector('svg');
+  var ns = 'http://www.w3.org/2000/svg';
+
+  // ── Rare event: Large bioluminescent pulse ──
+  function bioPulse() {
+    // Random point in the water area (x: 240-1200, y: 480-750)
+    var px = 240 + Math.random() * 960;
+    var py = 480 + Math.random() * 270;
+
+    var circle = document.createElementNS(ns, 'circle');
+    circle.setAttribute('cx', px);
+    circle.setAttribute('cy', py);
+    circle.setAttribute('r', '0');
+    circle.setAttribute('fill', 'none');
+    circle.setAttribute('stroke', '#00e8c0');
+    circle.setAttribute('stroke-width', '2.5');
+    circle.setAttribute('opacity', '0.6');
+    circle.setAttribute('filter', 'url(#sblur)');
+    svg.appendChild(circle);
+
+    var start = null;
+    var duration = 2500;
+
+    function animate(ts) {
+      if (!start) start = ts;
+      var t = (ts - start) / duration;
+      if (t > 1) {
+        svg.removeChild(circle);
+        return;
+      }
+      circle.setAttribute('r', (t * 200).toString());
+      circle.setAttribute('opacity', (0.6 * (1 - t)).toString());
+      circle.setAttribute('stroke-width', (2.5 * (1 - t * 0.6)).toString());
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+
+    setTimeout(bioPulse, 45000 + Math.random() * 30000);
+  }
+  setTimeout(bioPulse, 15000 + Math.random() * 20000);
+
+  // ── postMessage reaction: Clawd glow ──
+  var clawdGlow = document.createElementNS(ns, 'circle');
+  clawdGlow.setAttribute('r', '30');
+  clawdGlow.setAttribute('fill', '#00e8c0');
+  clawdGlow.setAttribute('stroke', 'none');
+  clawdGlow.setAttribute('opacity', '0');
+  clawdGlow.setAttribute('filter', 'url(#bioglow)');
+  clawdGlow.style.transition = 'opacity 0.4s ease-in-out';
+  // Insert before vignette so it's visible but under the vignette
+  var vignette = document.getElementById('vig');
+  var vigRect = vignette ? vignette.parentNode.nextElementSibling : null;
+  if (vigRect) {
+    svg.insertBefore(clawdGlow, vigRect);
+  } else {
+    svg.appendChild(clawdGlow);
+  }
+
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'clawd') return;
+    var cx = e.data.cx;
+    var cy = e.data.cy;
+    var state = e.data.state;
+
+    // Map normalized coords to SVG viewBox (1440x900)
+    var sx = cx * 1440;
+    var sy = cy * 900;
+
+    clawdGlow.setAttribute('cx', sx);
+    clawdGlow.setAttribute('cy', sy);
+
+    // Only visible when Clawd is over the water (cy > 0.4)
+    if (cy > 0.4) {
+      var opacity = state === 'HAPPY' ? 0.45 : 0.25;
+      clawdGlow.setAttribute('opacity', opacity.toString());
+    } else {
+      clawdGlow.setAttribute('opacity', '0');
+    }
+  });
+})();
+</script>
 </body>
 </html>

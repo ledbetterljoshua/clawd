@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Monsoon · Jungle Night</title>
+<style>
+* { margin:0; padding:0; }
+html, body { width:100%; height:100%; overflow:hidden; background:#020a04; }
+svg { width:100%; height:100%; display:block; }
+
+/* ── Rain layers ── */
+@keyframes rain-a { 0%{transform:translate(0,-40px);opacity:0} 8%{opacity:.42} 90%{opacity:.32} 100%{transform:translate(-22px,960px);opacity:0} }
+@keyframes rain-b { 0%{transform:translate(0,-40px);opacity:0} 8%{opacity:.35} 90%{opacity:.28} 100%{transform:translate(-18px,960px);opacity:0} }
+@keyframes rain-c { 0%{transform:translate(0,-40px);opacity:0} 6%{opacity:.45} 90%{opacity:.38} 100%{transform:translate(-25px,960px);opacity:0} }
+@keyframes rain-d { 0%{transform:translate(0,-40px);opacity:0} 8%{opacity:.30} 90%{opacity:.22} 100%{transform:translate(-20px,960px);opacity:0} }
+@keyframes rain-e { 0%{transform:translate(0,-40px);opacity:0} 7%{opacity:.40} 90%{opacity:.30} 100%{transform:translate(-15px,960px);opacity:0} }
+
+/* ── Firefly wandering (translate x and y with separate periods) ── */
+@keyframes ff-x-a { 0%,100%{transform:translateX(0px)} 50%{transform:translateX(38px)} }
+@keyframes ff-x-b { 0%,100%{transform:translateX(0px)} 50%{transform:translateX(-44px)} }
+@keyframes ff-x-c { 0%,100%{transform:translateX(0px)} 50%{transform:translateX(28px)} }
+@keyframes ff-x-d { 0%,100%{transform:translateX(0px)} 50%{transform:translateX(-35px)} }
+@keyframes ff-x-e { 0%,100%{transform:translateX(0px)} 50%{transform:translateX(52px)} }
+@keyframes ff-x-f { 0%,100%{transform:translateX(0px)} 50%{transform:translateX(-22px)} }
+@keyframes ff-x-g { 0%,100%{transform:translateX(0px)} 50%{transform:translateX(40px)} }
+@keyframes ff-x-h { 0%,100%{transform:translateX(0px)} 50%{transform:translateX(-30px)} }
+@keyframes ff-x-i { 0%,100%{transform:translateX(0px)} 50%{transform:translateX(18px)} }
+@keyframes ff-x-j { 0%,100%{transform:translateX(0px)} 50%{transform:translateX(-48px)} }
+
+@keyframes ff-y-a { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-25px)} }
+@keyframes ff-y-b { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-32px)} }
+@keyframes ff-y-c { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-18px)} }
+@keyframes ff-y-d { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-40px)} }
+@keyframes ff-y-e { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-22px)} }
+@keyframes ff-y-f { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-35px)} }
+@keyframes ff-y-g { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-28px)} }
+@keyframes ff-y-h { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-15px)} }
+@keyframes ff-y-i { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-42px)} }
+@keyframes ff-y-j { 0%,100%{transform:translateY(0px)} 50%{transform:translateY(-20px)} }
+
+@keyframes ff-fade-a { 0%,100%{opacity:.90} 50%{opacity:.18} }
+@keyframes ff-fade-b { 0%,100%{opacity:.72} 50%{opacity:.08} }
+@keyframes ff-fade-c { 0%,100%{opacity:.85} 50%{opacity:.22} }
+@keyframes ff-fade-d { 0%,100%{opacity:.68} 50%{opacity:.12} }
+@keyframes ff-fade-e { 0%,100%{opacity:.80} 50%{opacity:.05} }
+
+/* ── Mushroom glow pulse ── */
+@keyframes mush-glow { 0%,100%{opacity:.65} 50%{opacity:1} }
+@keyframes mush-glow-b { 0%,100%{opacity:.45} 50%{opacity:.82} }
+
+/* ── Steam wisps ── */
+@keyframes steam-a {
+  0%   { transform:translate(0,0) scale(1); opacity:0; }
+  15%  { opacity:.16; }
+  75%  { opacity:.07; }
+  100% { transform:translate(-12px,-90px) scale(2.8); opacity:0; }
+}
+@keyframes steam-b {
+  0%   { transform:translate(0,0) scale(1); opacity:0; }
+  15%  { opacity:.14; }
+  75%  { opacity:.06; }
+  100% { transform:translate(10px,-80px) scale(2.4); opacity:0; }
+}
+@keyframes steam-c {
+  0%   { transform:translate(0,0) scale(1); opacity:0; }
+  18%  { opacity:.18; }
+  75%  { opacity:.08; }
+  100% { transform:translate(-8px,-100px) scale(3.0); opacity:0; }
+}
+
+/* ── Rain ripples on river ── */
+@keyframes ripple {
+  0%   { rx:0; ry:0; opacity:.70; }
+  100% { rx:22; ry:8; opacity:0; }
+}
+
+/* ── Lightning (CSS-only, rare) ── */
+.lightning-1 { animation: ltn1 60s linear infinite; }
+.lightning-2 { animation: ltn2 83s linear infinite; }
+@keyframes ltn1 {
+  0%,93.2%  { opacity:0; }
+  93.5%     { opacity:.40; }
+  93.65%    { opacity:0; }
+  93.9%     { opacity:.28; }
+  94.05%    { opacity:0; }
+  94.25%    { opacity:.18; }
+  94.4%     { opacity:0; }
+  100%      { opacity:0; }
+}
+@keyframes ltn2 {
+  0%,95.8%  { opacity:0; }
+  96.0%     { opacity:.32; }
+  96.15%    { opacity:0; }
+  96.35%    { opacity:.22; }
+  96.5%     { opacity:0; }
+  100%      { opacity:0; }
+}
+</style>
+</head>
+<body>
+<svg viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+<defs>
+
+  <!-- Sky: barely visible through canopy — very dark, stormy -->
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#010302"/>
+    <stop offset="55%"  stop-color="#020804"/>
+    <stop offset="100%" stop-color="#030d06"/>
+  </linearGradient>
+
+  <!-- River / water -->
+  <linearGradient id="river" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#020c08"/>
+    <stop offset="100%" stop-color="#010804"/>
+  </linearGradient>
+
+  <!-- Jungle floor -->
+  <linearGradient id="floor" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#020a04"/>
+    <stop offset="100%" stop-color="#010502"/>
+  </linearGradient>
+
+  <!-- Tree silhouette gradient — lighter at top (sky), darker at bottom -->
+  <linearGradient id="tree-far" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#03110a"/>
+    <stop offset="100%" stop-color="#010602"/>
+  </linearGradient>
+  <linearGradient id="tree-mid" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#020d06"/>
+    <stop offset="100%" stop-color="#010402"/>
+  </linearGradient>
+  <linearGradient id="tree-fg" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#010802"/>
+    <stop offset="100%" stop-color="#010302"/>
+  </linearGradient>
+
+  <!-- Canopy leaf gradient -->
+  <linearGradient id="canopy-l" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#020f05"/>
+    <stop offset="100%" stop-color="#010602"/>
+  </linearGradient>
+
+  <!-- Mushroom glow radial -->
+  <radialGradient id="mush-glow-r" cx="50%" cy="80%" r="80%">
+    <stop offset="0%"   stop-color="#40e890" stop-opacity=".90"/>
+    <stop offset="55%"  stop-color="#28c870" stop-opacity=".40"/>
+    <stop offset="100%" stop-color="#10a040" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- Lightning overlay gradient — blue-white tint top to floor -->
+  <linearGradient id="ltn-grad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%"   stop-color="#c8e0ff" stop-opacity="1"/>
+    <stop offset="100%" stop-color="#a0c8e0" stop-opacity=".6"/>
+  </linearGradient>
+
+  <!-- Vignette -->
+  <radialGradient id="vig" cx="50%" cy="50%" r="72%">
+    <stop offset="0%"   stop-color="#000" stop-opacity="0"/>
+    <stop offset="100%" stop-color="#000" stop-opacity=".68"/>
+  </radialGradient>
+
+  <!-- Filters -->
+  <filter id="f-blur-sm"><feGaussianBlur stdDeviation="2.5"/></filter>
+  <filter id="f-blur-md"><feGaussianBlur stdDeviation="8"/></filter>
+  <filter id="f-blur-lg"><feGaussianBlur stdDeviation="20"/></filter>
+  <filter id="f-blur-xl"><feGaussianBlur stdDeviation="40"/></filter>
+  <filter id="f-rain"><feGaussianBlur stdDeviation="0.3 0"/></filter>
+  <filter id="f-mush-glow" x="-80%" y="-80%" width="260%" height="260%">
+    <feGaussianBlur stdDeviation="6" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="f-firefly" x="-120%" y="-120%" width="340%" height="340%">
+    <feGaussianBlur stdDeviation="3.5" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="f-steam"><feGaussianBlur stdDeviation="10"/></filter>
+
+</defs>
+
+<!-- ══════════════════════════════════════════
+     SKY — barely visible through canopy gaps
+══════════════════════════════════════════ -->
+<rect width="1440" height="900" fill="url(#sky)"/>
+
+<!-- Stormy cloud mass suggestions — large dark blobs at top -->
+<ellipse cx="300"  cy="60"  rx="380" ry="90"  fill="#020904" opacity=".8" filter="url(#f-blur-xl)"/>
+<ellipse cx="900"  cy="40"  rx="440" ry="80"  fill="#010703" opacity=".9" filter="url(#f-blur-xl)"/>
+<ellipse cx="1200" cy="70"  rx="320" ry="70"  fill="#020a04" opacity=".7" filter="url(#f-blur-xl)"/>
+<ellipse cx="600"  cy="25"  rx="500" ry="60"  fill="#010502" opacity=".85" filter="url(#f-blur-xl)"/>
+
+<!-- ══════════════════════════════════════════
+     BACKGROUND RIVER — dark water with rain ripples
+══════════════════════════════════════════ -->
+<!-- River bed — center background, low in frame -->
+<path d="M 0 700 Q 240 680 480 688 Q 720 695 960 685 Q 1200 675 1440 690 L1440 900 L0 900 Z"
+  fill="url(#river)"/>
+
+<!-- River surface shimmer — very subtle -->
+<ellipse cx="720" cy="730" rx="500" ry="18" fill="#0a2010" opacity=".30" filter="url(#f-blur-md)"/>
+<ellipse cx="360" cy="750" rx="300" ry="12" fill="#081808" opacity=".25" filter="url(#f-blur-md)"/>
+<ellipse cx="1080" cy="740" rx="280" ry="10" fill="#082010" opacity=".20" filter="url(#f-blur-md)"/>
+
+<!-- Distant treeline reflection in river -->
+<path d="M 0 700 Q 180 695 360 700 Q 540 706 720 700 Q 900 694 1080 700 Q 1260 706 1440 700 L1440 720 Q 1260 715 1080 720 Q 900 725 720 720 Q 540 715 360 720 Q 180 725 0 720 Z"
+  fill="#020d05" opacity=".55"/>
+
+<!-- Rain ripple animations on river surface (SVG animate) -->
+<g opacity=".50">
+  <ellipse cx="280" cy="720" rx="0" ry="0" fill="none" stroke="#1a3820" stroke-width="1">
+    <animate attributeName="rx" values="0;22" dur="1.8s" repeatCount="indefinite" begin="0s"/>
+    <animate attributeName="ry" values="0;8"  dur="1.8s" repeatCount="indefinite" begin="0s"/>
+    <animate attributeName="opacity" values=".6;0" dur="1.8s" repeatCount="indefinite" begin="0s"/>
+  </ellipse>
+  <ellipse cx="580" cy="708" rx="0" ry="0" fill="none" stroke="#1a3820" stroke-width="1">
+    <animate attributeName="rx" values="0;18" dur="1.5s" repeatCount="indefinite" begin="0.5s"/>
+    <animate attributeName="ry" values="0;7"  dur="1.5s" repeatCount="indefinite" begin="0.5s"/>
+    <animate attributeName="opacity" values=".55;0" dur="1.5s" repeatCount="indefinite" begin="0.5s"/>
+  </ellipse>
+  <ellipse cx="870" cy="718" rx="0" ry="0" fill="none" stroke="#182e18" stroke-width="1">
+    <animate attributeName="rx" values="0;25" dur="2.0s" repeatCount="indefinite" begin="0.9s"/>
+    <animate attributeName="ry" values="0;9"  dur="2.0s" repeatCount="indefinite" begin="0.9s"/>
+    <animate attributeName="opacity" values=".50;0" dur="2.0s" repeatCount="indefinite" begin="0.9s"/>
+  </ellipse>
+  <ellipse cx="1150" cy="726" rx="0" ry="0" fill="none" stroke="#1a3820" stroke-width="1">
+    <animate attributeName="rx" values="0;20" dur="1.65s" repeatCount="indefinite" begin="0.3s"/>
+    <animate attributeName="ry" values="0;7"  dur="1.65s" repeatCount="indefinite" begin="0.3s"/>
+    <animate attributeName="opacity" values=".58;0" dur="1.65s" repeatCount="indefinite" begin="0.3s"/>
+  </ellipse>
+  <ellipse cx="430" cy="742" rx="0" ry="0" fill="none" stroke="#182e18" stroke-width="1">
+    <animate attributeName="rx" values="0;16" dur="1.4s" repeatCount="indefinite" begin="1.1s"/>
+    <animate attributeName="ry" values="0;6"  dur="1.4s" repeatCount="indefinite" begin="1.1s"/>
+    <animate attributeName="opacity" values=".52;0" dur="1.4s" repeatCount="indefinite" begin="1.1s"/>
+  </ellipse>
+  <ellipse cx="1020" cy="734" rx="0" ry="0" fill="none" stroke="#1a3820" stroke-width="1">
+    <animate attributeName="rx" values="0;28" dur="2.2s" repeatCount="indefinite" begin="0.7s"/>
+    <animate attributeName="ry" values="0;10" dur="2.2s" repeatCount="indefinite" begin="0.7s"/>
+    <animate attributeName="opacity" values=".45;0" dur="2.2s" repeatCount="indefinite" begin="0.7s"/>
+  </ellipse>
+</g>
+
+<!-- ══════════════════════════════════════════
+     MID-GROUND TREES — layer 1 (farthest, lightest)
+══════════════════════════════════════════ -->
+<g fill="url(#tree-far)" opacity=".88">
+  <!-- Tall palm/jungle trunks — irregular organic silhouettes -->
+  <path d="M -10 900 L -10 580 Q 5 540 18 510 Q 30 480 22 450 Q 35 420 50 400 Q 62 380 58 355 Q 55 330 70 310 Q 82 295 90 280 Q 95 270 88 258 Q 85 245 100 232 Q 112 230 125 240 Q 132 255 128 270 Q 120 282 115 295 Q 118 315 125 330 Q 135 350 130 375 Q 122 398 130 420 Q 140 445 135 468 Q 128 492 138 515 Q 148 538 145 560 Q 142 580 150 610 L160 900 Z"/>
+  <path d="M 80 900 L 85 640 Q 95 610 108 585 Q 118 562 112 538 Q 108 515 120 492 Q 132 470 128 445 Q 122 420 135 398 Q 145 378 140 355 Q 135 332 148 312 Q 158 295 165 280 Q 170 268 162 255 Q 158 242 172 232 Q 185 228 198 240 Q 205 255 200 270 Q 192 285 188 300 Q 192 320 198 338 Q 205 360 200 382 Q 194 405 205 428 Q 215 452 210 475 Q 204 498 215 522 Q 225 545 220 568 L225 900 Z"/>
+  <path d="M 310 900 L 308 620 Q 318 592 328 568 Q 338 545 332 520 Q 326 495 338 472 Q 350 450 345 425 Q 340 400 352 378 Q 362 358 358 335 Q 354 312 366 292 Q 376 275 382 260 Q 386 248 378 236 Q 374 224 388 218 Q 402 215 412 228 Q 418 242 412 258 Q 404 272 400 288 Q 404 308 412 328 Q 420 348 415 370 Q 408 394 420 418 Q 430 442 425 466 Q 418 490 428 514 Q 438 538 433 562 L438 900 Z"/>
+  <path d="M 540 900 L 542 655 Q 552 628 562 605 Q 572 582 566 558 Q 560 535 572 512 Q 582 490 578 466 Q 572 442 582 420 Q 592 400 588 378 Q 584 356 595 336 Q 605 318 610 302 Q 614 288 607 276 Q 602 264 615 256 Q 628 250 638 262 Q 644 276 638 292 Q 630 308 628 325 Q 632 344 640 362 Q 648 382 643 404 Q 635 426 645 448 Q 655 470 650 492 Q 644 515 654 538 L658 900 Z"/>
+  <path d="M 720 900 L 722 635 Q 732 608 742 585 Q 752 562 746 538 Q 740 514 752 492 Q 762 472 758 448 Q 753 424 764 402 Q 774 382 770 360 Q 765 338 776 318 Q 786 300 791 285 Q 795 272 788 260 Q 782 248 795 240 Q 808 234 818 248 Q 823 262 817 278 Q 809 294 807 310 Q 812 330 820 350 Q 828 370 822 392 Q 815 415 825 438 Q 835 460 830 482 Q 824 505 834 528 L838 900 Z"/>
+  <path d="M 955 900 L 956 615 Q 966 587 976 563 Q 986 540 980 515 Q 974 492 986 468 Q 998 446 994 422 Q 988 398 1000 376 Q 1010 356 1006 333 Q 1001 310 1012 291 Q 1022 274 1028 259 Q 1032 246 1024 234 Q 1018 223 1032 216 Q 1046 212 1055 225 Q 1060 240 1054 256 Q 1046 272 1044 290 Q 1048 310 1056 330 Q 1064 350 1058 372 Q 1051 395 1061 418 Q 1072 440 1067 463 Q 1060 486 1070 510 L1074 900 Z"/>
+  <path d="M 1180 900 L 1182 640 Q 1192 614 1200 590 Q 1210 568 1204 544 Q 1198 520 1208 497 Q 1218 476 1214 452 Q 1208 428 1218 406 Q 1228 386 1224 364 Q 1220 342 1230 322 Q 1240 304 1245 289 Q 1249 276 1242 264 Q 1236 252 1249 244 Q 1262 238 1271 252 Q 1276 266 1270 282 Q 1262 298 1260 316 Q 1265 336 1272 355 Q 1280 375 1274 397 Q 1267 420 1277 442 Q 1287 465 1282 488 Q 1276 511 1285 534 L1289 900 Z"/>
+  <path d="M 1380 900 L 1382 660 Q 1392 635 1400 612 Q 1408 590 1402 568 Q 1396 545 1406 524 Q 1415 504 1412 482 Q 1407 458 1416 438 Q 1424 419 1420 398 Q 1416 377 1425 358 Q 1434 341 1438 326 Q 1441 313 1436 302 Q 1430 290 1442 282 L1460 282 L1460 900 Z"/>
+</g>
+
+<!-- Mid-ground foliage crowns — irregular blob silhouettes at treetops -->
+<g fill="#021408" opacity=".92">
+  <path d="M 50 320 Q 30 290 20 260 Q 12 232 28 208 Q 42 188 62 185 Q 80 185 92 200 Q 105 215 100 240 Q 95 262 110 278 Q 122 292 115 315 Q 106 335 90 342 Q 72 345 55 335 Z"/>
+  <path d="M 165 280 Q 148 252 140 224 Q 132 198 148 175 Q 162 155 182 152 Q 202 152 214 168 Q 226 184 220 208 Q 215 228 228 245 Q 240 260 234 282 Q 226 302 210 308 Q 192 312 176 302 Z"/>
+  <path d="M 392 285 Q 374 258 365 230 Q 356 205 372 182 Q 385 162 404 160 Q 424 160 436 175 Q 448 191 442 214 Q 436 234 450 250 Q 462 265 455 288 Q 447 308 430 314 Q 412 318 396 308 Z"/>
+  <path d="M 620 282 Q 602 256 594 228 Q 585 202 600 180 Q 613 160 632 158 Q 652 158 663 173 Q 674 188 668 212 Q 662 232 675 248 Q 686 263 680 286 Q 672 306 655 312 Q 638 316 622 306 Z"/>
+  <path d="M 810 290 Q 792 263 784 235 Q 775 208 790 185 Q 804 165 823 162 Q 842 162 854 178 Q 865 194 860 218 Q 854 238 868 255 Q 880 270 874 293 Q 866 313 848 318 Q 830 322 814 312 Z"/>
+  <path d="M 1044 295 Q 1026 268 1018 240 Q 1009 214 1024 192 Q 1038 172 1057 170 Q 1076 170 1088 185 Q 1099 200 1094 224 Q 1088 244 1102 260 Q 1114 275 1108 298 Q 1100 318 1082 323 Q 1064 327 1048 317 Z"/>
+  <path d="M 1260 305 Q 1242 278 1234 250 Q 1225 224 1240 202 Q 1254 182 1273 180 Q 1292 180 1304 195 Q 1315 210 1310 234 Q 1304 254 1318 270 Q 1330 285 1324 308 Q 1316 328 1298 333 Q 1280 337 1264 327 Z"/>
+</g>
+
+<!-- ══════════════════════════════════════════
+     MID-GROUND TREES — layer 2 (closer, darker)
+══════════════════════════════════════════ -->
+<g fill="url(#tree-mid)" opacity=".95">
+  <path d="M -20 900 L -20 510 Q 15 475 35 445 Q 55 415 48 382 Q 42 350 60 325 Q 78 302 85 278 Q 90 258 82 240 Q 75 225 92 215 Q 108 210 118 225 Q 124 240 118 260 Q 110 278 115 298 Q 122 320 115 344 Q 108 368 120 392 Q 130 416 125 442 Q 118 465 130 490 Q 140 515 137 545 L145 900 Z"/>
+  <path d="M 200 900 L 205 555 Q 215 525 228 498 Q 240 472 235 445 Q 228 418 242 393 Q 254 370 250 344 Q 245 318 258 295 Q 268 275 274 255 Q 278 240 270 228 Q 264 216 278 208 Q 292 202 302 216 Q 308 230 302 248 Q 294 265 296 285 Q 302 308 308 330 Q 314 354 308 378 Q 300 402 312 426 Q 322 450 317 475 Q 310 500 320 525 L325 900 Z"/>
+  <path d="M 460 900 L 462 545 Q 472 516 482 490 Q 492 465 487 440 Q 480 415 493 390 Q 505 368 500 342 Q 495 317 507 294 Q 518 274 524 255 Q 528 240 521 228 Q 515 216 528 208 Q 542 202 552 216 Q 558 230 552 248 Q 544 266 545 286 Q 550 308 558 330 Q 565 354 559 378 Q 552 402 562 426 Q 572 450 567 475 Q 560 500 570 525 L575 900 Z"/>
+  <path d="M 680 900 L 682 530 Q 692 500 702 474 Q 712 448 707 422 Q 700 396 714 370 Q 726 348 722 321 Q 717 295 728 272 Q 738 252 745 234 Q 750 220 742 208 Q 736 196 750 188 Q 764 182 774 196 Q 780 210 774 228 Q 766 246 767 266 Q 772 290 780 312 Q 787 335 781 360 Q 774 385 785 410 Q 795 434 790 460 Q 783 486 793 512 L798 900 Z"/>
+  <path d="M 900 900 L 902 550 Q 912 521 922 494 Q 932 468 927 443 Q 920 417 933 392 Q 945 370 941 344 Q 936 318 947 295 Q 957 274 963 256 Q 967 242 960 230 Q 953 218 966 210 Q 980 204 990 218 Q 996 232 990 250 Q 982 268 983 288 Q 988 310 996 332 Q 1003 355 997 379 Q 990 403 1000 428 Q 1010 452 1005 477 Q 998 502 1008 528 L1012 900 Z"/>
+  <path d="M 1130 900 L 1132 562 Q 1142 534 1150 508 Q 1160 483 1155 458 Q 1148 433 1160 408 Q 1172 386 1168 360 Q 1163 335 1174 312 Q 1184 292 1190 273 Q 1194 259 1187 247 Q 1181 235 1194 228 Q 1207 222 1217 235 Q 1222 249 1216 267 Q 1208 284 1210 304 Q 1215 326 1222 348 Q 1229 370 1223 394 Q 1216 418 1226 442 Q 1236 466 1231 491 Q 1224 516 1234 541 L1238 900 Z"/>
+  <path d="M 1360 900 L 1362 545 Q 1372 515 1380 490 Q 1390 465 1385 440 Q 1378 415 1390 390 Q 1402 368 1398 342 Q 1393 317 1404 294 Q 1415 274 1420 255 Q 1424 241 1417 229 Q 1411 218 1424 210 Q 1437 204 1446 217 L1460 217 L1460 900 Z"/>
+</g>
+
+<!-- Layer 2 foliage crowns -->
+<g fill="#011006" opacity=".95">
+  <path d="M 85 255 Q 62 222 52 190 Q 42 162 60 138 Q 76 118 100 116 Q 122 116 135 134 Q 148 152 142 180 Q 136 202 152 220 Q 165 236 158 262 Q 149 284 130 290 Q 110 294 92 280 Z"/>
+  <path d="M 298 245 Q 274 212 265 180 Q 256 150 275 128 Q 292 110 316 108 Q 338 108 352 126 Q 364 144 358 172 Q 352 194 368 213 Q 380 230 374 256 Q 365 278 346 284 Q 325 288 308 275 Z"/>
+  <path d="M 548 248 Q 524 215 515 183 Q 506 153 525 131 Q 542 113 566 111 Q 588 111 601 129 Q 614 147 608 175 Q 602 197 618 216 Q 630 233 624 259 Q 615 281 596 287 Q 575 291 558 278 Z"/>
+  <path d="M 770 255 Q 746 222 737 190 Q 728 160 747 138 Q 764 118 788 116 Q 810 116 823 134 Q 836 152 830 180 Q 824 202 840 221 Q 852 238 846 264 Q 837 286 818 292 Q 797 296 780 283 Z"/>
+  <path d="M 990 262 Q 966 229 957 197 Q 948 167 967 145 Q 984 125 1008 123 Q 1030 123 1043 141 Q 1056 159 1050 187 Q 1044 209 1060 228 Q 1072 245 1066 271 Q 1057 293 1038 299 Q 1017 303 1000 290 Z"/>
+  <path d="M 1212 258 Q 1188 225 1179 193 Q 1170 163 1188 141 Q 1204 121 1228 119 Q 1250 119 1263 137 Q 1276 155 1270 183 Q 1264 205 1280 224 Q 1292 241 1286 267 Q 1277 289 1258 295 Q 1237 299 1220 286 Z"/>
+</g>
+
+<!-- ══════════════════════════════════════════
+     MID-GROUND TREES — layer 3 (foreground-ish, very dark)
+══════════════════════════════════════════ -->
+<g fill="url(#tree-fg)" opacity="1">
+  <path d="M -30 900 L -25 480 Q 0 440 22 408 Q 44 378 38 345 Q 32 312 52 285 Q 68 262 75 238 Q 78 222 70 210 Q 62 198 78 190 Q 94 185 104 200 Q 110 216 104 236 Q 96 258 102 282 Q 110 308 103 335 Q 95 362 108 388 Q 120 414 115 445 Q 108 475 120 505 L128 900 Z"/>
+  <path d="M 360 900 L 362 490 Q 374 454 390 424 Q 404 396 398 364 Q 392 332 408 305 Q 422 280 430 254 Q 435 236 426 222 Q 418 210 432 202 Q 448 196 458 212 Q 464 228 458 250 Q 450 272 454 298 Q 460 325 452 354 Q 444 382 456 412 Q 466 440 462 472 L468 900 Z"/>
+  <path d="M 620 900 L 622 500 Q 634 464 650 434 Q 664 406 658 374 Q 652 342 668 315 Q 682 290 690 264 Q 695 246 686 232 Q 678 220 692 212 Q 708 206 718 222 Q 724 238 718 260 Q 710 282 714 308 Q 720 335 712 364 Q 704 392 716 422 Q 726 450 722 482 L728 900 Z"/>
+  <path d="M 860 900 L 862 485 Q 874 448 890 418 Q 905 390 899 358 Q 893 326 909 298 Q 924 273 932 247 Q 937 230 929 216 Q 921 204 934 196 Q 950 190 960 206 Q 966 222 960 244 Q 952 265 956 292 Q 962 320 954 350 Q 946 378 958 408 Q 968 437 964 468 L970 900 Z"/>
+  <path d="M 1100 900 L 1102 495 Q 1114 458 1130 428 Q 1145 400 1140 368 Q 1134 336 1150 308 Q 1164 282 1172 256 Q 1177 238 1168 224 Q 1160 212 1174 204 Q 1190 198 1200 214 Q 1206 230 1200 252 Q 1192 274 1196 300 Q 1202 328 1194 357 Q 1186 385 1198 415 Q 1208 444 1204 476 L1210 900 Z"/>
+  <path d="M 1310 900 L 1312 510 Q 1324 474 1340 444 Q 1354 416 1349 384 Q 1343 352 1358 325 Q 1372 300 1380 274 Q 1385 256 1377 242 Q 1369 230 1382 222 Q 1396 216 1406 232 Q 1412 248 1406 270 Q 1398 292 1402 318 Q 1408 346 1400 376 Q 1392 404 1404 434 Q 1414 463 1410 495 L1416 900 Z"/>
+</g>
+
+<!-- Layer 3 foliage crowns — darkest, most dominant -->
+<g fill="#010d04" opacity="1">
+  <path d="M 78 250 Q 48 210 35 172 Q 22 138 45 110 Q 65 86 94 84 Q 122 84 138 106 Q 154 128 146 162 Q 138 188 158 210 Q 174 230 166 260 Q 156 286 132 293 Q 106 298 86 282 Z"/>
+  <path d="M 432 245 Q 402 205 389 167 Q 376 133 399 105 Q 419 81 448 79 Q 476 79 492 101 Q 508 123 500 157 Q 492 183 512 205 Q 528 225 520 255 Q 510 281 486 288 Q 460 293 440 277 Z"/>
+  <path d="M 694 248 Q 664 208 651 170 Q 638 136 661 108 Q 681 84 710 82 Q 738 82 754 104 Q 770 126 762 160 Q 754 186 774 208 Q 790 228 782 258 Q 772 284 748 291 Q 722 296 702 280 Z"/>
+  <path d="M 934 252 Q 904 212 891 174 Q 878 140 901 112 Q 921 88 950 86 Q 978 86 994 108 Q 1010 130 1002 164 Q 994 190 1014 212 Q 1030 232 1022 262 Q 1012 288 988 295 Q 962 300 942 284 Z"/>
+  <path d="M 1174 258 Q 1144 218 1131 180 Q 1118 146 1141 118 Q 1161 94 1190 92 Q 1218 92 1234 114 Q 1250 136 1242 170 Q 1234 196 1254 218 Q 1270 238 1262 268 Q 1252 294 1228 301 Q 1202 306 1182 290 Z"/>
+  <path d="M 1380 262 Q 1352 222 1340 184 Q 1328 150 1350 123 Q 1370 99 1398 98 Q 1426 98 1440 120 L1460 120 L1460 262 Z"/>
+</g>
+
+<!-- ══════════════════════════════════════════
+     JUNGLE FLOOR — roots, leaf shapes
+══════════════════════════════════════════ -->
+<rect x="0" y="660" width="1440" height="240" fill="url(#floor)"/>
+
+<!-- Root tangles -->
+<g fill="#010802" opacity=".85">
+  <!-- Left root mass -->
+  <path d="M 0 720 Q 30 705 60 715 Q 90 725 110 710 Q 125 698 140 705 Q 155 712 168 700 Q 180 690 195 698 L195 760 Q 168 755 140 762 Q 110 768 80 755 Q 50 742 20 750 Q 10 753 0 750 Z"/>
+  <path d="M 0 760 Q 40 748 75 758 Q 105 768 130 755 Q 155 742 175 752 L175 800 Q 145 795 110 802 Q 75 810 40 800 Q 15 793 0 798 Z"/>
+  <!-- Mid root mass -->
+  <path d="M 350 690 Q 380 678 410 685 Q 440 692 465 680 Q 488 670 510 677 Q 528 684 540 674 L540 740 Q 515 735 485 742 Q 452 750 420 738 Q 388 726 358 734 Q 352 736 350 738 Z"/>
+  <!-- Right root tangles -->
+  <path d="M 900 700 Q 930 688 960 695 Q 990 702 1015 690 Q 1038 680 1055 687 Q 1072 694 1085 684 L1085 745 Q 1058 740 1028 747 Q 995 755 962 742 Q 930 730 900 738 Z"/>
+  <path d="M 1260 695 Q 1290 682 1320 690 Q 1350 698 1372 686 Q 1395 675 1415 682 Q 1435 690 1450 680 L1460 680 L1460 745 Q 1435 740 1408 748 Q 1380 757 1350 745 Q 1318 733 1288 741 Q 1270 746 1260 744 Z"/>
+</g>
+
+<!-- Fallen leaves on ground — just organic blob shapes -->
+<g opacity=".70">
+  <ellipse cx="250"  cy="710" rx="22" ry="8"  fill="#010f04" transform="rotate(-25 250 710)"/>
+  <ellipse cx="380"  cy="725" rx="18" ry="6"  fill="#011005" transform="rotate(15 380 725)"/>
+  <ellipse cx="580"  cy="718" rx="24" ry="7"  fill="#020e04" transform="rotate(-10 580 718)"/>
+  <ellipse cx="720"  cy="730" rx="16" ry="5"  fill="#010e03" transform="rotate(30 720 730)"/>
+  <ellipse cx="850"  cy="715" rx="20" ry="7"  fill="#021005" transform="rotate(-20 850 715)"/>
+  <ellipse cx="1050" cy="722" rx="18" ry="6"  fill="#010f04" transform="rotate(12 1050 722)"/>
+  <ellipse cx="1200" cy="712" rx="22" ry="8"  fill="#021005" transform="rotate(-18 1200 712)"/>
+  <ellipse cx="1380" cy="726" rx="16" ry="5"  fill="#010e03" transform="rotate(22 1380 726)"/>
+  <!-- Small cluster -->
+  <ellipse cx="445"  cy="742" rx="12" ry="4"  fill="#011004" transform="rotate(5 445 742)"/>
+  <ellipse cx="640"  cy="748" rx="14" ry="5"  fill="#020f04" transform="rotate(-8 640 748)"/>
+  <ellipse cx="920"  cy="738" rx="11" ry="4"  fill="#010e03" transform="rotate(18 920 738)"/>
+</g>
+
+<!-- ══════════════════════════════════════════
+     CANOPY OVERHEAD — top of frame, large tropical leaves
+══════════════════════════════════════════ -->
+<!-- Canopy mass blobs — very dark, top of frame -->
+<g fill="url(#canopy-l)">
+  <!-- Left canopy section -->
+  <path d="M -10 0 L -10 200 Q 40 185 80 165 Q 120 145 155 125 Q 190 108 220 90 Q 250 72 268 55 Q 280 42 275 30 Q 268 18 280 8 Q 290 0 -10 0 Z"/>
+  <path d="M -10 0 L -10 150 Q 30 132 68 115 Q 105 98 132 80 Q 158 65 172 50 Q 182 38 178 25 Q 172 12 185 2 Q 188 0 -10 0 Z"/>
+  <!-- Extending palm fronds left -->
+  <path d="M 120 0 Q 145 25 158 55 Q 168 82 155 105 Q 142 128 122 138 Q 102 148 88 135 Q 74 122 80 100 Q 86 78 75 55 Q 65 35 78 15 Q 90 -2 120 0 Z"/>
+  <path d="M 220 0 Q 248 20 262 48 Q 274 74 262 98 Q 250 120 230 130 Q 210 140 195 128 Q 180 116 186 94 Q 192 72 180 50 Q 170 30 182 12 Q 192 -2 220 0 Z"/>
+
+  <!-- Center canopy overhangs -->
+  <path d="M 500 0 Q 520 18 528 44 Q 534 68 522 90 Q 510 112 490 120 Q 470 128 455 115 Q 440 102 446 80 Q 452 58 440 38 Q 430 20 445 5 Q 455 -2 500 0 Z"/>
+  <path d="M 620 0 L 620 125 Q 660 108 695 88 Q 728 70 748 50 Q 762 35 758 20 Q 752 8 762 0 Z"/>
+  <path d="M 780 0 Q 810 22 820 50 Q 828 76 814 100 Q 800 122 778 130 Q 756 138 740 124 Q 724 110 730 87 Q 736 65 722 44 Q 710 26 724 10 Q 734 -2 780 0 Z"/>
+
+  <!-- Right canopy section -->
+  <path d="M 1100 0 Q 1128 24 1138 52 Q 1148 78 1136 102 Q 1124 124 1102 132 Q 1080 140 1064 126 Q 1048 112 1054 89 Q 1060 67 1046 46 Q 1034 28 1048 12 Q 1060 -2 1100 0 Z"/>
+  <path d="M 1250 0 L 1250 115 Q 1290 98 1325 78 Q 1358 60 1378 40 Q 1392 25 1388 12 Q 1382 2 1392 0 Z"/>
+  <path d="M 1440 0 L 1440 220 Q 1400 200 1365 180 Q 1330 160 1305 140 Q 1282 122 1270 105 Q 1260 90 1264 75 Q 1268 60 1255 48 Q 1244 38 1252 22 Q 1258 10 1270 0 Z"/>
+  <path d="M 1350 0 Q 1380 20 1390 48 Q 1398 74 1386 98 Q 1374 120 1352 128 Q 1330 136 1314 122 Q 1298 108 1304 85 Q 1310 63 1296 42 Q 1284 24 1298 8 Q 1310 -2 1350 0 Z"/>
+</g>
+
+<!-- Second darker canopy layer for depth -->
+<g fill="#010902" opacity=".95">
+  <path d="M -10 0 L -10 100 Q 22 85 50 70 Q 78 55 98 40 Q 115 28 110 15 Q 105 4 115 0 Z"/>
+  <path d="M 330 0 Q 355 18 365 44 Q 373 68 362 90 Q 350 110 330 118 Q 310 126 295 112 Q 280 98 286 76 Q 292 55 280 34 Q 270 16 284 2 Q 295 -2 330 0 Z"/>
+  <path d="M 900 0 Q 928 22 938 50 Q 946 76 933 100 Q 920 122 898 130 Q 876 138 860 124 Q 844 110 850 87 Q 856 65 842 44 Q 830 26 844 10 Q 856 -2 900 0 Z"/>
+  <path d="M 1440 0 L 1440 130 Q 1412 112 1385 95 Q 1358 78 1340 62 Q 1325 48 1328 35 Q 1332 22 1320 12 Q 1310 4 1320 0 Z"/>
+</g>
+
+<!-- ══════════════════════════════════════════
+     BIOLUMINESCENT MUSHROOMS
+══════════════════════════════════════════ -->
+<!-- Mushroom cluster 1 — left side -->
+<g id="mush-1" transform="translate(185, 688)" filter="url(#f-mush-glow)">
+  <!-- Cap glow halo -->
+  <ellipse cx="0" cy="-14" rx="22" ry="10" fill="#40e890" opacity=".25" style="animation:mush-glow 4.2s ease-in-out infinite"/>
+  <!-- Caps -->
+  <ellipse cx="0"  cy="-18" rx="12" ry="7" fill="#28c870" style="animation:mush-glow 4.2s ease-in-out infinite"/>
+  <ellipse cx="-14" cy="-12" rx="9"  ry="5" fill="#30d878" style="animation:mush-glow-b 3.8s ease-in-out infinite 0.8s"/>
+  <ellipse cx="14"  cy="-10" rx="8"  ry="4" fill="#22c065" style="animation:mush-glow 5.0s ease-in-out infinite 1.5s"/>
+  <!-- Stems -->
+  <rect x="-2"  y="-12" width="4"  height="14" rx="2" fill="#0e5028"/>
+  <rect x="-16" y="-8"  width="3.5" height="10" rx="2" fill="#0c4822"/>
+  <rect x="13"  y="-6"  width="3"  height="9"  rx="2" fill="#0e4e26"/>
+  <!-- Glow floor splash -->
+  <ellipse cx="0" cy="4" rx="28" ry="6" fill="#20b050" opacity=".18" filter="url(#f-blur-md)"/>
+</g>
+
+<!-- Mushroom cluster 2 — center-left -->
+<g id="mush-2" transform="translate(490, 694)" filter="url(#f-mush-glow)">
+  <ellipse cx="0"   cy="-16" rx="18" ry="8"  fill="#40e890" opacity=".22" style="animation:mush-glow-b 3.5s ease-in-out infinite 0.4s"/>
+  <ellipse cx="0"   cy="-20" rx="10" ry="6"  fill="#30d878" style="animation:mush-glow-b 3.5s ease-in-out infinite 0.4s"/>
+  <ellipse cx="-12" cy="-14" rx="8"  ry="4"  fill="#28c060" style="animation:mush-glow 4.8s ease-in-out infinite 1.2s"/>
+  <rect x="-2"  y="-14" width="4"   height="16" rx="2" fill="#0c4820"/>
+  <rect x="-14" y="-10" width="3.5" height="12" rx="2" fill="#0a4018"/>
+  <ellipse cx="0" cy="5" rx="22" ry="5" fill="#18a040" opacity=".16" filter="url(#f-blur-md)"/>
+</g>
+
+<!-- Mushroom cluster 3 — center -->
+<g id="mush-3" transform="translate(740, 682)" filter="url(#f-mush-glow)">
+  <ellipse cx="0"  cy="-18" rx="24" ry="11" fill="#40e890" opacity=".28" style="animation:mush-glow 5.2s ease-in-out infinite 2.0s"/>
+  <ellipse cx="0"  cy="-22" rx="13" ry="8"  fill="#38e080" style="animation:mush-glow 5.2s ease-in-out infinite 2.0s"/>
+  <ellipse cx="15" cy="-16" rx="9"  ry="5"  fill="#2cd070" style="animation:mush-glow-b 4.0s ease-in-out infinite 0.6s"/>
+  <ellipse cx="-16" cy="-13" rx="8" ry="4"  fill="#28be65" style="animation:mush-glow 3.8s ease-in-out infinite 1.8s"/>
+  <rect x="-2"   y="-14" width="4"   height="16" rx="2" fill="#0e5228"/>
+  <rect x="13"   y="-11" width="3.5" height="13" rx="2" fill="#0c4822"/>
+  <rect x="-18"  y="-9"  width="3"   height="11" rx="2" fill="#0a4020"/>
+  <ellipse cx="0" cy="5" rx="32" ry="7" fill="#20b058" opacity=".20" filter="url(#f-blur-md)"/>
+</g>
+
+<!-- Mushroom cluster 4 — center-right -->
+<g id="mush-4" transform="translate(1020, 690)" filter="url(#f-mush-glow)">
+  <ellipse cx="0"   cy="-15" rx="16" ry="7"  fill="#40e890" opacity=".20" style="animation:mush-glow-b 4.4s ease-in-out infinite 1.0s"/>
+  <ellipse cx="0"   cy="-19" rx="9"  ry="5"  fill="#2cc868" style="animation:mush-glow-b 4.4s ease-in-out infinite 1.0s"/>
+  <ellipse cx="11"  cy="-13" rx="7"  ry="4"  fill="#28b860" style="animation:mush-glow 3.6s ease-in-out infinite 0.5s"/>
+  <rect x="-2"  y="-13" width="4"   height="15" rx="2" fill="#0c4a22"/>
+  <rect x="10"  y="-9"  width="3"   height="11" rx="2" fill="#0a4020"/>
+  <ellipse cx="0" cy="4" rx="20" ry="5" fill="#18a040" opacity=".15" filter="url(#f-blur-md)"/>
+</g>
+
+<!-- Mushroom cluster 5 — right side -->
+<g id="mush-5" transform="translate(1280, 685)" filter="url(#f-mush-glow)">
+  <ellipse cx="0"   cy="-17" rx="20" ry="9"  fill="#40e890" opacity=".24" style="animation:mush-glow 4.8s ease-in-out infinite 1.6s"/>
+  <ellipse cx="0"   cy="-21" rx="11" ry="7"  fill="#34d878" style="animation:mush-glow 4.8s ease-in-out infinite 1.6s"/>
+  <ellipse cx="-13" cy="-15" rx="8"  ry="4"  fill="#28c268" style="animation:mush-glow-b 5.5s ease-in-out infinite 2.2s"/>
+  <ellipse cx="14"  cy="-12" rx="7"  ry="4"  fill="#2ccc70" style="animation:mush-glow 3.9s ease-in-out infinite 0.9s"/>
+  <rect x="-2"   y="-15" width="4"   height="17" rx="2" fill="#0e5228"/>
+  <rect x="-15"  y="-11" width="3.5" height="13" rx="2" fill="#0c4822"/>
+  <rect x="13"   y="-8"  width="3"   height="10" rx="2" fill="#0a4020"/>
+  <ellipse cx="0" cy="6" rx="26" ry="6" fill="#1ea850" opacity=".18" filter="url(#f-blur-md)"/>
+</g>
+
+<!-- ══════════════════════════════════════════
+     RAIN — heavy, multiple layers
+══════════════════════════════════════════ -->
+<!-- Rain layer 1: background — thin, slowest (0.55s), slight angle -->
+<g stroke="#b8ccd8" stroke-width="0.8" filter="url(#f-rain)" opacity=".28">
+  <line x1="55"   y1="-60" x2="33"   y2="900" style="animation:rain-b 0.55s linear infinite 0s"/>
+  <line x1="148"  y1="-60" x2="126"  y2="900" style="animation:rain-b 0.55s linear infinite 0.08s"/>
+  <line x1="240"  y1="-60" x2="218"  y2="900" style="animation:rain-a 0.50s linear infinite 0.16s"/>
+  <line x1="332"  y1="-60" x2="310"  y2="900" style="animation:rain-b 0.55s linear infinite 0.24s"/>
+  <line x1="424"  y1="-60" x2="402"  y2="900" style="animation:rain-a 0.50s linear infinite 0.03s"/>
+  <line x1="516"  y1="-60" x2="494"  y2="900" style="animation:rain-b 0.55s linear infinite 0.30s"/>
+  <line x1="608"  y1="-60" x2="586"  y2="900" style="animation:rain-a 0.50s linear infinite 0.42s"/>
+  <line x1="700"  y1="-60" x2="678"  y2="900" style="animation:rain-b 0.55s linear infinite 0.11s"/>
+  <line x1="792"  y1="-60" x2="770"  y2="900" style="animation:rain-a 0.50s linear infinite 0.35s"/>
+  <line x1="884"  y1="-60" x2="862"  y2="900" style="animation:rain-b 0.55s linear infinite 0.49s"/>
+  <line x1="976"  y1="-60" x2="954"  y2="900" style="animation:rain-a 0.50s linear infinite 0.22s"/>
+  <line x1="1068" y1="-60" x2="1046" y2="900" style="animation:rain-b 0.55s linear infinite 0.38s"/>
+  <line x1="1160" y1="-60" x2="1138" y2="900" style="animation:rain-a 0.50s linear infinite 0.15s"/>
+  <line x1="1252" y1="-60" x2="1230" y2="900" style="animation:rain-b 0.55s linear infinite 0.45s"/>
+  <line x1="1344" y1="-60" x2="1322" y2="900" style="animation:rain-a 0.50s linear infinite 0.28s"/>
+  <line x1="1436" y1="-60" x2="1414" y2="900" style="animation:rain-b 0.55s linear infinite 0.07s"/>
+</g>
+
+<!-- Rain layer 2: mid — medium weight, 0.45s -->
+<g stroke="#c0d4e0" stroke-width="1.0" filter="url(#f-rain)" opacity=".35">
+  <line x1="38"   y1="-60" x2="16"   y2="900" style="animation:rain-a 0.45s linear infinite 0.12s"/>
+  <line x1="114"  y1="-60" x2="92"   y2="900" style="animation:rain-c 0.42s linear infinite 0.28s"/>
+  <line x1="192"  y1="-60" x2="170"  y2="900" style="animation:rain-a 0.45s linear infinite 0.04s"/>
+  <line x1="270"  y1="-60" x2="248"  y2="900" style="animation:rain-c 0.42s linear infinite 0.39s"/>
+  <line x1="348"  y1="-60" x2="326"  y2="900" style="animation:rain-a 0.45s linear infinite 0.18s"/>
+  <line x1="426"  y1="-60" x2="404"  y2="900" style="animation:rain-c 0.42s linear infinite 0.06s"/>
+  <line x1="504"  y1="-60" x2="482"  y2="900" style="animation:rain-a 0.45s linear infinite 0.33s"/>
+  <line x1="582"  y1="-60" x2="560"  y2="900" style="animation:rain-c 0.42s linear infinite 0.47s"/>
+  <line x1="660"  y1="-60" x2="638"  y2="900" style="animation:rain-a 0.45s linear infinite 0.21s"/>
+  <line x1="738"  y1="-60" x2="716"  y2="900" style="animation:rain-c 0.42s linear infinite 0.35s"/>
+  <line x1="816"  y1="-60" x2="794"  y2="900" style="animation:rain-a 0.45s linear infinite 0.09s"/>
+  <line x1="894"  y1="-60" x2="872"  y2="900" style="animation:rain-c 0.42s linear infinite 0.43s"/>
+  <line x1="972"  y1="-60" x2="950"  y2="900" style="animation:rain-a 0.45s linear infinite 0.25s"/>
+  <line x1="1050" y1="-60" x2="1028" y2="900" style="animation:rain-c 0.42s linear infinite 0.14s"/>
+  <line x1="1128" y1="-60" x2="1106" y2="900" style="animation:rain-a 0.45s linear infinite 0.37s"/>
+  <line x1="1206" y1="-60" x2="1184" y2="900" style="animation:rain-c 0.42s linear infinite 0.02s"/>
+  <line x1="1284" y1="-60" x2="1262" y2="900" style="animation:rain-a 0.45s linear infinite 0.48s"/>
+  <line x1="1362" y1="-60" x2="1340" y2="900" style="animation:rain-c 0.42s linear infinite 0.20s"/>
+  <line x1="1440" y1="-60" x2="1418" y2="900" style="animation:rain-a 0.45s linear infinite 0.31s"/>
+</g>
+
+<!-- Rain layer 3: foreground — thicker, fastest (0.38s) -->
+<g stroke="#c8dce8" stroke-width="1.3" filter="url(#f-rain)" opacity=".42">
+  <line x1="72"   y1="-60" x2="47"   y2="900" style="animation:rain-c 0.38s linear infinite 0.17s"/>
+  <line x1="168"  y1="-60" x2="143"  y2="900" style="animation:rain-e 0.40s linear infinite 0.05s"/>
+  <line x1="264"  y1="-60" x2="239"  y2="900" style="animation:rain-c 0.38s linear infinite 0.36s"/>
+  <line x1="360"  y1="-60" x2="335"  y2="900" style="animation:rain-e 0.40s linear infinite 0.23s"/>
+  <line x1="456"  y1="-60" x2="431"  y2="900" style="animation:rain-c 0.38s linear infinite 0.44s"/>
+  <line x1="552"  y1="-60" x2="527"  y2="900" style="animation:rain-e 0.40s linear infinite 0.10s"/>
+  <line x1="648"  y1="-60" x2="623"  y2="900" style="animation:rain-c 0.38s linear infinite 0.29s"/>
+  <line x1="744"  y1="-60" x2="719"  y2="900" style="animation:rain-e 0.40s linear infinite 0.41s"/>
+  <line x1="840"  y1="-60" x2="815"  y2="900" style="animation:rain-c 0.38s linear infinite 0.13s"/>
+  <line x1="936"  y1="-60" x2="911"  y2="900" style="animation:rain-e 0.40s linear infinite 0.32s"/>
+  <line x1="1032" y1="-60" x2="1007" y2="900" style="animation:rain-c 0.38s linear infinite 0.46s"/>
+  <line x1="1128" y1="-60" x2="1103" y2="900" style="animation:rain-e 0.40s linear infinite 0.08s"/>
+  <line x1="1224" y1="-60" x2="1199" y2="900" style="animation:rain-c 0.38s linear infinite 0.26s"/>
+  <line x1="1320" y1="-60" x2="1295" y2="900" style="animation:rain-e 0.40s linear infinite 0.50s"/>
+  <line x1="1416" y1="-60" x2="1391" y2="900" style="animation:rain-c 0.38s linear infinite 0.19s"/>
+</g>
+
+<!-- Rain layer 4: extra density — slightly different angle, 0.43s -->
+<g stroke="#b8ccda" stroke-width="0.9" filter="url(#f-rain)" opacity=".30">
+  <line x1="22"   y1="-60" x2="0"    y2="900" style="animation:rain-d 0.43s linear infinite 0.34s"/>
+  <line x1="100"  y1="-60" x2="78"   y2="900" style="animation:rain-d 0.43s linear infinite 0.15s"/>
+  <line x1="205"  y1="-60" x2="183"  y2="900" style="animation:rain-d 0.43s linear infinite 0.42s"/>
+  <line x1="302"  y1="-60" x2="280"  y2="900" style="animation:rain-d 0.43s linear infinite 0.07s"/>
+  <line x1="398"  y1="-60" x2="376"  y2="900" style="animation:rain-d 0.43s linear infinite 0.28s"/>
+  <line x1="495"  y1="-60" x2="473"  y2="900" style="animation:rain-d 0.43s linear infinite 0.49s"/>
+  <line x1="592"  y1="-60" x2="570"  y2="900" style="animation:rain-d 0.43s linear infinite 0.22s"/>
+  <line x1="688"  y1="-60" x2="666"  y2="900" style="animation:rain-d 0.43s linear infinite 0.38s"/>
+  <line x1="785"  y1="-60" x2="763"  y2="900" style="animation:rain-d 0.43s linear infinite 0.11s"/>
+  <line x1="882"  y1="-60" x2="860"  y2="900" style="animation:rain-d 0.43s linear infinite 0.45s"/>
+  <line x1="978"  y1="-60" x2="956"  y2="900" style="animation:rain-d 0.43s linear infinite 0.03s"/>
+  <line x1="1075" y1="-60" x2="1053" y2="900" style="animation:rain-d 0.43s linear infinite 0.30s"/>
+  <line x1="1172" y1="-60" x2="1150" y2="900" style="animation:rain-d 0.43s linear infinite 0.18s"/>
+  <line x1="1268" y1="-60" x2="1246" y2="900" style="animation:rain-d 0.43s linear infinite 0.40s"/>
+  <line x1="1365" y1="-60" x2="1343" y2="900" style="animation:rain-d 0.43s linear infinite 0.25s"/>
+</g>
+
+<!-- ══════════════════════════════════════════
+     STEAM WISPS — rising from jungle floor
+══════════════════════════════════════════ -->
+<g filter="url(#f-steam)">
+  <ellipse cx="320"  cy="692" rx="20" ry="8"  fill="#e8f0e8" style="animation:steam-a 6.5s ease-out infinite 0s"/>
+  <ellipse cx="320"  cy="692" rx="15" ry="6"  fill="#d8e8d8" style="animation:steam-b 7.2s ease-out infinite 2.1s"/>
+  <ellipse cx="640"  cy="700" rx="22" ry="9"  fill="#e0ece0" style="animation:steam-c 5.8s ease-out infinite 1.4s"/>
+  <ellipse cx="640"  cy="700" rx="14" ry="5"  fill="#d0e4d0" style="animation:steam-a 7.8s ease-out infinite 3.5s"/>
+  <ellipse cx="960"  cy="695" rx="18" ry="7"  fill="#e8f0e8" style="animation:steam-b 6.2s ease-out infinite 0.8s"/>
+  <ellipse cx="960"  cy="695" rx="12" ry="5"  fill="#d8e8d8" style="animation:steam-c 8.0s ease-out infinite 4.2s"/>
+  <ellipse cx="1200" cy="704" rx="20" ry="8"  fill="#e0ece0" style="animation:steam-a 7.0s ease-out infinite 2.8s"/>
+  <ellipse cx="480"  cy="698" rx="16" ry="6"  fill="#d8e8d8" style="animation:steam-c 6.8s ease-out infinite 1.0s"/>
+  <ellipse cx="1100" cy="690" rx="14" ry="5"  fill="#e0ece0" style="animation:steam-b 5.5s ease-out infinite 3.8s"/>
+</g>
+
+<!-- ══════════════════════════════════════════
+     FIREFLIES — wandering with compound animations
+══════════════════════════════════════════ -->
+<g id="fireflies" filter="url(#f-firefly)">
+
+  <!-- Each firefly uses two nested g elements for independent x/y translation, plus opacity -->
+
+  <!-- FF 1 -->
+  <g style="animation:ff-x-a 6.8s ease-in-out infinite">
+    <g style="animation:ff-y-c 4.2s ease-in-out infinite 0.5s">
+      <circle id="ff-0" cx="280"  cy="580" r="2.8" fill="#c8ff40" style="animation:ff-fade-a 3.2s ease-in-out infinite"/>
+    </g>
+  </g>
+
+  <!-- FF 2 -->
+  <g style="animation:ff-x-b 5.4s ease-in-out infinite 1.2s">
+    <g style="animation:ff-y-a 7.1s ease-in-out infinite 0.8s">
+      <circle id="ff-1" cx="480"  cy="615" r="2.4" fill="#c8ff40" style="animation:ff-fade-b 4.0s ease-in-out infinite 1.8s"/>
+    </g>
+  </g>
+
+  <!-- FF 3 -->
+  <g style="animation:ff-x-c 7.5s ease-in-out infinite 0.3s">
+    <g style="animation:ff-y-e 5.8s ease-in-out infinite 2.0s">
+      <circle id="ff-2" cx="650"  cy="596" r="3.0" fill="#c8ff40" style="animation:ff-fade-c 2.8s ease-in-out infinite 0.5s"/>
+    </g>
+  </g>
+
+  <!-- FF 4 -->
+  <g style="animation:ff-x-d 6.2s ease-in-out infinite 2.4s">
+    <g style="animation:ff-y-b 4.8s ease-in-out infinite 1.0s">
+      <circle id="ff-3" cx="820"  cy="570" r="2.6" fill="#c8ff40" style="animation:ff-fade-d 3.6s ease-in-out infinite 2.5s"/>
+    </g>
+  </g>
+
+  <!-- FF 5 -->
+  <g style="animation:ff-x-e 8.0s ease-in-out infinite 0.9s">
+    <g style="animation:ff-y-d 6.4s ease-in-out infinite 3.2s">
+      <circle id="ff-4" cx="1000" cy="605" r="2.4" fill="#c8ff40" style="animation:ff-fade-e 4.5s ease-in-out infinite 1.2s"/>
+    </g>
+  </g>
+
+  <!-- FF 6 -->
+  <g style="animation:ff-x-f 5.8s ease-in-out infinite 3.5s">
+    <g style="animation:ff-y-f 7.8s ease-in-out infinite 0.4s">
+      <circle id="ff-5" cx="1170" cy="582" r="2.8" fill="#c8ff40" style="animation:ff-fade-a 3.0s ease-in-out infinite 3.8s"/>
+    </g>
+  </g>
+
+  <!-- FF 7 -->
+  <g style="animation:ff-x-g 7.2s ease-in-out infinite 1.6s">
+    <g style="animation:ff-y-g 5.2s ease-in-out infinite 2.8s">
+      <circle id="ff-6" cx="380"  cy="542" r="2.2" fill="#c8ff40" style="animation:ff-fade-b 5.0s ease-in-out infinite 0.2s"/>
+    </g>
+  </g>
+
+  <!-- FF 8 -->
+  <g style="animation:ff-x-h 6.5s ease-in-out infinite 4.0s">
+    <g style="animation:ff-y-h 4.5s ease-in-out infinite 1.5s">
+      <circle id="ff-7" cx="710"  cy="555" r="2.6" fill="#c8ff40" style="animation:ff-fade-c 3.8s ease-in-out infinite 4.2s"/>
+    </g>
+  </g>
+
+  <!-- FF 9 -->
+  <g style="animation:ff-x-i 5.0s ease-in-out infinite 0.7s">
+    <g style="animation:ff-y-i 8.2s ease-in-out infinite 3.0s">
+      <circle id="ff-8" cx="1320" cy="590" r="2.4" fill="#c8ff40" style="animation:ff-fade-d 2.5s ease-in-out infinite 2.2s"/>
+    </g>
+  </g>
+
+  <!-- FF 10 -->
+  <g style="animation:ff-x-j 7.8s ease-in-out infinite 2.1s">
+    <g style="animation:ff-y-j 6.0s ease-in-out infinite 0.6s">
+      <circle id="ff-9" cx="900"  cy="530" r="2.2" fill="#c8ff40" style="animation:ff-fade-e 4.8s ease-in-out infinite 1.0s"/>
+    </g>
+  </g>
+
+</g>
+
+<!-- ══════════════════════════════════════════
+     DEPTH ATMOSPHERE
+══════════════════════════════════════════ -->
+<!-- General deep green atmosphere haze -->
+<ellipse cx="720" cy="600" rx="600" ry="200" fill="#010802" opacity=".35" filter="url(#f-blur-xl)"/>
+
+<!-- Vignette -->
+<rect width="1440" height="900" fill="url(#vig)"/>
+
+<!-- ══════════════════════════════════════════
+     LIGHTNING FLASHES (CSS-only, rare)
+══════════════════════════════════════════ -->
+<rect class="lightning-1" width="1440" height="900" fill="url(#ltn-grad)" opacity="0"/>
+<rect class="lightning-2" width="1440" height="900" fill="url(#ltn-grad)" opacity="0"/>
+
+</svg>
+
+<script>
+(function() {
+  'use strict';
+
+  var svg = document.querySelector('svg');
+  var svgNS = 'http://www.w3.org/2000/svg';
+
+  // Firefly base positions (SVG coords) — matches the circle cx/cy above
+  var ffData = [
+    { el: document.getElementById('ff-0'), baseX: 280,  baseY: 580 },
+    { el: document.getElementById('ff-1'), baseX: 480,  baseY: 615 },
+    { el: document.getElementById('ff-2'), baseX: 650,  baseY: 596 },
+    { el: document.getElementById('ff-3'), baseX: 820,  baseY: 570 },
+    { el: document.getElementById('ff-4'), baseX: 1000, baseY: 605 },
+    { el: document.getElementById('ff-5'), baseX: 1170, baseY: 582 },
+    { el: document.getElementById('ff-6'), baseX: 380,  baseY: 542 },
+    { el: document.getElementById('ff-7'), baseX: 710,  baseY: 555 },
+    { el: document.getElementById('ff-8'), baseX: 1320, baseY: 590 },
+    { el: document.getElementById('ff-9'), baseX: 900,  baseY: 530 },
+  ];
+
+  // Mushroom groups for HAPPY state
+  var mushGroups = [
+    { el: document.getElementById('mush-1'), cx: 185 },
+    { el: document.getElementById('mush-2'), cx: 490 },
+    { el: document.getElementById('mush-3'), cx: 740 },
+    { el: document.getElementById('mush-4'), cx: 1020 },
+    { el: document.getElementById('mush-5'), cx: 1280 },
+  ];
+
+  // ── JS Lightning for STARTLED & rare thunderclap ──────────
+  function triggerLightning(intensity, duration) {
+    var flash = document.createElementNS(svgNS, 'rect');
+    flash.setAttribute('width', '1440');
+    flash.setAttribute('height', '900');
+    flash.setAttribute('fill', '#c8e0ff');
+    flash.setAttribute('opacity', intensity.toString());
+    svg.appendChild(flash);
+
+    var start = performance.now();
+    var dur = duration || 200;
+
+    function fade(now) {
+      var t = (now - start) / dur;
+      if (t >= 1) { flash.remove(); return; }
+      flash.setAttribute('opacity', (intensity * (1 - t)).toString());
+      requestAnimationFrame(fade);
+    }
+    requestAnimationFrame(fade);
+  }
+
+  function triggerDoubleFlash() {
+    triggerLightning(0.50, 80);
+    setTimeout(function() { triggerLightning(0.35, 100); }, 130);
+    setTimeout(function() {
+      // Scene-wide blue-white tint that lingers
+      var tint = document.createElementNS(svgNS, 'rect');
+      tint.setAttribute('width', '1440');
+      tint.setAttribute('height', '900');
+      tint.setAttribute('fill', '#a0c8e8');
+      tint.setAttribute('opacity', '0.28');
+      svg.appendChild(tint);
+      var s2 = performance.now();
+      function fadeTint(now) {
+        var t = (now - s2) / 1200;
+        if (t >= 1) { tint.remove(); return; }
+        tint.setAttribute('opacity', (0.28 * (1 - t)).toString());
+        requestAnimationFrame(fadeTint);
+      }
+      requestAnimationFrame(fadeTint);
+    }, 260);
+  }
+
+  // Rare thunderclap event every ~65s (50-80s jitter)
+  function scheduleThunderclap() {
+    var delay = 50000 + Math.random() * 30000;
+    setTimeout(function() {
+      triggerDoubleFlash();
+      scheduleThunderclap();
+    }, delay);
+  }
+  scheduleThunderclap();
+
+  // ── Rain splash on river surface ──────────────────────────
+  var RIVER_Y = 715; // approximate SVG y of river surface
+
+  function createRiverSplash(svgX) {
+    var el = document.createElementNS(svgNS, 'ellipse');
+    el.setAttribute('cx', svgX);
+    el.setAttribute('cy', RIVER_Y);
+    el.setAttribute('rx', '0');
+    el.setAttribute('ry', '0');
+    el.setAttribute('fill', 'none');
+    el.setAttribute('stroke', '#1a3820');
+    el.setAttribute('stroke-width', '1');
+    el.setAttribute('opacity', '0.6');
+    svg.insertBefore(el, svg.querySelector('.lightning-1'));
+
+    var start = performance.now();
+    var dur = 700;
+    function animate(now) {
+      var t = (now - start) / dur;
+      if (t >= 1) { el.remove(); return; }
+      el.setAttribute('rx', (t * 24).toString());
+      el.setAttribute('ry', (t * 9).toString());
+      el.setAttribute('opacity', (0.6 * (1 - t)).toString());
+      requestAnimationFrame(animate);
+    }
+    requestAnimationFrame(animate);
+  }
+
+  // ── Firefly nudge toward Clawd ────────────────────────────
+  var lastCx = -1, lastCy = -1;
+  var lastSplash = 0;
+  var mushGlowTimeout = null;
+
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'clawd') return;
+
+    var cx = e.data.cx;   // 0..1
+    var cy = e.data.cy;   // 0..1
+    var state = e.data.state;
+    var speed = e.data.speed || 0;
+
+    var svgX = cx * 1440;
+    var svgY = cy * 900;
+
+    // ── Firefly drift toward Clawd when on jungle floor ──
+    if (cy > 0.65) {
+      var attractRadius = 1440 * 0.18;
+      ffData.forEach(function(ff) {
+        if (!ff.el) return;
+        var dx = svgX - ff.baseX;
+        var dy = svgY - ff.baseY;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < attractRadius && dist > 1) {
+          // Nudge the circle's cx/cy slightly toward Clawd (subtle, not snap)
+          var pull = Math.min(0.35, (attractRadius - dist) / attractRadius);
+          var nx = ff.baseX + dx * pull * 0.5;
+          var ny = ff.baseY + dy * pull * 0.5;
+          ff.el.setAttribute('cx', nx.toString());
+          ff.el.setAttribute('cy', ny.toString());
+        } else {
+          // Return to base position gradually
+          var curX = parseFloat(ff.el.getAttribute('cx'));
+          var curY = parseFloat(ff.el.getAttribute('cy'));
+          ff.el.setAttribute('cx', (curX + (ff.baseX - curX) * 0.08).toString());
+          ff.el.setAttribute('cy', (curY + (ff.baseY - curY) * 0.08).toString());
+        }
+      });
+    }
+
+    // ── River splash when Clawd is near river ──
+    if (cy > 0.75 && speed > 0.3) {
+      var now = performance.now();
+      if (now - lastSplash > 400) {
+        lastSplash = now;
+        createRiverSplash(svgX + (Math.random() - 0.5) * 60);
+      }
+    }
+
+    // ── STARTLED: extra lightning flash ──
+    if (state === 'STARTLED' && lastCy !== -1) {
+      triggerLightning(0.45, 200);
+    }
+
+    // ── HAPPY: mushrooms near Clawd glow brighter ──
+    if (state === 'HAPPY') {
+      var mushRadius = 1440 * 0.20;
+      mushGroups.forEach(function(m) {
+        if (!m.el) return;
+        var mdx = svgX - m.cx;
+        if (Math.abs(mdx) < mushRadius) {
+          // Boost filter brightness briefly
+          m.el.setAttribute('filter', 'url(#f-mush-glow) brightness(2.2)');
+          // Can't do brightness in SVG filter attr like this — use style instead
+          m.el.style.filter = 'brightness(2.5)';
+          if (mushGlowTimeout) clearTimeout(mushGlowTimeout);
+          mushGlowTimeout = setTimeout(function() {
+            mushGroups.forEach(function(mg) {
+              if (mg.el) mg.el.style.filter = '';
+            });
+          }, 800);
+        }
+      });
+    }
+
+    lastCx = cx;
+    lastCy = cy;
+  });
+
+})();
+</script>
+
+</body>
+</html>

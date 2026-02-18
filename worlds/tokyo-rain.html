@@ -45,6 +45,29 @@ svg { width: 100%; height: 100%; }
   0%,100% { transform: translateY(0); }
   50%     { transform: translateY(-3px); }
 }
+
+/* ═══ LIGHTNING (rare event) ═══ */
+.lightning-flash-1 { animation: lightning1 50s ease-in-out infinite; }
+.lightning-flash-2 { animation: lightning2 67s ease-in-out infinite; }
+
+@keyframes lightning1 {
+  0%, 95.5%  { opacity: 0; }
+  96%        { opacity: 0.35; }
+  96.3%      { opacity: 0; }
+  96.6%      { opacity: 0.25; }
+  96.8%      { opacity: 0; }
+  97.1%      { opacity: 0.15; }
+  97.3%      { opacity: 0; }
+  100%       { opacity: 0; }
+}
+@keyframes lightning2 {
+  0%, 94%    { opacity: 0; }
+  94.5%      { opacity: 0.3; }
+  94.7%      { opacity: 0; }
+  95%        { opacity: 0.2; }
+  95.2%      { opacity: 0; }
+  100%       { opacity: 0; }
+}
 </style>
 </head>
 <body>
@@ -541,6 +564,67 @@ svg { width: 100%; height: 100%; }
 <!-- Scanlines (subtle CRT over the whole scene) -->
 <rect width="1200" height="750" fill="url(#vig)"/>
 
+<!-- ═══════════════════ LIGHTNING FLASHES ═══════════════════ -->
+<rect class="lightning-flash-1" width="1200" height="750" fill="#c8d8ff" opacity="0"/>
+<rect class="lightning-flash-2" width="1200" height="750" fill="#a0b8e8" opacity="0"/>
+
 </svg>
+
+<script>
+(function() {
+  const svg = document.querySelector('svg');
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const STREET_Y = 558; // puddle/ground level in SVG coords
+
+  function createSplash(svgX) {
+    const circle = document.createElementNS(svgNS, 'circle');
+    circle.setAttribute('cx', svgX);
+    circle.setAttribute('cy', STREET_Y);
+    circle.setAttribute('r', '0');
+    circle.setAttribute('fill', 'none');
+    circle.setAttribute('stroke', '#8898b8');
+    circle.setAttribute('stroke-width', '1.5');
+    circle.setAttribute('opacity', '0.6');
+    svg.appendChild(circle);
+
+    const startTime = performance.now();
+    const duration = 500; // ms
+
+    function animateSplash(now) {
+      const t = (now - startTime) / duration;
+      if (t >= 1) {
+        circle.remove();
+        return;
+      }
+      const r = t * 30;
+      const opacity = 0.6 * (1 - t);
+      circle.setAttribute('r', r);
+      circle.setAttribute('opacity', opacity);
+      circle.setAttribute('stroke-width', Math.max(0.5, 1.5 * (1 - t)));
+      requestAnimationFrame(animateSplash);
+    }
+    requestAnimationFrame(animateSplash);
+  }
+
+  let lastSplashTime = 0;
+
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'clawd') return;
+    const { cx, cy, speed } = e.data;
+
+    // When Clawd is on street level and moving, create puddle splashes
+    if (cy > 0.6 && speed > 0.5) {
+      const now = performance.now();
+      // Throttle splashes to max one per 300ms
+      if (now - lastSplashTime > 300) {
+        lastSplashTime = now;
+        const svgX = cx * 1200;
+        createSplash(svgX);
+      }
+    }
+  });
+})();
+</script>
+
 </body>
 </html>

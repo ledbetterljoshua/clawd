@@ -68,6 +68,22 @@ svg { width:100%; height:100%; display:block; }
 
 /* Subtle birdsong light flicker */
 @keyframes dawn-pulse { 0%,100%{opacity:.88} 50%{opacity:1} }
+
+/* Deer crossing rare event */
+@keyframes deer-cross {
+  0%   { transform: translateX(1500px); opacity: 0; }
+  5%   { opacity: .5; }
+  90%  { opacity: .45; }
+  100% { transform: translateX(-200px); opacity: 0; }
+}
+
+/* Leaf swirl around Clawd */
+@keyframes leaf-swirl {
+  0%   { transform: translate(0,0) rotate(0deg); opacity: .9; }
+  40%  { transform: translate(var(--dx1), var(--dy1)) rotate(180deg); opacity: .8; }
+  80%  { transform: translate(var(--dx2), var(--dy2)) rotate(320deg); opacity: .5; }
+  100% { transform: translate(var(--dx3), var(--dy3)) rotate(400deg); opacity: 0; }
+}
 </style>
 </head>
 <body>
@@ -446,6 +462,7 @@ svg { width:100%; height:100%; display:block; }
 </g>
 
 <!-- ── DEER (subtle, mid-distance, behind mist) ──────── -->
+<!-- Static deer -->
 <g transform="translate(718, 615)" opacity=".45" fill="#1a0806">
   <!-- Body -->
   <ellipse cx="0" cy="0" rx="22" ry="11" transform="rotate(-8)"/>
@@ -487,6 +504,88 @@ svg { width:100%; height:100%; display:block; }
 </linearGradient>
 <rect x="0" y="0" width="1440" height="120" fill="url(#top-vig)"/>
 
+<!-- ── CROSSING DEER (rare event) ─────────────────────── -->
+<g id="crossing-deer" opacity="0" fill="#1a0806" transform="translate(0, 640)">
+  <ellipse cx="0" cy="0" rx="26" ry="13" transform="rotate(-5)"/>
+  <ellipse cx="26" cy="-12" rx="9" ry="7" transform="rotate(-20 26 -12)"/>
+  <path d="M 18 -7 L 26 -16" stroke="#1a0806" stroke-width="5" stroke-linecap="round"/>
+  <ellipse cx="32" cy="-18" rx="4" ry="7" transform="rotate(-25 32 -18)"/>
+  <line x1="-14" y1="10" x2="-16" y2="32" stroke="#1a0806" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="-5"  y1="12" x2="-6"  y2="34" stroke="#1a0806" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="10"  y1="12" x2="11"  y2="34" stroke="#1a0806" stroke-width="3.5" stroke-linecap="round"/>
+  <line x1="18"  y1="10" x2="20"  y2="32" stroke="#1a0806" stroke-width="3.5" stroke-linecap="round"/>
+</g>
+
+<!-- ── LEAF SWIRL CONTAINER ─────────────────────────── -->
+<g id="leaf-swirl-container"></g>
+
 </svg>
+<script>
+(function() {
+  var svgNS = 'http://www.w3.org/2000/svg';
+  var deer = document.getElementById('crossing-deer');
+  var swirlContainer = document.getElementById('leaf-swirl-container');
+
+  // Rare event: deer crossing every ~90s (80-100s random)
+  function scheduleDeer() {
+    var delay = 80000 + Math.random() * 20000;
+    setTimeout(function() {
+      deer.style.animation = 'deer-cross 8s ease-in-out forwards';
+      deer.setAttribute('opacity', '1');
+      setTimeout(function() {
+        deer.style.animation = '';
+        deer.setAttribute('opacity', '0');
+        scheduleDeer();
+      }, 8200);
+    }, delay);
+  }
+  scheduleDeer();
+
+  // postMessage: leaf swirl when Clawd near forest floor
+  var lastSwirl = 0;
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'clawd') return;
+    var cx = e.data.cx, cy = e.data.cy, speed = e.data.speed || 0;
+    if (cy <= 0.7 || speed <= 0.4) return;
+    var now = Date.now();
+    if (now - lastSwirl < 800) return;
+    lastSwirl = now;
+
+    var svgX = cx * 1440, svgY = cy * 900;
+    var colors = ['#e08018', '#d08010', '#c87810', '#f0a020'];
+    for (var i = 0; i < 4; i++) {
+      var leaf = document.createElementNS(svgNS, 'rect');
+      leaf.setAttribute('x', svgX - 3);
+      leaf.setAttribute('y', svgY - 1.5);
+      leaf.setAttribute('width', '6');
+      leaf.setAttribute('height', '3');
+      leaf.setAttribute('rx', '1');
+      leaf.setAttribute('fill', colors[i]);
+      leaf.setAttribute('opacity', '0.9');
+      var angle = (i * 90) + (Math.random() * 40 - 20);
+      var rad = angle * Math.PI / 180;
+      var dist = 20 + Math.random() * 25;
+      var dx1 = Math.cos(rad) * dist * 0.4;
+      var dy1 = Math.sin(rad) * dist * 0.4;
+      var dx2 = Math.cos(rad) * dist * 0.8;
+      var dy2 = Math.sin(rad) * dist * 0.8;
+      var dx3 = Math.cos(rad) * dist;
+      var dy3 = Math.sin(rad) * dist;
+      leaf.style.setProperty('--dx1', dx1 + 'px');
+      leaf.style.setProperty('--dy1', dy1 + 'px');
+      leaf.style.setProperty('--dx2', dx2 + 'px');
+      leaf.style.setProperty('--dy2', dy2 + 'px');
+      leaf.style.setProperty('--dx3', dx3 + 'px');
+      leaf.style.setProperty('--dy3', dy3 + 'px');
+      leaf.style.animation = 'leaf-swirl 0.6s ease-out forwards';
+      leaf.style.animationDelay = (i * 0.05) + 's';
+      swirlContainer.appendChild(leaf);
+      (function(el) {
+        setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 800);
+      })(leaf);
+    }
+  });
+})();
+</script>
 </body>
 </html>

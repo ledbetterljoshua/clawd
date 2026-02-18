@@ -32,6 +32,21 @@ svg { width:100%; height:100%; display:block; }
 @keyframes aur-pulse { 0%,100%{opacity:.55} 50%{opacity:.82} }
 @keyframes shimmer   { 0%,100%{opacity:.28} 50%{opacity:.46} }
 @keyframes cabin-f   { 0%,100%{opacity:.88} 52%{opacity:.65} 78%{opacity:1} }
+
+/* Aurora surge rare event */
+.surge { filter: brightness(2.2) !important; transition: filter 0.8s ease-in-out !important; }
+.surge-off { filter: brightness(1) !important; transition: filter 1.5s ease-out !important; }
+
+/* postMessage reactions */
+.aurora-happy { filter: brightness(1.4); transition: filter 0.6s ease-in-out; }
+.aurora-startled { animation: startle-ripple 0.6s ease-out !important; }
+@keyframes startle-ripple {
+  0%   { filter: brightness(1) hue-rotate(0deg); }
+  25%  { filter: brightness(1.8) hue-rotate(15deg); }
+  50%  { filter: brightness(1.3) hue-rotate(-10deg); }
+  75%  { filter: brightness(1.6) hue-rotate(8deg); }
+  100% { filter: brightness(1) hue-rotate(0deg); }
+}
 </style>
 </head>
 <body>
@@ -271,5 +286,69 @@ svg { width:100%; height:100%; display:block; }
 <rect width="1440" height="900" fill="url(#vig)"/>
 
 </svg>
+<script>
+(function() {
+  // Aurora elements (the <g> wrappers around aurora paths)
+  var auroraEls = document.querySelectorAll('[clip-path="url(#sky-clip)"]');
+
+  // ── Rare event: Aurora Surge ──
+  function auroraSurge() {
+    auroraEls.forEach(function(el) {
+      el.classList.remove('surge-off');
+      el.classList.add('surge');
+    });
+    setTimeout(function() {
+      auroraEls.forEach(function(el) {
+        el.classList.remove('surge');
+        el.classList.add('surge-off');
+      });
+      setTimeout(function() {
+        auroraEls.forEach(function(el) {
+          el.classList.remove('surge-off');
+        });
+      }, 1500);
+    }, 4000);
+    setTimeout(auroraSurge, 60000 + Math.random() * 40000);
+  }
+  setTimeout(auroraSurge, 20000 + Math.random() * 30000);
+
+  // ── postMessage reactions ──
+  var currentState = '';
+  var startledTimeout = null;
+
+  window.addEventListener('message', function(e) {
+    if (!e.data || e.data.type !== 'clawd') return;
+    var state = e.data.state;
+
+    if (state === currentState) return;
+    currentState = state;
+
+    // Clear previous startled timeout
+    if (startledTimeout) {
+      clearTimeout(startledTimeout);
+      startledTimeout = null;
+    }
+
+    auroraEls.forEach(function(el) {
+      el.classList.remove('aurora-happy', 'aurora-startled');
+    });
+
+    if (state === 'HAPPY') {
+      auroraEls.forEach(function(el) {
+        el.classList.add('aurora-happy');
+      });
+    } else if (state === 'STARTLED') {
+      auroraEls.forEach(function(el) {
+        el.classList.add('aurora-startled');
+      });
+      startledTimeout = setTimeout(function() {
+        auroraEls.forEach(function(el) {
+          el.classList.remove('aurora-startled');
+        });
+      }, 600);
+    }
+  });
+})();
+</script>
 </body>
 </html>

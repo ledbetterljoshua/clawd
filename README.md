@@ -48,6 +48,11 @@ clawd inhabits a different world every time you open the page. click the glowing
 | Bioluminescent Bay | tropical night. dark water glowing teal. mangroves, fireflies, outrigger boat |
 | Autumn Dawn · Forest | dawn breaking through autumn trees. light rays, mist, falling leaves, deer |
 | Abyssal · Deep Ocean | crushing darkness. marine snow drifting. anglerfish lure pulsing. jellyfish |
+| Volcanic · Island Night | dark basalt shore. lava cracks glowing. embers rising. ocean lit from below |
+| Cherry Blossom · Dusk Rain | japanese garden in soft rain. stone lantern. torii in the mist. petals falling |
+| Monsoon · Jungle Night | tropical downpour through thick canopy. bioluminescent mushrooms. wandering fireflies |
+
+each world has rare events that happen on their own — things that feel like luck when you catch them. each world also knows where clawd is and reacts.
 
 ---
 
@@ -62,16 +67,20 @@ clawd inhabits a different world every time you open the page. click the glowing
 - blush cheeks fade in when happiness builds
 - mood aura — blurred glow behind clawd shifts color per state
 - hue interpolation with wraparound (no snapping)
-- canvas trail of fading dots
+- canvas trail of fading particles — style varies per world
 - custom cursor that reacts to proximity
 - VT323 pixel font for speech bubbles
 - spontaneous thoughts every ~8 seconds
+- ambient audio per world (click the speaker icon)
 
 **worlds**
 - each world is a standalone SVG scene, loaded as an iframe
 - random world selected on every page load
 - glowing orrery orb to switch worlds — orbiting satellites, breathing pulse, hover label
 - worlds are fully self-contained HTML files, viewable on their own
+- clawd's position and mood are broadcast into each world via postMessage
+- worlds react to clawd's presence — fish flee, aurora brightens, petals swirl
+- rare events fire on long timers: shooting stars, lightning, whale surfacing, deer crossing, aurora surges, petal gusts
 
 ---
 
